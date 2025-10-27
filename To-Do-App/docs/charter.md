@@ -38,12 +38,8 @@ Initially, the web server will run locally on each user’s machine. Future iter
 
 ## 5. Stakeholders
 | Role                      | Name / Group           | Responsibilities                                                   |
-|---------------------------|-------------------------|----------------------------------------------------------------------|
-| Project Sponsor           | SE101 Instruction Team | Approve project charter and final deliverable                       |
-| Developers                | Team Members           | Implement assigned functions, follow branching workflow             |
-| Testers                   | Team Members           | Write and run test cases, ensure function correctness               |
-| Reviewers                 | Team Members           | Review and approve Merge Requests                                  |
-| Project Maintainer        | Assigned Team Lead     | Coordinate development, testing, and merging                         |
+|---------------------------|-------------------------|-------------------------------------------------------------------|
+| Project Sponsor           | SE101 Instruction Team | Approve project charter and final deliverable                      |
 
 ## 6. Deliverables
 - Flask-based local web application for managing tasks
@@ -63,8 +59,8 @@ Initially, the web server will run locally on each user’s machine. Future iter
 ## 8. Roles and Responsibilities
 | Team Member | Function Responsibility | Testing Responsibility | MR Reviewer |
 |-------------|---------------------------|---------------------------|-------------|
-| Member A    | `add()`                   | Test `update()`           | `delete()`  |
-| Member B    | `update()`                | Test `delete()`           | `add()`     |
+| Shiman      | `add()`                   | Test `update()`           | `delete()`  |
+| Elaine      | `update()`                | Test `delete()`           | `add()`     |
 | Member C    | `delete()`                | Test `today()`            | `update()`  |
 | Member D    | `today()`                 | Test `tomorrow()`         | `next()`    |
 | Member E    | `tomorrow()`              | Test `next()`             | `today()`   |
@@ -96,12 +92,11 @@ By approving this charter, all team members agree to:
 - Complete assigned functions and tests on time
 - Collaborate and communicate effectively to meet project milestones
 
-| Name                | Role            | Signature | Date        |
-|---------------------|-----------------|-----------|-------------|
-| [Team Member A]     | Developer       |           |             |
-| [Team Member B]     | Tester          |           |             |
-| [Team Member C]     | Reviewer        |           |             |
-| [Team Lead]         | Maintainer     |           |             |
-| SE101 Instruction Team | Sponsor     |           |             |
+| Name                | Signature | Date        |
+|---------------------|-----------|-------------|
+| Shiman              |           |             |
+| Krish               |           |             |
+| Elaine              |           |             |
+| Liron               |           |             |
 
 ---
