@@ -4,7 +4,7 @@
 # To-Do Application with Web Access (Lab 5)
 # Team 10
 #
-# Use branches 2 - 7 to implement the functions below (corresponding to issues on Gitlab)
+# Use branches 2-7 to implement the functions below (corresponding to issues on GitLab)
 ################################################################################
 
 import pymysql
@@ -29,206 +29,259 @@ def configureLogging():
 configureLogging()
 logger = logging.getLogger("todo")
 
-load_dotenv() # Load environment variables from .env file
+# Load environment variables from .env file
+load_dotenv()
 
+################################################################################
+# Database Connection
+################################################################################
 
-class ToDoApp:
-    def __init__(self):
-        self.connection = None
-        self.cursor = None
+def get_db_connection():
+    """
+    Get database connection from environment variables (.env file).
+    
+    Returns:
+        pymysql.Connection object if successful, None otherwise
+    """
+    try:
+        connection = pymysql.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            database=os.getenv("DB_DATABASE"),
+            password=os.getenv("DB_PASSWORD")
+        )
+        logger.info(f"Connected to database {os.getenv('DB_DATABASE')}")
+        return connection
+    except pymysql.Error as err:
+        logger.error(f"Database connection error: {err}")
+        print(f"Error: {err}")
+        return None
 
-    def connect2DB(self):
-        try:
-            self.connection = pymysql.connect(
-                host     = os.getenv("DB_HOST"),
-                user     = os.getenv("DB_USER"),
-                database = os.getenv("DB_NAME"),
-                password = os.getenv("DB_PASSWORD"))
-            self.cursor = self.connection.cursor()
-            if self.cursor:
-                logger.info("Database connected")
-            else:
-                logger.error("Failed to connect to database")
-            return self.connection
+################################################################################
+# Create Table with userid
+################################################################################
 
-        except pymysql.Error as err:
-            logger.error(f"Error: {err}")
-            return None
-
-    def close_connection(self):
-        if self.cursor:
-            self.cursor.close()
-        if self.connection:
-            self.connection.close()
-
-    ################################################################################
-    # Create Table with userid
-    ################################################################################
-
-    def createTable(connection):
-        """Create ToDoData table with userid field for Lab 5"""
-        try:
-            cursor = connection.cursor()
-            create_table_query = """
-                CREATE TABLE IF NOT EXISTS ToDoData (
-                    userid VARCHAR(255),
-                    item VARCHAR(255),
-                    type VARCHAR(255),
-                    started DATETIME,
-                    due DATETIME,
-                    done DATETIME,
-                    PRIMARY KEY (userid, item)
-                )
-                """
-            cursor.execute(create_table_query)
-            connection.commit()
-            cursor.close()
-            logger.info("ToDoData table created/verified with userid field")
-            return True
-        except pymysql.Error as err:
-            logger.error(f"Error creating table: {err}")
-            print(f"Error creating table: {err}")
-            return False
-
-    ################################################################################
-    # Function: add()
-    # TODO: Team member to implement with userid support
-    ################################################################################
-
-    def add(connection, userid, item, type_val=None, started=None, due=None, done=None):
-        """
-        Add a task for a specific user.
+def createTable(connection):
+    """
+    Create ToDoData table with userid field for Lab 5.
+    
+    Args:
+        connection: MySQL database connection
         
-        Args:
-            connection: MySQL database connection
-            userid: User identifier
-            item: Task description
-            type_val: Task category/type
-            started: Start datetime
-            due: Due datetime
-            done: Completion datetime
-        
-        Returns:
-            True if successful, False otherwise
-        
-        TODO: Implement this function
-        """
-        logger.info(f"add() called - userid={userid}, item={item}")
-        # TODO: Implement
-        pass
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        cursor = connection.cursor()
+        create_table_query = """
+            CREATE TABLE IF NOT EXISTS ToDoData (
+                userid VARCHAR(255),
+                item VARCHAR(255),
+                type VARCHAR(255),
+                started DATETIME,
+                due DATETIME,
+                done DATETIME,
+                PRIMARY KEY (userid, item)
+            )
+            """
+        cursor.execute(create_table_query)
+        connection.commit()
+        cursor.close()
+        logger.info("ToDoData table created/verified with userid field")
+        return True
+    except pymysql.Error as err:
+        logger.error(f"Error creating table: {err}")
+        print(f"Error creating table: {err}")
+        return False
 
-    ################################################################################
-    # Function: update()
-    # TODO: Team member to implement with userid support
-    ################################################################################
+################################################################################
+# Function: add()
+# TODO: Team member to implement with userid support (Issue #2)
+################################################################################
 
-    def update(connection, userid, item, type_val=None, started=None, due=None, done=None):
-        """
-        Update an existing task for a specific user.
+def add(connection, userid, item, type_val=None, started=None, due=None, done=None):
+    """
+    Add a task for a specific user.
+    
+    Args:
+        connection: MySQL database connection
+        userid: User identifier
+        item: Task description
+        type_val: Task category/type (optional)
+        started: Start datetime (optional)
+        due: Due datetime (optional)
+        done: Completion datetime (optional)
+    
+    Returns:
+        True if successful, raises exception otherwise
         
-        Args:
-            connection: MySQL database connection
-            userid: User identifier
-            item: Task description (identifies the task)
-            type_val: Updated task category/type
-            started: Updated start datetime
-            due: Updated due datetime
-            done: Updated completion datetime
-        
-        Returns:
-            True if successful, False otherwise
-        
-        TODO: Implement this function
-        """
-        logger.info(f"update() called - userid={userid}, item={item}")
-        # TODO: Implement
-        pass
+    Raises:
+        ValueError: If duplicate (userid, item) exists
+        pymysql.Error: On database errors
+    
+    TODO: Implement this function in Issue #2
+    """
+    logger.info(f"add() called - userid={userid}, item={item}")
+    # TODO: Implement
+    pass
 
-    ################################################################################
-    # Function: delete()
-    # TODO: Team member to implement
-    ################################################################################
+################################################################################
+# Function: update()
+# TODO: Team member to implement with userid support (Issue #3)
+################################################################################
 
-    def delete(connection, userid, item):
-        """
-        Delete a task for a specific user.
+def update(connection, userid, item, type_val=None, started=None, due=None, done=None):
+    """
+    Update an existing task for a specific user.
+    
+    Args:
+        connection: MySQL database connection
+        userid: User identifier
+        item: Task description (identifies the task)
+        type_val: Updated task category/type (optional)
+        started: Updated start datetime (optional)
+        due: Updated due datetime (optional)
+        done: Updated completion datetime (optional)
+    
+    Returns:
+        True if successful, raises exception otherwise
         
-        Args:
-            connection: MySQL database connection
-            userid: User identifier
-            item: Task description to delete
-        
-        Returns:
-            True if successful, False otherwise
-        
-        TODO: Implement this function
-        """
-        logger.info(f"delete() called - userid={userid}, item={item}")
-        # TODO: Implement
-        pass
+    Raises:
+        ValueError: If task (userid, item) does not exist
+        pymysql.Error: On database errors
+    
+    TODO: Implement this function in Issue #3
+    """
+    logger.info(f"update() called - userid={userid}, item={item}")
+    # TODO: Implement
+    pass
 
-    ################################################################################
-    # Function: next()
-    # TODO: Team member to implement with userid filter
-    ################################################################################
+################################################################################
+# Function: delete()
+# TODO: Team member to implement (Issue #4)
+################################################################################
 
-    def next(connection, userid):
-        """
-        Get the next task (earliest due date) for a specific user.
+def delete(connection, userid, item):
+    """
+    Delete a task for a specific user.
+    
+    Args:
+        connection: MySQL database connection
+        userid: User identifier
+        item: Task description to delete
+    
+    Returns:
+        True if successful, raises exception otherwise
         
-        Args:
-            connection: MySQL database connection
-            userid: User identifier
-        
-        Returns:
-            Dictionary with task details or None if no tasks
-        
-        TODO: Implement this function
-        """
-        logger.info(f"next() called - userid={userid}")
-        # TODO: Implement
-        pass
+    Raises:
+        ValueError: If task (userid, item) does not exist
+        pymysql.Error: On database errors
+    
+    TODO: Implement this function in Issue #4
+    """
+    logger.info(f"delete() called - userid={userid}, item={item}")
+    # TODO: Implement
+    pass
 
-    ################################################################################
-    # Function: today()
-    # TODO: Team member to implement
-    ################################################################################
+################################################################################
+# Function: next()
+# TODO: Team member to implement with userid filter (Issue #5)
+################################################################################
 
-    def today(connection, userid):
-        """
-        Get all tasks due today for a specific user.
+def next(connection, userid):
+    """
+    Get the next task (earliest due date) for a specific user.
+    
+    Args:
+        connection: MySQL database connection
+        userid: User identifier
+    
+    Returns:
+        Dictionary with task details: {item, type, started, due, done}
+        None if no tasks with due dates exist
         
-        Args:
-            connection: MySQL database connection
-            userid: User identifier
-        
-        Returns:
-            List of dictionaries with task details
-        
-        TODO: Implement this function
-        """
-        logger.info(f"today() called - userid={userid}")
-        # TODO: Implement
-        pass
+    Raises:
+        pymysql.Error: On database errors
+    
+    TODO: Implement this function in Issue #5
+    """
+    logger.info(f"next() called - userid={userid}")
+    # TODO: Implement
+    pass
 
-    ################################################################################
-    # Function: tomorrow()
-    # TODO: Team member to implement
-    ################################################################################
+################################################################################
+# Function: today()
+# TODO: Team member to implement (Issue #6)
+################################################################################
 
-    def tomorrow(connection, userid):
-        """
-        Get all tasks due tomorrow for a specific user.
+def today(connection, userid):
+    """
+    Get all tasks due today for a specific user.
+    
+    Args:
+        connection: MySQL database connection
+        userid: User identifier
+    
+    Returns:
+        List of dictionaries with task details: [{item, type, started, due, done}, ...]
+        Empty list if no tasks due today
         
-        Args:
-            connection: MySQL database connection
-            userid: User identifier
+    Raises:
+        pymysql.Error: On database errors
+    
+    TODO: Implement this function in Issue #6
+    """
+    logger.info(f"today() called - userid={userid}")
+    # TODO: Implement
+    pass
+
+################################################################################
+# Function: tomorrow()
+# TODO: Team member to implement (Issue #7)
+################################################################################
+
+def tomorrow(connection, userid):
+    """
+    Get all tasks due tomorrow for a specific user.
+    
+    Args:
+        connection: MySQL database connection
+        userid: User identifier
+    
+    Returns:
+        List of dictionaries with task details: [{item, type, started, due, done}, ...]
+        Empty list if no tasks due tomorrow
         
-        Returns:
-            List of dictionaries with task details
-        
-        TODO: Implement this function
-        """
-        logger.info(f"tomorrow() called - userid={userid}")
-        # TODO: Implement
-        pass
+    Raises:
+        pymysql.Error: On database errors
+    
+    TODO: Implement this function in Issue #7
+    """
+    logger.info(f"tomorrow() called - userid={userid}")
+    # TODO: Implement
+    pass
+
+################################################################################
+# Main - For Testing Database Connection
+################################################################################
+
+def main():
+    """Main entry point for testing database connection"""
+    print("Testing database connection...")
+    connection = get_db_connection()
+
+    if connection:
+        print("✓ Successfully connected to MySQL database")
+        if createTable(connection):
+            print("✓ ToDoData table is ready with userid field")
+        else:
+            print("✗ Failed to create ToDoData table")
+        connection.close()
+        print("✓ Connection closed")
+    else:
+        print("✗ Unable to connect to database")
+        print("  Check your .env file has correct credentials")
+        exit(-1)
+
+if __name__ == "__main__":
+    main()
