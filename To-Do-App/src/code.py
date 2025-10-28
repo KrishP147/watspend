@@ -176,12 +176,34 @@ def delete(connection, userid, item):
     Raises:
         ValueError: If task (userid, item) does not exist
         pymysql.Error: On database errors
-    
-    TODO: Implement this function in Issue #4
     """
     logger.info(f"delete() called - userid={userid}, item={item}")
-    # TODO: Implement
-    pass
+    
+    try:
+        cursor = connection.cursor()
+        
+        # First check if the task exists
+        check_query = "SELECT COUNT(*) FROM ToDoData WHERE userid = %s AND item = %s"
+        cursor.execute(check_query, (userid, item))
+        count = cursor.fetchone()[0]
+        
+        if count == 0:
+            cursor.close()
+            logger.error(f"Task '{item}' for user '{userid}' does not exist")
+            raise ValueError(f"Task '{item}' for user '{userid}' does not exist")
+        
+        # Delete the task
+        delete_query = "DELETE FROM ToDoData WHERE userid = %s AND item = %s"
+        cursor.execute(delete_query, (userid, item))
+        connection.commit()
+        
+        cursor.close()
+        logger.info(f"Successfully deleted task '{item}' for user '{userid}'")
+        return True
+        
+    except pymysql.Error as err:
+        logger.error(f"Database error in delete(): {err}")
+        raise
 
 ################################################################################
 # Function: next()
