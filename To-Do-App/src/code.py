@@ -161,7 +161,7 @@ def add(connection, userid, item, type_val=None, started=None, due=None, done=No
 def update(connection, userid, item, type_val=None, started=None, due=None, done=None):
     """
     Update an existing task for a specific user.
-    
+
     Args:
         connection: MySQL database connection
         userid: User identifier
@@ -170,10 +170,11 @@ def update(connection, userid, item, type_val=None, started=None, due=None, done
         started: Updated start datetime (optional)
         due: Updated due datetime (optional)
         done: Updated completion datetime (optional)
-    
+
     Returns:
-        True if successful, raises exception otherwise
-        
+        True if successful
+        False if no fields were provided to update
+
     Raises:
         ValueError: If task (userid, item) does not exist
         pymysql.Error: On database errors
@@ -181,8 +182,56 @@ def update(connection, userid, item, type_val=None, started=None, due=None, done
     TODO: Implement this function in Issue #3
     """
     logger.info(f"update() called - userid={userid}, item={item}")
-    # TODO: Implement
-    pass
+
+    try:
+        cursor = connection.cursor()
+
+        # Check if record exists
+        check_query = "SELECT COUNT(*) FROM ToDoData WHERE userid = %s AND item = %s"
+        cursor.execute(check_query, (userid, item))
+        count = cursor.fetchone()[0]
+
+        if count == 0:
+            raise ValueError(f"No task found for userid={userid} and item='{item}'")
+
+        # Build dynamic UPDATE query
+        fields = []
+        values = []
+
+        if type_val is not None:
+            fields.append("task type = %s")
+            values.append(type_val)
+        if started is not None:
+            fields.append("started = %s")
+            values.append(started)
+        if due is not None:
+            fields.append("due = %s")
+            values.append(due)
+        if done is not None:
+            fields.append("done = %s")
+            values.append(done)
+
+        # Nothing to update
+        if not fields:
+            logger.warning("update() called but no fields provided to update")
+            return False
+
+        update_query = f"UPDATE ToDoData SET {', '.join(fields)} WHERE userid = %s AND item = %s"
+        values.extend([userid, item])
+
+        # Execute and commit
+        cursor.execute(update_query, tuple(values))
+        connection.commit()
+
+        logger.info(f"Task updated for userid={userid}, item='{item}'")
+        return True
+
+    except pymysql.Error as err:
+        logger.error(f"Database error during update(): {err}")
+        raise
+    finally:
+        cursor.close()
+
 
 ################################################################################
 # Function: delete()
