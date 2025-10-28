@@ -255,12 +255,44 @@ def tomorrow(connection, userid):
         
     Raises:
         pymysql.Error: On database errors
-    
-    TODO: Implement this function in Issue #7
     """
     logger.info(f"tomorrow() called - userid={userid}")
-    # TODO: Implement
-    pass
+    cursor = connection.cursor()
+    
+    try:
+        # Query for tasks due tomorrow
+        query = """
+            SELECT item, type, started, due, done
+            FROM ToDoData
+            WHERE userid = %s AND DATE(due) = DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+        """
+        cursor.execute(query, (userid,))
+        rows = cursor.fetchall()
+        
+        if not rows:
+            logger.info(f"No tasks due tomorrow for user {userid}")
+            return []
+        
+        # Build result list
+        results = []
+        for row in rows:
+            task = {
+                "item": row[0],
+                "type": row[1],
+                "started": row[2],
+                "due": row[3],
+                "done": row[4]
+            }
+            results.append(task)
+        
+        logger.info(f"{len(results)} task(s) due tomorrow for user {userid}")
+        return results
+        
+    except pymysql.Error as err:
+        logger.error(f"Database error in tomorrow() for user {userid}: {err}")
+        raise err
+    finally:
+        cursor.close()
 
 ################################################################################
 # Main - For Testing Database Connection
