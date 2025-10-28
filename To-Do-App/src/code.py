@@ -230,12 +230,43 @@ def next(connection, userid):
         
     Raises:
         pymysql.Error: On database errors
-    
-    TODO: Implement this function in Issue #5
     """
     logger.info(f"next() called - userid={userid}")
-    # TODO: Implement
-    pass
+    cursor = connection.cursor()
+    
+    try:
+        # Query for earliest due task
+        query = """
+            SELECT item, type, started, due, done
+            FROM ToDoData
+            WHERE userid = %s AND due IS NOT NULL
+            ORDER BY due ASC
+            LIMIT 1
+        """
+        cursor.execute(query, (userid,))
+        row = cursor.fetchone()
+        
+        if not row:
+            logger.info(f"No tasks with due dates found for user {userid}")
+            return None
+        
+        # Build result dictionary
+        result = {
+            "item": row[0],
+            "type": row[1],
+            "started": row[2],
+            "due": row[3],
+            "done": row[4]
+        }
+        
+        logger.info(f"Next task retrieved for user {userid}: {result['item']}")
+        return result
+        
+    except pymysql.Error as err:
+        logger.error(f"Database error in next() for user {userid}: {err}")
+        raise err
+    finally:
+        cursor.close()
 
 ################################################################################
 # Function: today()
