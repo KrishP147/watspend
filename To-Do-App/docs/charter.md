@@ -59,12 +59,12 @@ Initially, the web server will run locally on each user’s machine. Future iter
 ## 8. Roles and Responsibilities
 | Team Member | Function Responsibility | Testing Responsibility | MR Reviewer  |
 | ----------- | ----------------------- | ---------------------- | ------------ |
-| Shiman      | `add()`                 | Test `update()`        | `next()`     |
-| Elaine      | `update()`              | Test `add()`           | `delete()`   |
+| Shiman      | `add()`                 | Test `next()`          | `tomorrow()` |
+| Elaine      | `update()`              | Test `delete()`        | `next()`     |
 | Liron       | `delete()`              | Test `today()`         | `update()`   |
 | Ava         | `today()`               | Test `tomorrow()`      | `add()`      |
-| Krish       | `tomorrow()`            | Test `next()`          | `today()`    |
-| Krish       | `next()`                | Test `add()`           | `tomorrow()` |
+| Krish       | `tomorrow()`            | Test `update()`        | `today()`    |
+| Krish       | `next()`                | Test `add()`           | `delete()`   |
 
 
 ## 9. Milestones and Timeline
