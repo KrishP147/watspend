@@ -146,6 +146,7 @@ def update(connection, userid, item, type_val=None, started=None, due=None, done
 
     Returns:
         True if successful
+        False if no fields were provided to update
 
     Raises:
         ValueError: If task (userid, item) does not exist
@@ -171,7 +172,7 @@ def update(connection, userid, item, type_val=None, started=None, due=None, done
         values = []
 
         if type_val is not None:
-            fields.append("type = %s")
+            fields.append("type type = %s")
             values.append(type_val)
         if started is not None:
             fields.append("started = %s")
