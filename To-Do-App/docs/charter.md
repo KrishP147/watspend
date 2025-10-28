@@ -37,9 +37,9 @@ Initially, the web server will run locally on each user’s machine. Future iter
 - Mobile application development (may be a future extension).
 
 ## 5. Stakeholders
-| Role                      | Name / Group           | Responsibilities                                                   |
-|---------------------------|-------------------------|-------------------------------------------------------------------|
-| Project Sponsor           | SE101 Instruction Team | Approve project charter and final deliverable                      |
+| Role            | Name / Group           | Responsibilities                              |
+| --------------- | ---------------------- | --------------------------------------------- |
+| Project Sponsor | SE101 Instruction Team | Approve project charter and final deliverable |
 
 ## 6. Deliverables
 - Flask-based local web application for managing tasks
@@ -52,39 +52,38 @@ Initially, the web server will run locally on each user’s machine. Future iter
 ## 7. Technology Stack
 - **Language:** Python  
 - **Framework:** Flask  
-- **Database:** SQLite (or PostgreSQL / MySQL if configured)  
+- **Database:** MySQL 
 - **Version Control:** Git (GitLab)  
 - **Testing:** Pytest  
 
 ## 8. Roles and Responsibilities
-| Team Member | Function Responsibility | Testing Responsibility | MR Reviewer |
-|-------------|---------------------------|---------------------------|-------------|
-| Shiman      | `add()`                   | Test `update()`           | `delete()`  |
-| Elaine      | `update()`                | Test `delete()`           | `add()`     |
-| Member C    | `delete()`                | Test `today()`            | `update()`  |
-| Member D    | `today()`                 | Test `tomorrow()`         | `next()`    |
-| Member E    | `tomorrow()`              | Test `next()`             | `today()`   |
-| Member F    | `next()`                  | Test `add()`              | `tomorrow()`|
+| Team Member | Function Responsibility | Testing Responsibility | MR Reviewer  |
+| ----------- | ----------------------- | ---------------------- | ------------ |
+| Shiman      | `add()`                 | Test `update()`        | `delete()`   |
+| Elaine      | `update()`              | Test `add()`           | `add()`      |
+| Liron       | `delete()`              | Test `today()`         | `update()`   |
+| Ava         | `today()`               | Test `tomorrow()`      | `next()`     |
+| Krish       | `tomorrow()`            | Test `next()`          | `today()`    |
+| Krish       | `next()`                | Test `add()`           | `tomorrow()` |
 
-*(This mapping can be adjusted based on team size.)*
 
 ## 9. Milestones and Timeline
-| Milestone                                 | Description                                                     | Due Date        |
-|--------------------------------------------|------------------------------------------------------------------|-----------------|
-| Charter Completion                         | Finalize and upload `charter.md`                                | Week 1          |
-| Function Implementation                    | Each team member implements their assigned function             | Week 2–3        |
-| Testing                                    | Test cases written and run                                      | Week 3–4        |
-| Code Review and Merging                    | Merge requests reviewed, fixed, and approved                     | Week 4          |
-| Local Flask Integration                    | Frontend connected to backend functions                         | Week 5          |
-| Final Submission                           | All work merged, project delivered to sponsor                    | Week 6          |
+| Milestone               | Description                                         | Due Date  |
+| ----------------------- | --------------------------------------------------- | --------- |
+| Charter Completion      | Finalize and upload `charter.md`                    | Monday    |
+| Function Implementation | Each team member implements their assigned function | Tuesday   |
+| Testing                 | Test cases written and run                          | Wednesday |
+| Code Review and Merging | Merge requests reviewed, fixed, and approved        | Thursday  |
+| Local Flask Integration | Frontend connected to backend functions             | Friday    |
+| Final Submission        | All work merged, project delivered to sponsor       | Saturday  |
 
 ## 10. Risk Assessment
-| Risk                                    | Impact           | Likelihood | Mitigation Strategy                                                   |
-|-----------------------------------------|------------------|------------|-----------------------------------------------------------------------|
-| Merge conflicts                         | Medium           | High       | Use feature branches, frequent commits, and timely merge requests     |
-| Delayed implementation by a member     | High             | Medium     | Redistribute tasks early, maintain team communication                 |
-| Flask integration errors                | Medium           | Medium     | Incremental integration with testing                                  |
-| Database inconsistencies                | High             | Low        | Use consistent schema and test queries early                          |
+| Risk                               | Impact | Likelihood | Mitigation Strategy                                               |
+| ---------------------------------- | ------ | ---------- | ----------------------------------------------------------------- |
+| Merge conflicts                    | Medium | High       | Use feature branches, frequent commits, and timely merge requests |
+| Delayed implementation by a member | High   | Medium     | Redistribute tasks early, maintain team communication             |
+| Flask integration errors           | Medium | Medium     | Incremental integration with testing                              |
+| Database inconsistencies           | High   | Low        | Use consistent schema and test queries early                      |
 
 ## 11. Approval
 By approving this charter, all team members agree to:
@@ -92,11 +91,12 @@ By approving this charter, all team members agree to:
 - Complete assigned functions and tests on time
 - Collaborate and communicate effectively to meet project milestones
 
-| Name                | Signature | Date        |
-|---------------------|-----------|-------------|
-| Shiman              |           |             |
-| Krish               |           |             |
-| Elaine              |           |             |
-| Liron               |           |             |
+| Name   | Signature | Date       |
+| ------ | --------- | ---------- |
+| Shiman | Shiman    | 10/28/2025 |
+| Ava    |           |            |
+| Krish  |           |            |
+| Elaine |           |            |
+| Liron  |           |            |
 
 ---
