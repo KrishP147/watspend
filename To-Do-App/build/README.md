@@ -117,6 +117,15 @@ See GitLab Issues #2-9 for function assignments:
 - **Issue #8**: Flask web interface
 - **Issue #9**: Test suite
 
+issue-#2-add-function
+issue-#3-update-function
+issue-#4-delete-function
+issue-#5-next-function
+issue-#6-today-function
+issue-#7-tomorrow-function
+issue-#8-flask-interface
+issue-#9-test-suite
+
 ---
 
 ## Git Workflow
