@@ -188,7 +188,6 @@ def delete(connection, userid, item):
         count = cursor.fetchone()[0]
         
         if count == 0:
-            cursor.close()
             logger.error(f"Task '{item}' for user '{userid}' does not exist")
             raise ValueError(f"Task '{item}' for user '{userid}' does not exist")
         
@@ -197,13 +196,14 @@ def delete(connection, userid, item):
         cursor.execute(delete_query, (userid, item))
         connection.commit()
         
-        cursor.close()
         logger.info(f"Successfully deleted task '{item}' for user '{userid}'")
-        return True
-        
+        return True 
     except pymysql.Error as err:
+        connection.rollback()
         logger.error(f"Database error in delete(): {err}")
         raise
+    finally:
+        cursor.close()
 
 ################################################################################
 # Function: next()
