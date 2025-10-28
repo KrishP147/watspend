@@ -94,7 +94,7 @@ By approving this charter, all team members agree to:
 | Name   | Signature | Date       |
 | ------ | --------- | ---------- |
 | Shiman | Shiman    | 10/28/2025 |
-| Ava    |           |            |
+| Ava    | Ava       | 10/28/2025 |
 | Krish  | Krish     | 10/28/2025 |
 | Elaine | Elaine    | 10/28/2025 |
 | Liron  | Liron     | 10/28/2025 |
