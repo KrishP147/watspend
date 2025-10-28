@@ -1,3 +1,9 @@
 2025-10-27 01:28:06,870 [ERROR] todo: Database connection error: (1045, "Access denied for user 'k2punjab'@'10.39.48.13' (using password: YES)")
 2025-10-27 01:28:25,972 [INFO] todo: Connected to database SE101_Team_10
 2025-10-27 01:28:25,987 [INFO] todo: ToDoData table created/verified with userid field
+2025-10-28 13:12:57,417 [ERROR] todo: Database connection error: (1045, "Access denied for user 'your_uwaterloo_userid'@'eduroam-campus-10-36-189-179.campus-dynamic.uwaterloo.ca' (using password: YES)")
+2025-10-28 13:13:59,910 [ERROR] todo: Database connection error: (1045, "Access denied for user 'your_uwaterloo_userid'@'eduroam-campus-10-36-189-179.campus-dynamic.uwaterloo.ca' (using password: YES)")
+2025-10-28 13:14:26,944 [ERROR] todo: Database connection error: (1045, "Access denied for user 'your_uwaterloo_userid'@'eduroam-campus-10-36-189-179.campus-dynamic.uwaterloo.ca' (using password: YES)")
+2025-10-28 13:14:34,016 [ERROR] todo: Database connection error: (1045, "Access denied for user 'your_uwaterloo_userid'@'eduroam-campus-10-36-189-179.campus-dynamic.uwaterloo.ca' (using password: YES)")
+2025-10-28 13:15:24,989 [INFO] todo: Connected to database SE101_Team_10
+2025-10-28 13:15:25,000 [INFO] todo: ToDoData table created/verified with userid field
