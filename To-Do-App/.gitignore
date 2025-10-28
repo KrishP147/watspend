@@ -36,6 +36,8 @@ instance/
 dist/
 *.egg-info/
 ```
+# Log
+*.log
 
 ---
 
