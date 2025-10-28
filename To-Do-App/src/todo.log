@@ -7,10 +7,3 @@
 2025-10-28 13:14:34,016 [ERROR] todo: Database connection error: (1045, "Access denied for user 'your_uwaterloo_userid'@'eduroam-campus-10-36-189-179.campus-dynamic.uwaterloo.ca' (using password: YES)")
 2025-10-28 13:15:24,989 [INFO] todo: Connected to database SE101_Team_10
 2025-10-28 13:15:25,000 [INFO] todo: ToDoData table created/verified with userid field
-2025-10-28 14:12:14,289 [ERROR] todo: Database connection error: (1045, "Access denied for user 'shiman_zhu'@'localhost' (using password: NO)")
-2025-10-28 14:12:28,505 [INFO] todo: Connected to database None
-2025-10-28 14:12:28,509 [ERROR] todo: Error creating table: (1046, 'No database selected')
-2025-10-28 14:13:35,673 [INFO] todo: Connected to database None
-2025-10-28 14:13:35,690 [ERROR] todo: Error creating table: (1046, 'No database selected')
-2025-10-28 14:15:32,528 [INFO] todo: Connected to database SE101_Team_10
-2025-10-28 14:15:32,551 [INFO] todo: ToDoData table created/verified with userid field
