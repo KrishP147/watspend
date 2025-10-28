@@ -19,10 +19,6 @@ htmlcov/
 coverage.xml
 .hypothesis/
 
-# Logging
-*.log
-todo.log
-todoapp.log
 
 # IDE
 .vscode/
@@ -38,7 +34,6 @@ instance/
 
 # Distribution / packaging
 dist/
-build/
 *.egg-info/
 ```
 

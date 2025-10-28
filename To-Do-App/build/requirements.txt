@@ -1,0 +1,11 @@
+flask
+pymysql
+pytest
+pytest-cov
+pytest-html
+pytest-metadata
+python-dotenv
+coverage
+Jinja2
+MarkupSafe
+cryptography
