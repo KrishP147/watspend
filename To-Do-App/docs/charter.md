@@ -59,10 +59,10 @@ Initially, the web server will run locally on each user’s machine. Future iter
 ## 8. Roles and Responsibilities
 | Team Member | Function Responsibility | Testing Responsibility | MR Reviewer  |
 | ----------- | ----------------------- | ---------------------- | ------------ |
-| Shiman      | `add()`                 | Test `update()`        | `delete()`   |
-| Elaine      | `update()`              | Test `add()`           | `add()`      |
+| Shiman      | `add()`                 | Test `update()`        | `next()`     |
+| Elaine      | `update()`              | Test `add()`           | `delete()`   |
 | Liron       | `delete()`              | Test `today()`         | `update()`   |
-| Ava         | `today()`               | Test `tomorrow()`      | `next()`     |
+| Ava         | `today()`               | Test `tomorrow()`      | `add()`      |
 | Krish       | `tomorrow()`            | Test `next()`          | `today()`    |
 | Krish       | `next()`                | Test `add()`           | `tomorrow()` |
 
@@ -96,7 +96,7 @@ By approving this charter, all team members agree to:
 | Shiman | Shiman    | 10/28/2025 |
 | Ava    |           |            |
 | Krish  | Krish     | 10/28/2025 |
-| Elaine |           |            |
+| Elaine | Elaine    | 10/28/2025 |
 | Liron  | Liron     | 10/28/2025 |
 
 ---
