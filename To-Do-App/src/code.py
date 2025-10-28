@@ -228,12 +228,27 @@ def today(connection, userid):
         
     Raises:
         pymysql.Error: On database errors
-    
-    TODO: Implement this function in Issue #6
     """
     logger.info(f"today() called - userid={userid}")
-    # TODO: Implement
-    pass
+
+    query = """
+        SELECT item, type, started, due, done
+        FROM ToDoData
+        WHERE userid = %s AND DATE(due) = %s
+        ORDER BY due ASC
+    """
+    today_date = date.today()  # YYYY-MM-DD
+
+    try:
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute(query, (userid, today_date))
+            results = cursor.fetchall()
+        logger.info(f"today(): found {len(results)} tasks for userid={userid}")
+        return results
+    except pymysql.Error as e:
+        logger.error(f"today() MySQL error for userid={userid}: {e}")
+        raise
+
 
 ################################################################################
 # Function: tomorrow()
