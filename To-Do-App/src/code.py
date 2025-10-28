@@ -290,23 +290,26 @@ def today(connection, userid):
     """
     logger.info(f"today() called - userid={userid}")
 
+    # Use CURDATE() directly in SQL for reliable date comparison
     query = """
         SELECT item, type, started, due, done
         FROM ToDoData
-        WHERE userid = %s AND DATE(due) = %s
-        ORDER BY due ASC
+        WHERE userid = %s AND DATE(due) = CURDATE()
     """
-    today_date = date.today()  # YYYY-MM-DD
 
     try:
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(query, (userid, today_date))
+            cursor.execute(query, (userid,))
             results = cursor.fetchall()
-        logger.info(f"today(): found {len(results)} tasks for userid={userid}")
+        logger.info(f"today(): found {len(results)} task(s) for userid={userid}")
         return results
+
     except pymysql.Error as e:
+        # Rollback the connection in case of errors to avoid partial transactions
+        connection.rollback()
         logger.error(f"today() MySQL error for userid={userid}: {e}")
         raise
+
 
 
 ################################################################################
