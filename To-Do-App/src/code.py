@@ -121,9 +121,37 @@ def add(connection, userid, item, type_val=None, started=None, due=None, done=No
     
     TODO: Implement this function in Issue #2
     """
+    cursor = connection.cursor()
+
+    sql = """
+        INSERT INTO ToDoData (item, type, userid, started, due, done)
+        VALUES (%s, %s, %s, %s, %s, NULL)
+        """
+
+    try:
+        cursor.execute(sql, (item, type_val, userid, started, due))
+        connection.commit()
+        logger.info(f"add() called - userid={userid}, item={item}")
+        return True
+
+    except pymysql.err.IntegrityError as err:  # catches duplicate key errors
+        logger.error(f"Duplicate or constraint error adding task: {err}")
+        return False
+
+    except pymysql.Error as err:
+        logger.error(f"General SQL error: {err}")
+        return False
+
+    except Exception as err:  # catch any other exceptions (including mock exceptions)
+        logger.error(f"Unexpected error: {err}")
+        return False
+
+    finally:
+        cursor.close()
+
     logger.info(f"add() called - userid={userid}, item={item}")
-    # TODO: Implement
-    pass
+    
+    return True
 
 ################################################################################
 # Function: update()
