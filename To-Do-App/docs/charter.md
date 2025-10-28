@@ -97,6 +97,6 @@ By approving this charter, all team members agree to:
 | Ava    |           |            |
 | Krish  |           |            |
 | Elaine |           |            |
-| Liron  |           |            |
+| Liron  | Liron     | 10/28/2025 |
 
 ---
