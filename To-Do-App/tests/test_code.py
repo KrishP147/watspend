@@ -15,9 +15,22 @@ import os
 from unittest.mock import Mock
 from datetime import datetime, date, timedelta
 import logging
+import pymysql
 
-# Add src directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# Add src directory to path - use absolute path
+import sys
+import os
+
+# Get absolute path to src directory
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+if src_path in sys.path:
+    sys.path.remove(src_path)
+sys.path.insert(0, src_path)
+
+# Force reload if already imported
+if 'code' in sys.modules:
+    del sys.modules['code']
+
 import code as todo
 
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 ################################################################################
 # UNIT TESTS WITH MOCKS (Fast, for CI/CD)
-# TODO: Implement comprehensive mock tests in Issue #9
+# Tested by: KRISH
 ################################################################################
 
 @pytest.fixture
@@ -37,98 +50,355 @@ def mock_connection():
     return connection
 
 ################################################################################
-# Tests for add() function
+# Tests for add() function - BY KRISH
 ################################################################################
 
-def test_add_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests in Issue #9"""
-    # TODO: Test basic task addition with mocks
-    # TODO: Test with all parameters
-    # TODO: Test duplicate prevention
-    # TODO: Test with different userids
-    # TODO: Test error handling
-    pass
+def test_add_basic_success(mock_connection):
+    """Test basic task addition with minimal parameters"""
+    cursor = mock_connection.cursor.return_value
+    cursor.execute.return_value = None
+    
+    result = todo.add(mock_connection, "test_user", "Buy milk")
+    
+    assert result == True
+    cursor.execute.assert_called_once()
+    mock_connection.commit.assert_called_once()
+    cursor.close.assert_called_once()
+
+def test_add_with_all_parameters(mock_connection):
+    """Test task addition with all optional parameters"""
+    cursor = mock_connection.cursor.return_value
+    cursor.execute.return_value = None
+    
+    started = datetime(2024, 12, 1, 10, 0)
+    due = datetime(2024, 12, 25, 23, 59)
+    
+    result = todo.add(
+        mock_connection, 
+        "test_user", 
+        "Complete project",
+        type_val="work",
+        started=started,
+        due=due,
+        done=None
+    )
+    
+    assert result == True
+    cursor.execute.assert_called_once()
+    mock_connection.commit.assert_called_once()
+
+def test_add_duplicate_task(mock_connection):
+    """Test that adding duplicate task returns False"""
+    cursor = mock_connection.cursor.return_value
+    cursor.execute.side_effect = pymysql.err.IntegrityError("Duplicate entry")
+    
+    result = todo.add(mock_connection, "test_user", "Buy milk")
+    
+    assert result == False
+    cursor.close.assert_called_once()
+
+def test_add_sql_error(mock_connection):
+    """Test handling of general SQL errors"""
+    cursor = mock_connection.cursor.return_value
+    cursor.execute.side_effect = pymysql.Error("SQL error")
+    
+    result = todo.add(mock_connection, "test_user", "Buy milk")
+    
+    assert result == False
+    cursor.close.assert_called_once()
+
+def test_add_userid_isolation(mock_connection):
+    """Test that tasks are associated with correct userid"""
+    cursor = mock_connection.cursor.return_value
+    
+    result = todo.add(mock_connection, "user1", "Task for user1")
+    
+    # Verify the SQL contains the correct userid
+    call_args = cursor.execute.call_args
+    assert "user1" in str(call_args)
+    assert result == True
 
 ################################################################################
-# Tests for update() function
+# Tests for update() function - BY KRISH
 ################################################################################
 
-def test_update_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests in Issue #9"""
-    # TODO: Test successful update with mocks
-    # TODO: Test updating non-existent task
-    # TODO: Test userid filtering
-    # TODO: Test error handling
-    pass
+def test_update_basic_success(mock_connection):
+    """Test successful update of existing task"""
+    cursor = mock_connection.cursor.return_value
+    # Mock the COUNT check to return 1 (task exists)
+    cursor.fetchone.return_value = (1,)
+    
+    result = todo.update(
+        mock_connection, 
+        "test_user", 
+        "Buy milk",
+        type_val="personal"
+    )
+    
+    assert result == True
+    assert cursor.execute.call_count == 2  # Check query + update query
+    mock_connection.commit.assert_called_once()
+    cursor.close.assert_called_once()
+
+def test_update_nonexistent_task(mock_connection):
+    """Test updating task that doesn't exist raises ValueError"""
+    cursor = mock_connection.cursor.return_value
+    # Mock the COUNT check to return 0 (task doesn't exist)
+    cursor.fetchone.return_value = (0,)
+    
+    with pytest.raises(ValueError, match="No task found"):
+        todo.update(mock_connection, "test_user", "Nonexistent task")
+    
+    cursor.close.assert_called_once()
+
+def test_update_multiple_fields(mock_connection):
+    """Test updating multiple fields at once"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.return_value = (1,)
+    
+    started = datetime(2024, 12, 1)
+    due = datetime(2024, 12, 25)
+    done = datetime(2024, 12, 20)
+    
+    result = todo.update(
+        mock_connection,
+        "test_user",
+        "Project task",
+        type_val="work",
+        started=started,
+        due=due,
+        done=done
+    )
+    
+    assert result == True
+    mock_connection.commit.assert_called_once()
+
+def test_update_no_fields(mock_connection):
+    """Test update with no fields returns False"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.return_value = (1,)
+    
+    result = todo.update(mock_connection, "test_user", "Some task")
+    
+    assert result == False
+
+def test_update_userid_filtering(mock_connection):
+    """Test that update only affects tasks for specific userid"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.return_value = (1,)
+    
+    result = todo.update(
+        mock_connection,
+        "user1",
+        "Task A",
+        type_val="updated"
+    )
+    
+    # Verify userid is in the query
+    call_args = cursor.execute.call_args
+    assert "user1" in str(call_args)
+    assert result == True
+
+def test_update_sql_error(mock_connection):
+    """Test handling of SQL errors during update"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.return_value = (1,)
+    cursor.execute.side_effect = [None, pymysql.Error("SQL error")]
+    
+    with pytest.raises(pymysql.Error):
+        todo.update(mock_connection, "test_user", "Task", type_val="new")
+    
+    cursor.close.assert_called_once()
 
 ################################################################################
-# Tests for delete() function
+# Tests for delete() function - BY ELAINE
+# TODO: Implement in Issue #9
 ################################################################################
 
 def test_delete_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests in Issue #9"""
-    # TODO: Test successful deletion with mocks
-    # TODO: Test deleting non-existent task
-    # TODO: Test userid filtering
-    # TODO: Test error handling
+    """Placeholder - TODO: Implement mock tests"""
     pass
 
+class TestDeleteIntegration(unittest.TestCase):
+    """Integration tests for delete() function with real database"""
+
+    def setUp(self):
+        """Setup: Connect to database and insert test task"""
+        self.connection = todo.get_db_connection()
+        self.assertIsNotNone(self.connection, "Failed to connect to database")
+        self.test_userid = "test_delete_user"
+        self.cleanup()
+        # Insert task to delete
+        todo.add(self.connection, self.test_userid, "Task to delete")
+        logger.info("Database connected for delete() integration test")
+
+    def tearDown(self):
+        """Teardown: Clean up test data"""
+        self.cleanup()
+        if self.connection:
+            self.connection.close()
+        logger.info("Database disconnected")
+
+    def cleanup(self):
+        """Remove all test data"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM ToDoData WHERE userid = %s", (self.test_userid,))
+            self.connection.commit()
+            cursor.close()
+        except:
+            pass
+
+    def test_delete_placeholder_integration(self):
+        """Placeholder - TODO: Implement real DB tests"""
+        pass
+
+
 ################################################################################
-# Tests for next() function
+# Tests for next() function - BY SHIMAN
+# TODO: Implement in Issue #9
 ################################################################################
 
 def test_next_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests in Issue #9"""
-    # TODO: Test returning earliest due task
-    # TODO: Test with no tasks
-    # TODO: Test userid filtering
-    # TODO: Test with multiple tasks
+    """Placeholder - TODO: Implement mock tests"""
     pass
 
+class TestNextIntegration(unittest.TestCase):
+    """Integration tests for next() function with real database"""
+
+    def setUp(self):
+        """Setup: Connect to database"""
+        self.connection = todo.get_db_connection()
+        self.assertIsNotNone(self.connection, "Failed to connect to database")
+        self.test_userid = "test_next_user"
+        self.cleanup()
+        logger.info("Database connected for next() integration test")
+
+    def tearDown(self):
+        """Teardown: Clean up test data"""
+        self.cleanup()
+        if self.connection:
+            self.connection.close()
+        logger.info("Database disconnected")
+
+    def cleanup(self):
+        """Remove all test data"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM ToDoData WHERE userid = %s", (self.test_userid,))
+            self.connection.commit()
+            cursor.close()
+        except:
+            pass
+
+    def test_next_placeholder_integration(self):
+        """Placeholder - TODO: Implement real DB tests"""
+        pass
+
+
 ################################################################################
-# Tests for today() function
+# Tests for today() function - BY LIRON
+# TODO: Implement in Issue #9
 ################################################################################
 
 def test_today_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests in Issue #9"""
-    # TODO: Test returning today's tasks
-    # TODO: Test with no tasks today
-    # TODO: Test date comparison
-    # TODO: Test userid filtering
+    """Placeholder - TODO: Implement mock tests"""
     pass
 
+class TestTodayIntegration(unittest.TestCase):
+    """Integration tests for today() function with real database"""
+
+    def setUp(self):
+        """Setup: Connect to database"""
+        self.connection = todo.get_db_connection()
+        self.assertIsNotNone(self.connection, "Failed to connect to database")
+        self.test_userid = "test_today_user"
+        self.cleanup()
+        logger.info("Database connected for today() integration test")
+
+    def tearDown(self):
+        """Teardown: Clean up test data"""
+        self.cleanup()
+        if self.connection:
+            self.connection.close()
+        logger.info("Database disconnected")
+
+    def cleanup(self):
+        """Remove all test data"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM ToDoData WHERE userid = %s", (self.test_userid,))
+            self.connection.commit()
+            cursor.close()
+        except:
+            pass
+
+    def test_today_placeholder_integration(self):
+        """Placeholder - TODO: Implement real DB tests"""
+        pass
+
+
 ################################################################################
-# Tests for tomorrow() function
+# Tests for tomorrow() function - BY AVA
+# TODO: Implement in Issue #9
 ################################################################################
 
 def test_tomorrow_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests in Issue #9"""
-    # TODO: Test returning tomorrow's tasks
-    # TODO: Test with no tasks tomorrow
-    # TODO: Test date comparison
-    # TODO: Test userid filtering
+    """Placeholder - TODO: Implement mock tests"""
     pass
+
+class TestTomorrowIntegration(unittest.TestCase):
+    """Integration tests for tomorrow() function with real database"""
+
+    def setUp(self):
+        """Setup: Connect to database"""
+        self.connection = todo.get_db_connection()
+        self.assertIsNotNone(self.connection, "Failed to connect to database")
+        self.test_userid = "test_tomorrow_user"
+        self.cleanup()
+        logger.info("Database connected for tomorrow() integration test")
+
+    def tearDown(self):
+        """Teardown: Clean up test data"""
+        self.cleanup()
+        if self.connection:
+            self.connection.close()
+        logger.info("Database disconnected")
+
+    def cleanup(self):
+        """Remove all test data"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM ToDoData WHERE userid = %s", (self.test_userid,))
+            self.connection.commit()
+            cursor.close()
+        except:
+            pass
+
+    def test_tomorrow_placeholder_integration(self):
+        """Placeholder - TODO: Implement real DB tests"""
+        pass
 
 ################################################################################
 # INTEGRATION TESTS WITH REAL DATABASE (Thorough, catches SQL errors)
-# TODO: Implement comprehensive integration tests in Issue #9
+# Tested by: Krish
 ################################################################################
 
-class TestTodoAppIntegration(unittest.TestCase):
-    """Integration tests using real database with setup/teardown"""
+class TestAddIntegration(unittest.TestCase):
+    """Integration tests for add() function with real database"""
 
     def setUp(self):
         """Setup: Connect to real database before each test"""
         self.connection = todo.get_db_connection()
         self.assertIsNotNone(self.connection, "Failed to connect to database")
+        self.test_userid = "test_add_user"
+        self.cleanup()
         logger.info("Database connected for integration test")
 
     def tearDown(self):
-        """Teardown: Clean up test data and close connection after each test"""
+        """Teardown: Clean up test data"""
+        self.cleanup()
         if self.connection:
-            # TODO: Implement cleanup in Issue #9
-            # Example: self.connection.cursor().execute("DELETE FROM ToDoData WHERE userid = 'test_user'")
-            # self.connection.commit()
             self.connection.close()
         logger.info("Database disconnected")
 
@@ -139,13 +409,215 @@ class TestTodoAppIntegration(unittest.TestCase):
         # TODO: Clean up test data
         pass
 
-    def test_update_placeholder_integration(self):
-        """Placeholder - TODO: Implement real DB tests in Issue #9"""
-        # TODO: Insert test data
-        # TODO: Test update() with real database
-        # TODO: Verify update with SELECT query
-        # TODO: Clean up test data
-        pass
+    def cleanup(self):
+        """Remove all test data"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM ToDoData WHERE userid = %s", (self.test_userid,))
+            self.connection.commit()
+            cursor.close()
+        except:
+            pass
+
+    def test_add_basic_integration(self):
+        """Test adding a task actually inserts into database"""
+        result = todo.add(self.connection, self.test_userid, "Integration test task")
+        self.assertTrue(result)
+        
+        # Verify it was inserted
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT item FROM ToDoData WHERE userid = %s AND item = %s",
+            (self.test_userid, "Integration test task")
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        
+        self.assertIsNotNone(row)
+        self.assertEqual(row[0], "Integration test task")
+
+    def test_add_with_all_fields_integration(self):
+        """Test adding task with all fields"""
+        started = datetime(2024, 12, 1, 10, 0)
+        due = datetime(2024, 12, 25, 23, 59)
+        
+        result = todo.add(
+            self.connection,
+            self.test_userid,
+            "Complete task",
+            type_val="work",
+            started=started,
+            due=due
+        )
+        self.assertTrue(result)
+        
+        # Verify all fields were saved
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT item, type, started, due FROM ToDoData WHERE userid = %s AND item = %s",
+            (self.test_userid, "Complete task")
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        
+        self.assertIsNotNone(row)
+        self.assertEqual(row[0], "Complete task")
+        self.assertEqual(row[1], "work")
+        self.assertIsNotNone(row[2])  # started
+        self.assertIsNotNone(row[3])  # due
+
+    def test_add_duplicate_integration(self):
+        """Test that duplicate tasks are prevented"""
+        # Add first task
+        result1 = todo.add(self.connection, self.test_userid, "Duplicate test")
+        self.assertTrue(result1)
+        
+        # Try to add duplicate
+        result2 = todo.add(self.connection, self.test_userid, "Duplicate test")
+        self.assertFalse(result2)  # Should return False on duplicate
+
+    def test_add_userid_isolation_integration(self):
+        """Test that tasks are isolated by userid"""
+        # Add task for user1
+        result1 = todo.add(self.connection, self.test_userid, "Task A")
+        self.assertTrue(result1)
+        
+        # Add same task name for different user
+        result2 = todo.add(self.connection, "other_user", "Task A")
+        self.assertTrue(result2)
+        
+        # Verify both exist
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM ToDoData WHERE item = %s", ("Task A",))
+        count = cursor.fetchone()[0]
+        cursor.close()
+        
+        self.assertEqual(count, 2)
+        
+        # Cleanup other user
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM ToDoData WHERE userid = %s", ("other_user",))
+        self.connection.commit()
+        cursor.close()
+
+class TestUpdateIntegration(unittest.TestCase):
+    """Integration tests for update() function with real database"""
+
+    def setUp(self):
+        """Setup: Connect to database and insert test task"""
+        self.connection = todo.get_db_connection()
+        self.assertIsNotNone(self.connection, "Failed to connect to database")
+        self.test_userid = "test_update_user"
+        self.cleanup()
+        
+        # Insert a task to update
+        todo.add(self.connection, self.test_userid, "Task to update", type_val="initial")
+        logger.info("Database connected for update() integration test")
+
+    def tearDown(self):
+        """Teardown: Clean up test data"""
+        self.cleanup()
+        if self.connection:
+            self.connection.close()
+        logger.info("Database disconnected")
+
+    def cleanup(self):
+        """Remove all test data"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM ToDoData WHERE userid = %s", (self.test_userid,))
+            self.connection.commit()
+            cursor.close()
+        except:
+            pass
+
+    def test_update_type_integration(self):
+        """Test updating task type field"""
+        result = todo.update(
+            self.connection,
+            self.test_userid,
+            "Task to update",
+            type_val="updated_type"
+        )
+        self.assertTrue(result)
+        
+        # Verify update
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT type FROM ToDoData WHERE userid = %s AND item = %s",
+            (self.test_userid, "Task to update")
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        
+        self.assertEqual(row[0], "updated_type")
+
+    def test_update_dates_integration(self):
+        """Test updating date fields"""
+        new_due = datetime(2025, 1, 1, 12, 0)
+        new_done = datetime(2024, 12, 30, 15, 30)
+        
+        result = todo.update(
+            self.connection,
+            self.test_userid,
+            "Task to update",
+            due=new_due,
+            done=new_done
+        )
+        self.assertTrue(result)
+        
+        # Verify update
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT due, done FROM ToDoData WHERE userid = %s AND item = %s",
+            (self.test_userid, "Task to update")
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        
+        self.assertIsNotNone(row[0])  # due
+        self.assertIsNotNone(row[1])  # done
+
+    def test_update_nonexistent_integration(self):
+        """Test updating task that doesn't exist"""
+        with self.assertRaises(ValueError):
+            todo.update(
+                self.connection,
+                self.test_userid,
+                "Nonexistent task",
+                type_val="test"
+            )
+
+    def test_update_userid_isolation_integration(self):
+        """Test that update only affects correct userid"""
+        # Add task for different user
+        todo.add(self.connection, "other_user", "Task to update", type_val="original")
+        
+        # Update for test user (should not affect other user's task)
+        result = todo.update(
+            self.connection,
+            self.test_userid,
+            "Task to update",
+            type_val="updated"
+        )
+        self.assertTrue(result)
+        
+        # Verify other user's task unchanged
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT type FROM ToDoData WHERE userid = %s AND item = %s",
+            ("other_user", "Task to update")
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        
+        self.assertEqual(row[0], "original")
+        
+        # Cleanup
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM ToDoData WHERE userid = %s", ("other_user",))
+        self.connection.commit()
+        cursor.close()
 
     def test_delete_placeholder_integration(self):
         """Placeholder - TODO: Implement real DB tests in Issue #9"""
@@ -176,4 +648,7 @@ class TestTodoAppIntegration(unittest.TestCase):
         pass
 
 if __name__ == '__main__':
+    # Run pytest for unit tests
+    pytest.main([__file__, '-v'])
+    # Run unittest for integration tests
     unittest.main()
