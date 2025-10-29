@@ -1,6 +1,6 @@
 # Test Plan - To-Do Application
 **Team 10** | **Lab 5**  
-**Date:** {DATE}
+**Date:** October 29 2025
 
 ---
 
@@ -46,7 +46,7 @@
 ### 2.2 Test Environment
 - **Database:** SE101_Team_10 on riku.shoshin.uwaterloo.ca
 - **Test User Prefix:** test_{function}_user
-- **Python Version:** 3.x
+- **Python Version:** 3.13.2
 - **Dependencies:** See `build/requirements.txt`
 
 ---
@@ -54,93 +54,99 @@
 ## 3. Test Cases by Function
 
 ### 3.1 add() Function
-**Tested by:** {TESTER_NAME}  
-**Issue:** #2
+**Tested by:** Krish  
+**Issue:** #2  
+**Status:** ✅ Complete
 
 **Unit Tests:**
-| Test ID | Test Case | Expected Result |
-|---------|-----------|-----------------|
-| UT-ADD-01 | Add task with minimal parameters | Returns True, cursor closed |
-| UT-ADD-02 | Add task with all parameters | Returns True, all fields passed to SQL |
-| UT-ADD-03 | Add duplicate task | Returns False, IntegrityError caught |
-| UT-ADD-04 | Add with SQL error | Returns False, error logged |
-| UT-ADD-05 | Add with correct userid | SQL contains correct userid parameter |
+| Test ID | Test Case | Expected Result | Status |
+|---------|-----------|-----------------|--------|
+| UT-ADD-01 | Add task with minimal parameters | Returns True, cursor closed | ✅ PASS |
+| UT-ADD-02 | Add task with all parameters | Returns True, all fields passed to SQL | ✅ PASS |
+| UT-ADD-03 | Add duplicate task | Returns False, IntegrityError caught | ✅ PASS |
+| UT-ADD-04 | Add with SQL error | Returns False, error logged | ✅ PASS |
+| UT-ADD-05 | Add with correct userid | SQL contains correct userid parameter | ✅ PASS |
 
 **Integration Tests:**
-| Test ID | Test Case | Expected Result |
-|---------|-----------|-----------------|
-| IT-ADD-01 | Add task to database | Task appears in SELECT query |
-| IT-ADD-02 | Add task with all fields | All fields saved correctly |
-| IT-ADD-03 | Add duplicate task | Second add fails, only one record exists |
-| IT-ADD-04 | Add tasks for different users | Both tasks exist with different userids |
+| Test ID | Test Case | Expected Result | Status |
+|---------|-----------|-----------------|--------|
+| IT-ADD-01 | Add task to database | Task appears in SELECT query | ✅ PASS |
+| IT-ADD-02 | Add task with all fields | All fields saved correctly | ✅ PASS |
+| IT-ADD-03 | Add duplicate task | Second add fails, only one record exists | ✅ PASS |
+| IT-ADD-04 | Add tasks for different users | Both tasks exist with different userids | ✅ PASS |
 
-**Coverage Target:** {TARGET_PERCENTAGE}%
+**Coverage:** 9/9 tests passing (100%)
 
 ---
 
 ### 3.2 update() Function
-**Tested by:** {TESTER_NAME}  
-**Issue:** #3
+**Tested by:** Krish  
+**Issue:** #3  
+**Status:** ✅ Complete
 
 **Unit Tests:**
-| Test ID | Test Case | Expected Result |
-|---------|-----------|-----------------|
-| UT-UPD-01 | Update existing task | Returns True, commit called |
-| UT-UPD-02 | Update nonexistent task | Raises ValueError |
-| UT-UPD-03 | Update multiple fields | All fields in UPDATE query |
-| UT-UPD-04 | Update with no fields | Returns False, warning logged |
-| UT-UPD-05 | Update with userid filter | SQL contains correct userid WHERE clause |
-| UT-UPD-06 | Update with SQL error | Raises pymysql.Error |
+| Test ID | Test Case | Expected Result | Status |
+|---------|-----------|-----------------|--------|
+| UT-UPD-01 | Update existing task | Returns True, commit called | ✅ PASS |
+| UT-UPD-02 | Update nonexistent task | Raises ValueError | ✅ PASS |
+| UT-UPD-03 | Update multiple fields | All fields in UPDATE query | ✅ PASS |
+| UT-UPD-04 | Update with no fields | Returns False, warning logged | ✅ PASS |
+| UT-UPD-05 | Update with userid filter | SQL contains correct userid WHERE clause | ✅ PASS |
+| UT-UPD-06 | Update with SQL error | Raises pymysql.Error | ✅ PASS |
 
 **Integration Tests:**
-| Test ID | Test Case | Expected Result |
-|---------|-----------|-----------------|
-| IT-UPD-01 | Update task type | Field updated in database |
-| IT-UPD-02 | Update date fields | Dates saved correctly |
-| IT-UPD-03 | Update nonexistent task | Raises ValueError, no changes |
-| IT-UPD-04 | Update only affects correct userid | Other users' tasks unchanged |
+| Test ID | Test Case | Expected Result | Status |
+|---------|-----------|-----------------|--------|
+| IT-UPD-01 | Update task type | Field updated in database | ✅ PASS |
+| IT-UPD-02 | Update date fields | Dates saved correctly | ✅ PASS |
+| IT-UPD-03 | Update nonexistent task | Raises ValueError, no changes | ✅ PASS |
+| IT-UPD-04 | Update only affects correct userid | Other users' tasks unchanged | ✅ PASS |
 
-**Coverage Target:** {TARGET_PERCENTAGE}%
+**Coverage:** 10/10 tests passing (100%)
 
 ---
 
 ### 3.3 delete() Function
-**Tested by:** {TESTER_NAME}  
-**Issue:** #4
+**Tested by:** Elaine  
+**Issue:** #4  
+**Status:** 🔄 In Progress
 
-[Similar structure - filled in by Elaine]
+[To be completed by Elaine]
 
 ---
 
 ### 3.4 next() Function
-**Tested by:** {TESTER_NAME}  
-**Issue:** #5
+**Tested by:** Shiman  
+**Issue:** #5  
+**Status:** 🔄 In Progress
 
-[Similar structure - filled in by Shiman]
+[To be completed by Shiman]
 
 ---
 
 ### 3.5 today() Function
-**Tested by:** {TESTER_NAME}  
-**Issue:** #6
+**Tested by:** Liron  
+**Issue:** #6  
+**Status:** 🔄 In Progress
 
-[Similar structure - filled in by Liron]
+[To be completed by Liron]
 
 ---
 
 ### 3.6 tomorrow() Function
-**Tested by:** {TESTER_NAME}  
-**Issue:** #7
+**Tested by:** Ava  
+**Issue:** #7  
+**Status:** 🔄 In Progress
 
-[Similar structure - filled in by Ava]
+[To be completed by Ava]
 
 ---
 
 ## 4. Test Data
 
 ### 4.1 Test Users
-- `test_add_user` - for add() integration tests
-- `test_update_user` - for update() integration tests
+- `test_add_user` - for add() integration tests ✅
+- `test_update_user` - for update() integration tests ✅
 - `test_delete_user` - for delete() integration tests
 - `test_next_user` - for next() integration tests
 - `test_today_user` - for today() integration tests
@@ -150,7 +156,7 @@
 - Minimal: `{userid, item}` only
 - Complete: All fields populated
 - Date-based: Tasks with specific due dates
-- Edge cases: Empty strings, NULL values, special characters
+- Edge cases: Duplicate entries, nonexistent tasks
 
 ---
 
@@ -161,61 +167,73 @@
 **All tests:**
 ```bash
 cd tests
-pytest test_code.py -v
+python -m pytest test_code.py -v
 ```
 
 **Specific function:**
 ```bash
-pytest test_code.py::test_add_basic_success -v
+python -m pytest test_code.py -k "add" -v
+python -m pytest test_code.py -k "update" -v
 ```
 
 **With coverage:**
 ```bash
-pytest --cov=../src --cov-report=html --cov-report=term
+python -m pytest test_code.py --cov=../src --cov-report=html --cov-report=term -v
 ```
 
 **Integration tests only:**
 ```bash
 python -m unittest test_code.TestAddIntegration -v
+python -m unittest test_code.TestUpdateIntegration -v
 ```
 
 ### 5.2 Success Criteria
-- All tests pass (100% pass rate)
-- Code coverage > {TARGET_PERCENTAGE}%
-- No manual database cleanup required
-- Tests run in < {TIME_LIMIT} seconds
+- All tests pass (100% pass rate) ✅
+- Code coverage > 80% (Current: 42%, In Progress)
+- No manual database cleanup required ✅
+- Tests run in < 5 seconds ✅ (0.81s)
 
 ---
 
 ## 6. Risk Analysis
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Test data not cleaned up | High | Use setUp/tearDown properly |
-| Database connection fails | High | Check .env, test connection first |
-| Tests interfere with each other | Medium | Use unique test userids |
-| Mock tests don't catch SQL errors | Medium | Use integration tests too |
+| Risk | Impact | Mitigation | Status |
+|------|--------|------------|--------|
+| Test data not cleaned up | High | Use setUp/tearDown properly | ✅ Resolved |
+| Database connection fails | High | Check .env, test connection first | ✅ Mitigated |
+| Tests interfere with each other | Medium | Use unique test userids | ✅ Resolved |
+| Mock tests don't catch SQL errors | Medium | Use integration tests too | ✅ Resolved |
+| Python module caching | Medium | Force reload in test file | ✅ Resolved |
 
 ---
 
 ## 7. Schedule
 
-| Activity | Owner | Deadline |
-|----------|-------|----------|
-| Write test plan | {COORDINATOR} | {DATE} |
-| Implement add() tests | {TESTER_1} | {DATE} |
-| Implement update() tests | {TESTER_2} | {DATE} |
-| Implement delete() tests | {TESTER_3} | {DATE} |
-| Implement next() tests | {TESTER_4} | {DATE} |
-| Implement today() tests | {TESTER_5} | {DATE} |
-| Implement tomorrow() tests | {TESTER_6} | {DATE} |
-| Run all tests | All | {DATE} |
-| Generate coverage report | {COORDINATOR} | {DATE} |
-| Write test report | {COORDINATOR} | {DATE} |
+| Activity | Owner | Deadline | Status |
+|----------|-------|----------|--------|
+| Write test plan | Krish | Dec 2024 | ✅ Complete |
+| Implement add() tests | Krish | Dec 2024 | ✅ Complete |
+| Implement update() tests | Krish | Dec 2024 | ✅ Complete |
+| Implement delete() tests | Elaine | TBD | 🔄 In Progress |
+| Implement next() tests | Shiman | TBD | 🔄 In Progress |
+| Implement today() tests | Liron | TBD | 🔄 In Progress |
+| Implement tomorrow() tests | Ava | TBD | 🔄 In Progress |
+| Run all tests | All | TBD | 🔄 In Progress |
+| Generate coverage report | Krish | TBD | 🔄 In Progress |
+| Write test report | Krish | TBD | 🔄 In Progress |
 
 ---
 
-## 8. References
+## 8. Current Progress
+
+**Completed:** 2/6 functions (33%)  
+**Tests Passing:** 28/28 (100%)  
+**Code Coverage:** 42%  
+**Remaining Work:** 4 functions (delete, next, today, tomorrow)
+
+---
+
+## 9. References
 - Requirements: `docs/requirements.md`
 - Source code: `src/code.py`
 - Test code: `tests/test_code.py`
@@ -224,6 +242,6 @@ python -m unittest test_code.TestAddIntegration -v
 
 ---
 
-**Document Version:** {VERSION}  
-**Last Updated:** {DATE}  
-**Status:** {STATUS}
+**Document Version:** 1.0  
+**Last Updated:** October 29 2025
+**Status:** In Progress

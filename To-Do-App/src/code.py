@@ -199,7 +199,7 @@ def update(connection, userid, item, type_val=None, started=None, due=None, done
         values = []
 
         if type_val is not None:
-            fields.append("task type = %s")
+            fields.append("`type` = %s")
             values.append(type_val)
         if started is not None:
             fields.append("started = %s")
