@@ -280,7 +280,11 @@ def delete(connection, userid, item):
         logger.error(f"Database error in delete(): {err}")
         raise
     finally:
-        cursor.close()
+        try:
+            cursor.close()
+        except Exception:
+            pass
+
 
 ################################################################################
 # Function: next()
