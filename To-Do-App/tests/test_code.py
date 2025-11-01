@@ -215,9 +215,87 @@ def test_update_sql_error(mock_connection):
 # TODO: Implement in Issue #9
 ################################################################################
 
-def test_delete_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests"""
-    pass
+def test_delete_basic_success(mock_connection):
+    """Test successful deletion of existing task"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.side_effect = [(1,)]  # Task exists
+
+    result = todo.delete(mock_connection, "test_user", "Buy milk")
+
+    assert result is True
+    cursor.execute.assert_any_call(
+        "SELECT COUNT(*) FROM ToDoData WHERE userid = %s AND item = %s",
+        ("test_user", "Buy milk")
+    )
+    cursor.execute.assert_any_call(
+        "DELETE FROM ToDoData WHERE userid = %s AND item = %s",
+        ("test_user", "Buy milk")
+    )
+    mock_connection.commit.assert_called_once()
+    cursor.close.assert_called_once()
+
+
+def test_delete_nonexistent_task(mock_connection):
+    """Test deleting a task that doesn't exist raises ValueError"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.side_effect = [(0,)]  # Task not found
+
+    with pytest.raises(ValueError, match="does not exist"):
+        todo.delete(mock_connection, "user1", "Nonexistent task")
+
+    cursor.execute.assert_called_once()
+    cursor.close.assert_called_once()
+
+
+def test_delete_sql_error(mock_connection):
+    """Test handling of SQL errors during deletion"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.side_effect = [(1,)]  # Task exists
+    cursor.execute.side_effect = [None, pymysql.Error("SQL error")]
+
+    with pytest.raises(pymysql.Error):
+        todo.delete(mock_connection, "test_user", "Task X")
+
+    mock_connection.rollback.assert_called_once()
+    cursor.close.assert_called_once()
+
+
+def test_delete_userid_isolation(mock_connection):
+    """Test that delete only affects the correct userid"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.side_effect = [(1,)]
+
+    todo.delete(mock_connection, "userA", "Task Z")
+
+    calls = [str(call) for call in cursor.execute.call_args_list]
+    assert any("userA" in c for c in calls)
+    mock_connection.commit.assert_called_once()
+    cursor.close.assert_called_once()
+
+
+def test_delete_commit_failure_triggers_rollback(mock_connection):
+    """Test that a commit() failure triggers rollback"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.side_effect = [(1,)]
+    mock_connection.commit.side_effect = pymysql.Error("Commit failed")
+
+    with pytest.raises(pymysql.Error):
+        todo.delete(mock_connection, "test_user", "Task commit fail")
+
+    mock_connection.rollback.assert_called_once()
+    cursor.close.assert_called_once()
+
+
+def test_delete_cursor_close_failure(mock_connection):
+    """Test that cursor.close() failure does not break the function"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.side_effect = [(1,)]
+    cursor.close.side_effect = Exception("close failed")
+
+    result = todo.delete(mock_connection, "userB", "Task Y")
+    assert result is True
+    mock_connection.commit.assert_called_once()
+
 
 class TestDeleteIntegration(unittest.TestCase):
     """Integration tests for delete() function with real database"""
@@ -228,7 +306,8 @@ class TestDeleteIntegration(unittest.TestCase):
         self.assertIsNotNone(self.connection, "Failed to connect to database")
         self.test_userid = "test_delete_user"
         self.cleanup()
-        # Insert task to delete
+
+        # Insert a test record
         todo.add(self.connection, self.test_userid, "Task to delete")
         logger.info("Database connected for delete() integration test")
 
@@ -249,10 +328,53 @@ class TestDeleteIntegration(unittest.TestCase):
         except:
             pass
 
-    def test_delete_placeholder_integration(self):
-        """Placeholder - TODO: Implement real DB tests"""
-        pass
+    def test_delete_existing_task(self):
+        """Test that delete() removes an existing task"""
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM ToDoData WHERE userid = %s", (self.test_userid,))
+        before = cursor.fetchone()[0]
+        cursor.close()
+        self.assertEqual(before, 1)
 
+        result = todo.delete(self.connection, self.test_userid, "Task to delete")
+        self.assertTrue(result)
+
+        # Verify it was deleted
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM ToDoData WHERE userid = %s", (self.test_userid,))
+        after = cursor.fetchone()[0]
+        cursor.close()
+        self.assertEqual(after, 0)
+
+    def test_delete_nonexistent_task_integration(self):
+        """Deleting nonexistent task should raise ValueError"""
+        with self.assertRaises(ValueError):
+            todo.delete(self.connection, self.test_userid, "Nonexistent Task")
+
+    def test_delete_userid_isolation_integration(self):
+        """Test that delete for one user does not affect others"""
+        # Add same task for another user
+        todo.add(self.connection, "other_user", "Task to delete")
+
+        # Delete for test user
+        result = todo.delete(self.connection, self.test_userid, "Task to delete")
+        self.assertTrue(result)
+
+        # Verify the other user still has their task
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT COUNT(*) FROM ToDoData WHERE userid = %s AND item = %s",
+            ("other_user", "Task to delete")
+        )
+        count = cursor.fetchone()[0]
+        cursor.close()
+        self.assertEqual(count, 1)
+
+        # Cleanup
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM ToDoData WHERE userid = %s", ("other_user",))
+        self.connection.commit()
+        cursor.close()
 
 ################################################################################
 # Tests for next() function - BY SHIMAN
