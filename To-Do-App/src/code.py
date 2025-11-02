@@ -341,7 +341,10 @@ def next(connection, userid):
         logger.error(f"Database error in next() for user {userid}: {err}")
         raise err
     finally:
-        cursor.close()
+        try:
+            cursor.close()
+        except Exception as close_err:
+            logger.warning(f"cursor.close() failed: {close_err}")
 
 ################################################################################
 # Function: today()

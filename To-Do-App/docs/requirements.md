@@ -7,14 +7,14 @@
 
 **Table: ToDoData**
 
-| Column | Type | Description |
-|--------|------|-------------|
-| userid | VARCHAR(255) | User identifier (from DB login) |
-| item | VARCHAR(255) | Task description |
-| type | VARCHAR(255) | Task category (optional) |
-| started | DATETIME | Start time (optional) |
-| due | DATETIME | Due date/time (optional) |
-| done | DATETIME | Completion time (optional) |
+| Column  | Type         | Description                     |
+| ------- | ------------ | ------------------------------- |
+| userid  | VARCHAR(255) | User identifier (from DB login) |
+| item    | VARCHAR(255) | Task description                |
+| type    | VARCHAR(255) | Task category (optional)        |
+| started | DATETIME     | Start time (optional)           |
+| due     | DATETIME     | Due date/time (optional)        |
+| done    | DATETIME     | Completion time (optional)      |
 
 **Primary Key:** (userid, item)
 
