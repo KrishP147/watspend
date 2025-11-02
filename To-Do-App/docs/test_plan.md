@@ -59,21 +59,21 @@
 **Status:** ✅ Complete
 
 **Unit Tests:**
-| Test ID | Test Case | Expected Result | Status |
-|---------|-----------|-----------------|--------|
-| UT-ADD-01 | Add task with minimal parameters | Returns True, cursor closed | ✅ PASS |
-| UT-ADD-02 | Add task with all parameters | Returns True, all fields passed to SQL | ✅ PASS |
-| UT-ADD-03 | Add duplicate task | Returns False, IntegrityError caught | ✅ PASS |
-| UT-ADD-04 | Add with SQL error | Returns False, error logged | ✅ PASS |
-| UT-ADD-05 | Add with correct userid | SQL contains correct userid parameter | ✅ PASS |
+| Test ID   | Test Case                        | Expected Result                        | Status |
+| --------- | -------------------------------- | -------------------------------------- | ------ |
+| UT-ADD-01 | Add task with minimal parameters | Returns True, cursor closed            | ✅ PASS |
+| UT-ADD-02 | Add task with all parameters     | Returns True, all fields passed to SQL | ✅ PASS |
+| UT-ADD-03 | Add duplicate task               | Returns False, IntegrityError caught   | ✅ PASS |
+| UT-ADD-04 | Add with SQL error               | Returns False, error logged            | ✅ PASS |
+| UT-ADD-05 | Add with correct userid          | SQL contains correct userid parameter  | ✅ PASS |
 
 **Integration Tests:**
-| Test ID | Test Case | Expected Result | Status |
-|---------|-----------|-----------------|--------|
-| IT-ADD-01 | Add task to database | Task appears in SELECT query | ✅ PASS |
-| IT-ADD-02 | Add task with all fields | All fields saved correctly | ✅ PASS |
-| IT-ADD-03 | Add duplicate task | Second add fails, only one record exists | ✅ PASS |
-| IT-ADD-04 | Add tasks for different users | Both tasks exist with different userids | ✅ PASS |
+| Test ID   | Test Case                     | Expected Result                          | Status |
+| --------- | ----------------------------- | ---------------------------------------- | ------ |
+| IT-ADD-01 | Add task to database          | Task appears in SELECT query             | ✅ PASS |
+| IT-ADD-02 | Add task with all fields      | All fields saved correctly               | ✅ PASS |
+| IT-ADD-03 | Add duplicate task            | Second add fails, only one record exists | ✅ PASS |
+| IT-ADD-04 | Add tasks for different users | Both tasks exist with different userids  | ✅ PASS |
 
 **Coverage:** 9/9 tests passing (100%)
 
@@ -85,22 +85,22 @@
 **Status:** ✅ Complete
 
 **Unit Tests:**
-| Test ID | Test Case | Expected Result | Status |
-|---------|-----------|-----------------|--------|
-| UT-UPD-01 | Update existing task | Returns True, commit called | ✅ PASS |
-| UT-UPD-02 | Update nonexistent task | Raises ValueError | ✅ PASS |
-| UT-UPD-03 | Update multiple fields | All fields in UPDATE query | ✅ PASS |
-| UT-UPD-04 | Update with no fields | Returns False, warning logged | ✅ PASS |
+| Test ID   | Test Case                 | Expected Result                          | Status |
+| --------- | ------------------------- | ---------------------------------------- | ------ |
+| UT-UPD-01 | Update existing task      | Returns True, commit called              | ✅ PASS |
+| UT-UPD-02 | Update nonexistent task   | Raises ValueError                        | ✅ PASS |
+| UT-UPD-03 | Update multiple fields    | All fields in UPDATE query               | ✅ PASS |
+| UT-UPD-04 | Update with no fields     | Returns False, warning logged            | ✅ PASS |
 | UT-UPD-05 | Update with userid filter | SQL contains correct userid WHERE clause | ✅ PASS |
-| UT-UPD-06 | Update with SQL error | Raises pymysql.Error | ✅ PASS |
+| UT-UPD-06 | Update with SQL error     | Raises pymysql.Error                     | ✅ PASS |
 
 **Integration Tests:**
-| Test ID | Test Case | Expected Result | Status |
-|---------|-----------|-----------------|--------|
-| IT-UPD-01 | Update task type | Field updated in database | ✅ PASS |
-| IT-UPD-02 | Update date fields | Dates saved correctly | ✅ PASS |
-| IT-UPD-03 | Update nonexistent task | Raises ValueError, no changes | ✅ PASS |
-| IT-UPD-04 | Update only affects correct userid | Other users' tasks unchanged | ✅ PASS |
+| Test ID   | Test Case                          | Expected Result               | Status |
+| --------- | ---------------------------------- | ----------------------------- | ------ |
+| IT-UPD-01 | Update task type                   | Field updated in database     | ✅ PASS |
+| IT-UPD-02 | Update date fields                 | Dates saved correctly         | ✅ PASS |
+| IT-UPD-03 | Update nonexistent task            | Raises ValueError, no changes | ✅ PASS |
+| IT-UPD-04 | Update only affects correct userid | Other users' tasks unchanged  | ✅ PASS |
 
 **Coverage:** 10/10 tests passing (100%)
 
@@ -122,12 +122,12 @@
 | UT-DEL-06 | Cursor close failure              | Function safely handles close exception  | ✅ PASS |
 
 **Integration Tests:**
-| Test ID   | Test Name                                | Status | Duration | Notes                       |
-| --------- | ---------------------------------------- | ------ | -------- | --------------------------- |
-| IT-DEL-01 | test_delete_existing_task                | ✅ PASS | ~70ms    | Record removed from DB      |
-| IT-DEL-02 | test_delete_nonexistent_task_integration | ✅ PASS | ~70ms    | Returns False, DB unchanged |
-| IT-DEL-03 | test_delete_userid_isolation_integration | ✅ PASS | ~70ms    | User isolation maintained   |
-| IT-DEL-04 | test_delete_placeholder_integration      | ✅ PASS | ~70ms    | Commit verified             |
+| Test ID   | Test Name                                | Status                      | Status |
+| --------- | ---------------------------------------- | --------------------------- | ------ |
+| IT-DEL-01 | test_delete_existing_task                | Record removed from DB      | ✅ PASS |
+| IT-DEL-02 | test_delete_nonexistent_task_integration | Returns False, DB unchanged | ✅ PASS |
+| IT-DEL-03 | test_delete_userid_isolation_integration | User isolation maintained   | ✅ PASS |
+| IT-DEL-04 | test_delete_placeholder_integration      | Commit verified             | ✅ PASS |
 
 **Coverage:** 10/10 tests passing (100%)
 ---
@@ -135,9 +135,26 @@
 ### 3.4 next() Function
 **Tested by:** Shiman  
 **Issue:** #5  
-**Status:** 🔄 In Progress
+**Status:** ✅ Complete
 
-[To be completed by Shiman]
+**Unit Tests:**
+| Test ID   | Test Case                      | Expected Result                              | Status |
+| --------- | ------------------------------ | -------------------------------------------- | ------ |
+| UT-NEX-01 | test_next_basic_success        | Returns the earliest due task                | ✅ PASS |
+| UT-NEX-02 | test_next_no_due_tasks         | Returns None if user has no due tasks        | ✅ PASS |
+| UT-NEX-03 | test_next_sql_error            | Returns False, rollback called               | ✅ PASS |
+| UT-NEX-04 | test_next_userid_isolation     | Query uses correct userid parameter          | ✅ PASS |
+| UT-NEX-05 | test_next_cursor_close_failure | Cursor.close() failure does not break next() | ✅ PASS |
+
+**Integration Tests:**
+| Test ID   | Test Name                              | Expected Result                                   | Status |
+| --------- | -------------------------------------- | ------------------------------------------------- | ------ |
+| IT-NEX-01 | test_next_returns_earliest_due         | Returns the task with the nearest due date        | ✅ PASS |
+| IT-NEX-02 | test_next_returns_none_if_no_due_dates | Returns None when user has tasks but no due dates | ✅ PASS |
+| IT-NEX-03 | test_next_no_tasks_for_user            | Return None if the user has no tasks at all       | ✅ PASS |
+| IT-NEX-04 | test_next_userid_isolation_integration | Other users' tasks do not affect current user     | ✅ PASS |
+
+**Coverage:** 9/9 tests passing (100%)
 
 ---
 
@@ -214,30 +231,30 @@ python -m unittest test_code.TestUpdateIntegration -v
 
 ## 6. Risk Analysis
 
-| Risk | Impact | Mitigation | Status |
-|------|--------|------------|--------|
-| Test data not cleaned up | High | Use setUp/tearDown properly | ✅ Resolved |
-| Database connection fails | High | Check .env, test connection first | ✅ Mitigated |
-| Tests interfere with each other | Medium | Use unique test userids | ✅ Resolved |
-| Mock tests don't catch SQL errors | Medium | Use integration tests too | ✅ Resolved |
-| Python module caching | Medium | Force reload in test file | ✅ Resolved |
+| Risk                              | Impact | Mitigation                        | Status      |
+| --------------------------------- | ------ | --------------------------------- | ----------- |
+| Test data not cleaned up          | High   | Use setUp/tearDown properly       | ✅ Resolved  |
+| Database connection fails         | High   | Check .env, test connection first | ✅ Mitigated |
+| Tests interfere with each other   | Medium | Use unique test userids           | ✅ Resolved  |
+| Mock tests don't catch SQL errors | Medium | Use integration tests too         | ✅ Resolved  |
+| Python module caching             | Medium | Force reload in test file         | ✅ Resolved  |
 
 ---
 
 ## 7. Schedule
 
-| Activity | Owner | Deadline | Status |
-|----------|-------|----------|--------|
-| Write test plan | Krish | Dec 2024 | ✅ Complete |
-| Implement add() tests | Krish | Dec 2024 | ✅ Complete |
-| Implement update() tests | Krish | Dec 2024 | ✅ Complete |
-| Implement delete() tests | Elaine | TBD | 🔄 In Progress |
-| Implement next() tests | Shiman | TBD | 🔄 In Progress |
-| Implement today() tests | Liron | TBD | 🔄 In Progress |
-| Implement tomorrow() tests | Ava | TBD | 🔄 In Progress |
-| Run all tests | All | TBD | 🔄 In Progress |
-| Generate coverage report | Krish | TBD | 🔄 In Progress |
-| Write test report | Krish | TBD | 🔄 In Progress |
+| Activity                   | Owner  | Deadline | Status        |
+| -------------------------- | ------ | -------- | ------------- |
+| Write test plan            | Krish  | Dec 2024 | ✅ Complete    |
+| Implement add() tests      | Krish  | Dec 2024 | ✅ Complete    |
+| Implement update() tests   | Krish  | Dec 2024 | ✅ Complete    |
+| Implement delete() tests   | Elaine | TBD      | 🔄 In Progress |
+| Implement next() tests     | Shiman | TBD      | 🔄 In Progress |
+| Implement today() tests    | Liron  | TBD      | 🔄 In Progress |
+| Implement tomorrow() tests | Ava    | TBD      | 🔄 In Progress |
+| Run all tests              | All    | TBD      | 🔄 In Progress |
+| Generate coverage report   | Krish  | TBD      | 🔄 In Progress |
+| Write test report          | Krish  | TBD      | 🔄 In Progress |
 
 ---
 
