@@ -381,9 +381,53 @@ class TestDeleteIntegration(unittest.TestCase):
 # TODO: Implement in Issue #9
 ################################################################################
 
-def test_next_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests"""
-    pass
+def test_next_returns_earliest_due_task(mock_connection):
+    """Test that next() returns the soonest due task for a user"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.return_value = ("Buy milk", "personal", "2025-10-30", "2025-11-01", None)
+
+    result = todo.next(mock_connection, "user1")
+
+    cursor.execute.assert_called_once_with(
+        """
+            SELECT item, type, started, due, done
+            FROM ToDoData
+            WHERE userid = %s AND due IS NOT NULL
+            ORDER BY due ASC
+            LIMIT 1
+        """,
+        ("user1",)
+    )
+    assert result == {
+        "item": "Buy milk",
+        "type": "personal",
+        "started": "2025-10-30",
+        "due": "2025-11-01",
+        "done": None,
+    }
+    cursor.close.assert_called_once()
+
+
+def test_next_no_task_found(mock_connection):
+    """Test that next() returns None if no tasks with due dates exist"""
+    cursor = mock_connection.cursor.return_value
+    cursor.fetchone.return_value = None
+
+    result = todo.next(mock_connection, "user1")
+
+    assert result is None
+    cursor.close.assert_called_once()
+
+
+def test_next_database_error(mock_connection):
+    """Test that database errors in next() are raised"""
+    cursor = mock_connection.cursor.return_value
+    cursor.execute.side_effect = pymysql.Error("DB crashed")
+
+    with pytest.raises(pymysql.Error):
+        todo.next(mock_connection, "user1")
+
+    cursor.close.assert_called_once()
 
 class TestNextIntegration(unittest.TestCase):
     """Integration tests for next() function with real database"""
@@ -413,10 +457,71 @@ class TestNextIntegration(unittest.TestCase):
         except:
             pass
 
-    def test_next_placeholder_integration(self):
-        """Placeholder - TODO: Implement real DB tests"""
-        pass
+    def test_next_returns_earliest_due_task(self):
+        """next() should return the soonest due task"""
+        # Set up test data with different due dates
+        now = datetime.now()
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s);",
+            (self.test_userid, "Task A", "personal", now, now + timedelta(days=3), None),
+        )
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s);",
+            (self.test_userid, "Task B", "work", now, now + timedelta(days=1), None),
+        )
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s);",
+            (self.test_userid, "Task C", "misc", now, now + timedelta(days=2), None),
+        )
+        self.connection.commit()
+        cursor.close()
+        
+        result = todo.next(self.connection, self.test_userid)
+        self.assertIsNotNone(result)
+        self.assertEqual(result["item"], "Task B")  # earliest due
+        self.assertEqual(result["type"], "work")
+        self.assertEqual(result["done"], None)
 
+    def test_next_returns_none_if_no_due_tasks(self):
+        """Should return None if user has no due dates"""
+        self.cleanup()
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s);",
+            (self.test_userid, "Task D", "misc", datetime.now(), None, None),
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.next(self.connection, self.test_userid)
+        self.assertIsNone(result)
+
+    def test_next_userid_isolation(self):
+        """Tasks of other users should not affect this user"""
+        # Set up test data for this user
+        now = datetime.now()
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s);",
+            (self.test_userid, "Task B", "work", now, now + timedelta(days=2), None),
+        )
+        # Add earlier task for another user
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s);",
+            ("other_user", "Other User Task", "work", now, now + timedelta(hours=1), None),
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.next(self.connection, self.test_userid)
+        self.assertEqual(result["item"], "Task B")  # unaffected by other user
+
+        # cleanup other user
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM ToDoData WHERE userid = %s", ("other_user",))
+        self.connection.commit()
+        cursor.close()
 
 ################################################################################
 # Tests for today() function - BY LIRON
