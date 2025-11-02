@@ -243,17 +243,16 @@ python -m unittest test_code.TestUpdateIntegration -v
 
 ## 7. Schedule
 
-| Activity                   | Owner  | Deadline | Status        |
-| -------------------------- | ------ | -------- | ------------- |
-| Write test plan            | Krish  | Dec 2024 | ✅ Complete    |
-| Implement add() tests      | Krish  | Dec 2024 | ✅ Complete    |
-| Implement update() tests   | Krish  | Dec 2024 | ✅ Complete    |
-| Implement delete() tests   | Elaine | TBD      | 🔄 In Progress |
-| Implement next() tests     | Shiman | TBD      | 🔄 In Progress |
+| Activity                   | Owner  | Deadline | Status         |
+| -------------------------- | ------ | -------- | -------------- |
+| Write test plan            | Krish  | Nov 2025 | ✅ Complete    |
+| Implement add() tests      | Krish  | Nov 2025 | ✅ Complete    |
+| Implement update() tests   | Krish  | Nov 2025 | ✅ Complete    |
+| Implement delete() tests   | Elaine | Nov 2025 | ✅ Complete    |
+| Implement next() tests     | Shiman | Nov 2025 | ✅ Complete    |
 | Implement today() tests    | Liron  | TBD      | 🔄 In Progress |
 | Implement tomorrow() tests | Ava    | TBD      | 🔄 In Progress |
 | Run all tests              | All    | TBD      | 🔄 In Progress |
-| Generate coverage report   | Krish  | TBD      | 🔄 In Progress |
 | Write test report          | Krish  | TBD      | 🔄 In Progress |
 
 ---
