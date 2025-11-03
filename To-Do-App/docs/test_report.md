@@ -7,14 +7,14 @@
 
 ## Executive Summary
 
-**Overall Result:** ✅ PASS (Partial - 3/6 functions complete)  
-**Total Tests:** 38  
-**Passed:** 38  
+**Overall Result:** ✅ PASS (Partial - 4/6 functions complete)  
+**Total Tests:** 44
+**Passed:** 44
 **Failed:** 0  
 **Pass Rate:** 100%  
 **Code Coverage:** 60%
 
-Functions add(), update(), and delete() have been fully tested and are passing all tests. Remaining 3 functions (next, today, tomorrow) have placeholder tests.
+Functions add(), update(), delete(), and next() have been fully tested and are passing all tests. Remaining 3 functions (today, tomorrow) have placeholder tests.
 
 ---
 
@@ -197,7 +197,7 @@ TOTAL                 179    106    41%
 | add()      | ~25        | ~21     | ~85%     | ✅ Good      |
 | update()   | ~30        | ~27     | ~90%     | ✅ Excellent |
 | delete()   | ~25        | ~23     | ~90%     | ✅ Excellent |
-| next()     | ~15        | ~8      | ~50%     | ⏳ Partial   |
+| next()     | ~15        | ~14      | ~90%     | ✅ Excellent  |
 | today()    | ~18        | ~10     | ~55%     | ⏳ Partial   |
 | tomorrow() | ~18        | ~10     | ~55%     | ⏳ Partial   |
 
@@ -301,7 +301,7 @@ See `htmlcov/index.html` for detailed coverage report showing line-by-line cover
 
 ---
 
-**Report Prepared by:** Krish and Elaine
+**Report Prepared by:** Krish, Elaine and Shiman
 **Reviewed by:** Pending  
 **Approved by:** Pending  
 **Date:** October 31 2025 
