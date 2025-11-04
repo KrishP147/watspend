@@ -12,7 +12,7 @@ import pytest
 import unittest
 import sys
 import os
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 from datetime import datetime, date, timedelta
 import logging
 import pymysql
@@ -44,8 +44,8 @@ logger = logging.getLogger(__name__)
 @pytest.fixture
 def mock_connection():
     """Fixture to create a mock database connection and cursor"""
-    connection = Mock()
-    cursor = Mock()
+    connection = MagicMock()
+    cursor = MagicMock()
     connection.cursor.return_value = cursor
     return connection
 
@@ -551,9 +551,137 @@ class TestNextIntegration(unittest.TestCase):
 # TODO: Implement in Issue #9
 ################################################################################
 
-def test_today_placeholder_mock(mock_connection):
-    """Placeholder - TODO: Implement mock tests"""
-    pass
+def test_today_basic_success(mock_connection):
+    """Test that today() returns tasks due today"""
+    cursor_mock = MagicMock()
+    cursor_mock.fetchall.return_value = [
+        {"item": "Submit assignment", "type": "work", "started": "2024-11-04", "due": "2024-11-04", "done": None},
+        {"item": "Buy groceries", "type": "personal", "started": "2024-11-04", "due": "2024-11-04", "done": None}
+    ]
+    
+    # Mock the context manager
+    mock_connection.cursor.return_value.__enter__.return_value = cursor_mock
+    mock_connection.cursor.return_value.__exit__.return_value = None
+
+    result = todo.today(mock_connection, "test_user")
+
+    assert len(result) == 2
+    assert result[0]["item"] == "Submit assignment"
+    assert result[1]["item"] == "Buy groceries"
+    
+    # Check that cursor was called with DictCursor
+    mock_connection.cursor.assert_called_once_with(pymysql.cursors.DictCursor)
+    cursor_mock.execute.assert_called_once_with(
+        """
+        SELECT item, type, started, due, done
+        FROM ToDoData
+        WHERE userid = %s AND DATE(due) = CURDATE()
+    """,
+        ("test_user",)
+    )
+
+
+def test_today_no_tasks_due_today(mock_connection):
+    """Test that today() returns empty list if no tasks due today"""
+    cursor_mock = MagicMock()
+    cursor_mock.fetchall.return_value = []
+
+    mock_connection.cursor.return_value.__enter__.return_value = cursor_mock
+    mock_connection.cursor.return_value.__exit__.return_value = None
+
+    result = todo.today(mock_connection, "test_user")
+
+    assert result == []
+    assert isinstance(result, list)
+
+
+def test_today_sql_error(mock_connection):
+    """Test handling of SQL errors during query"""
+    cursor_mock = MagicMock()
+    cursor_mock.execute.side_effect = pymysql.Error("SQL error")
+
+    mock_connection.cursor.return_value.__enter__.return_value = cursor_mock
+    mock_connection.cursor.return_value.__exit__.return_value = None
+
+    with pytest.raises(pymysql.Error):
+        todo.today(mock_connection, "test_user")
+
+    mock_connection.rollback.assert_called_once()
+
+
+def test_today_userid_isolation(mock_connection):
+    """Test that query uses correct userid parameter"""
+    cursor_mock = MagicMock()
+    cursor_mock.fetchall.return_value = [
+        {"item": "User specific task", "type": "work", "started": "2024-11-04", "due": "2024-11-04", "done": None}
+    ]
+
+    mock_connection.cursor.return_value.__enter__.return_value = cursor_mock
+    mock_connection.cursor.return_value.__exit__.return_value = None
+
+    result = todo.today(mock_connection, "specific_test_user")
+    
+    assert len(result) == 1
+    assert result[0]["item"] == "User specific task"
+    cursor_mock.execute.assert_called_once_with(
+        """
+        SELECT item, type, started, due, done
+        FROM ToDoData
+        WHERE userid = %s AND DATE(due) = CURDATE()
+    """,
+        ("specific_test_user",)
+    )
+
+
+def test_today_multiple_tasks_due_today(mock_connection):
+    """Test that today() returns all tasks due today"""
+    cursor_mock = MagicMock()
+    cursor_mock.fetchall.return_value = [
+        {"item": "Morning task", "type": "personal", "started": "2024-11-04", "due": "2024-11-04", "done": None},
+        {"item": "Afternoon task", "type": "work", "started": "2024-11-04", "due": "2024-11-04", "done": None},
+        {"item": "Evening task", "type": "personal", "started": "2024-11-04", "due": "2024-11-04", "done": None}
+    ]
+
+    mock_connection.cursor.return_value.__enter__.return_value = cursor_mock
+    mock_connection.cursor.return_value.__exit__.return_value = None
+
+    result = todo.today(mock_connection, "busy_user")
+
+    assert len(result) == 3
+    assert all(task["due"] == "2024-11-04" for task in result)
+
+
+def test_today_with_completed_tasks(mock_connection):
+    """Test that today() includes both completed and incomplete tasks due today"""
+    cursor_mock = MagicMock()
+    cursor_mock.fetchall.return_value = [
+        {"item": "Completed task", "type": "work", "started": "2024-11-04", "due": "2024-11-04", "done": "2024-11-04"},
+        {"item": "Incomplete task", "type": "personal", "started": "2024-11-04", "due": "2024-11-04", "done": None}
+    ]
+
+    mock_connection.cursor.return_value.__enter__.return_value = cursor_mock
+    mock_connection.cursor.return_value.__exit__.return_value = None
+
+    result = todo.today(mock_connection, "test_user")
+
+    assert len(result) == 2
+    assert result[0]["done"] == "2024-11-04"  # completed
+    assert result[1]["done"] is None  # incomplete
+
+
+def test_today_context_manager_usage(mock_connection):
+    """Test that today() properly uses context manager for cursor"""
+    cursor_mock = MagicMock()
+    cursor_mock.fetchall.return_value = []
+
+    mock_connection.cursor.return_value.__enter__.return_value = cursor_mock
+    mock_connection.cursor.return_value.__exit__.return_value = None
+
+    todo.today(mock_connection, "test_user")
+
+    # Verify context manager methods were called
+    mock_connection.cursor.return_value.__enter__.assert_called_once()
+    mock_connection.cursor.return_value.__exit__.assert_called_once()
 
 class TestTodayIntegration(unittest.TestCase):
     """Integration tests for today() function with real database"""
@@ -583,9 +711,211 @@ class TestTodayIntegration(unittest.TestCase):
         except:
             pass
 
-    def test_today_placeholder_integration(self):
-        """Placeholder - TODO: Implement real DB tests"""
-        pass
+    def test_today_returns_tasks_due_today(self):
+        """Test that today() returns tasks due today"""
+        now = datetime.now()
+        today_date = now.date()
+        
+        # Insert tasks due today
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Task due today 1", "work", now, today_date, None)
+        )
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Task due today 2", "personal", now, today_date, None)
+        )
+        # Insert task due tomorrow (should not appear)
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Task due tomorrow", "work", now, today_date + timedelta(days=1), None)
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.today(self.connection, self.test_userid)
+        
+        self.assertEqual(len(result), 2)
+        task_items = [task["item"] for task in result]
+        self.assertIn("Task due today 1", task_items)
+        self.assertIn("Task due today 2", task_items)
+        self.assertNotIn("Task due tomorrow", task_items)
+
+    def test_today_returns_empty_list_no_tasks(self):
+        """Test that today() returns empty list when no tasks due today"""
+        # Don't insert any tasks
+        result = todo.today(self.connection, self.test_userid)
+        self.assertEqual(result, [])
+        self.assertIsInstance(result, list)
+
+    def test_today_returns_empty_list_no_today_tasks(self):
+        """Test that today() returns empty list when user has tasks but none due today"""
+        now = datetime.now()
+        yesterday = now.date() - timedelta(days=1)
+        tomorrow = now.date() + timedelta(days=1)
+        
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Task due yesterday", "work", now, yesterday, None)
+        )
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Task due tomorrow", "work", now, tomorrow, None)
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.today(self.connection, self.test_userid)
+        self.assertEqual(result, [])
+
+    def test_today_includes_completed_tasks(self):
+        """Test that today() includes both completed and incomplete tasks due today"""
+        now = datetime.now()
+        today_date = now.date()
+        
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Completed task today", "work", now, today_date, now)
+        )
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Incomplete task today", "personal", now, today_date, None)
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.today(self.connection, self.test_userid)
+        
+        self.assertEqual(len(result), 2)
+        completed_task = next(task for task in result if task["item"] == "Completed task today")
+        incomplete_task = next(task for task in result if task["item"] == "Incomplete task today")
+        
+        self.assertIsNotNone(completed_task["done"])
+        self.assertIsNone(incomplete_task["done"])
+
+    def test_today_userid_isolation_integration(self):
+        """Test that today() only returns tasks for the specified user"""
+        now = datetime.now()
+        today_date = now.date()
+        
+        cursor = self.connection.cursor()
+        # Add task for test user
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "My task today", "work", now, today_date, None)
+        )
+        # Add task for different user
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            ("other_test_user", "Other user task today", "work", now, today_date, None)
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.today(self.connection, self.test_userid)
+        
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["item"], "My task today")
+        
+        # Verify other user's task exists
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT COUNT(*) FROM ToDoData WHERE userid = %s AND item = %s",
+            ("other_test_user", "Other user task today")
+        )
+        count = cursor.fetchone()[0]
+        cursor.close()
+        self.assertEqual(count, 1)
+        
+        # Cleanup other user's data
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM ToDoData WHERE userid = %s", ("other_test_user",))
+        self.connection.commit()
+        cursor.close()
+
+    def test_today_with_different_times_same_date(self):
+        """Test that today() returns tasks due today regardless of time"""
+        now = datetime.now()
+        today_date = now.date()
+        
+        cursor = self.connection.cursor()
+        # Task due early morning today
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Morning task", "work", now, 
+             datetime.combine(today_date, datetime.min.time().replace(hour=8)), None)
+        )
+        # Task due late evening today
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Evening task", "personal", now,
+             datetime.combine(today_date, datetime.min.time().replace(hour=23, minute=59)), None)
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.today(self.connection, self.test_userid)
+        
+        self.assertEqual(len(result), 2)
+        task_items = [task["item"] for task in result]
+        self.assertIn("Morning task", task_items)
+        self.assertIn("Evening task", task_items)
+
+    def test_today_with_null_due_dates(self):
+        """Test that today() ignores tasks with null due dates"""
+        now = datetime.now()
+        today_date = now.date()
+        
+        cursor = self.connection.cursor()
+        # Task with due date today
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Task with due date", "work", now, today_date, None)
+        )
+        # Task with null due date
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Task without due date", "personal", now, None, None)
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.today(self.connection, self.test_userid)
+        
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["item"], "Task with due date")
+
+    def test_today_return_format(self):
+        """Test that today() returns list of dictionaries with correct keys"""
+        now = datetime.now()
+        today_date = now.date()
+        
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO ToDoData (userid, item, type, started, due, done) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.test_userid, "Format test task", "work", now, today_date, None)
+        )
+        self.connection.commit()
+        cursor.close()
+
+        result = todo.today(self.connection, self.test_userid)
+        
+        self.assertEqual(len(result), 1)
+        task = result[0]
+        
+        # Check that all expected keys are present
+        expected_keys = {"item", "type", "started", "due", "done"}
+        self.assertEqual(set(task.keys()), expected_keys)
+        
+        # Check data types and values
+        self.assertEqual(task["item"], "Format test task")
+        self.assertEqual(task["type"], "work")
+        self.assertIsNotNone(task["started"])
+        self.assertIsNotNone(task["due"])
+        self.assertIsNone(task["done"])
 
 
 ################################################################################
