@@ -39,7 +39,7 @@ The dashboard will present **categorized spending trends, remaining balance visu
 - Monthly reports display 
 - SMS/Different method of notifications (ie. monthly report out)
 - Public or multi-user authentication system (may be added later)
-- Local or limited-access server setup (no public hosting yet).
+- Local or limited-access server setup (no public hosting yet)
 
 ### Out of Scope
 - Cloud deployment and live web hosting
