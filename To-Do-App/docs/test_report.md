@@ -26,7 +26,7 @@ Functions add(), update(), delete(), and next() have been fully tested and are p
 | update()   | 6          | 4                 | 10     | 10     | 0      | 100%      | Krish     |
 | delete()   | 6          | 4                 | 10     | 10     | 0      | 100%      | Elaine    |
 | next()     | 5          | 4                 | 9      | 9      | 0      | 100%      | Shiman    |
-| today()    | 1          | 1                 | 2      | 2      | 0      | 100%      | Pending   |
+| today()    | 7          | 8                 | 15     | 15     | 0      | 100%      | Liron.    |
 | tomorrow() | 1          | 1                 | 2      | 2      | 0      | 100%      | Pending   |
 | **TOTAL**  | **25**     | **19**            | **44** | **44** | **0**  | **100%**  | -         |
 
@@ -160,12 +160,37 @@ Resolution: Added safe cleanup block in finally to handle cursor close exception
 ---
 
 ### 2.5 today() Function
-**Tested by:** Pending  
-**Total Tests:** 2 (placeholders)  
-**Pass Rate:** 100% (placeholders)  
-**Coverage:** 0%
+**Tested by:** Liron  
+**Total Tests:** 15  
+**Pass Rate:** 100%  
+**Coverage:** Estimated 90%+
 
-**Status:** Awaiting implementation by Liron
+**Unit Test Results:**
+| Test ID     | Test Name                            | Status | Duration | Notes                                      |
+| ----------- | ------------------------------------ | ------ | -------- | ------------------------------------------ |
+| UT-TOD-01   | test_today_basic_success             | ✅ PASS | <50ms    | Returns tasks due today correctly          |
+| UT-TOD-02   | test_today_no_tasks_due_today        | ✅ PASS | <50ms    | Returns empty list when no tasks due      |
+| UT-TOD-03   | test_today_sql_error                 | ✅ PASS | <50ms    | SQL errors handled with rollback          |
+| UT-TOD-04   | test_today_userid_isolation          | ✅ PASS | <50ms    | Userid parameter filtering verified       |
+| UT-TOD-05   | test_today_multiple_tasks_due_today  | ✅ PASS | <50ms    | Multiple tasks returned correctly         |
+| UT-TOD-06   | test_today_with_completed_tasks      | ✅ PASS | <50ms    | Includes both completed and incomplete    |
+| UT-TOD-07   | test_today_context_manager_usage     | ✅ PASS | <50ms    | Context manager properly used for cursor  |
+
+**Integration Test Results:**
+| Test ID     | Test Name                                    | Status | Duration | Notes                                    |
+| ----------- | -------------------------------------------- | ------ | -------- | ---------------------------------------- |
+| IT-TOD-01   | test_today_returns_tasks_due_today           | ✅ PASS | ~70ms    | Tasks due today retrieved from real DB   |
+| IT-TOD-02   | test_today_returns_empty_list_no_tasks       | ✅ PASS | ~70ms    | Empty list when no tasks exist          |
+| IT-TOD-03   | test_today_returns_empty_list_no_today_tasks | ✅ PASS | ~70ms    | Empty list when tasks exist but not due |
+| IT-TOD-04   | test_today_includes_completed_tasks          | ✅ PASS | ~70ms    | Both completed and incomplete included   |
+| IT-TOD-05   | test_today_userid_isolation_integration      | ✅ PASS | ~70ms    | User isolation maintained in real DB    |
+| IT-TOD-06   | test_today_with_different_times_same_date    | ✅ PASS | ~70ms    | Different times on same date included   |
+| IT-TOD-07   | test_today_with_null_due_dates               | ✅ PASS | ~70ms    | Tasks with null due dates ignored       |
+| IT-TOD-08   | test_today_return_format                     | ✅ PASS | ~70ms    | Dictionary format with correct keys      |
+
+**Issues Found:** 1 (Resolved)  
+**Issue:** Function returned tuple instead of list when no results found  
+**Resolution:** Modified function to return `list(results)` ensuring consistent list return type
 
 ---
 
