@@ -4,22 +4,26 @@
 **WatCard Meal Plan Dashboard**
 
 ## 2. Project Overview
-The goal of this project is to develop the **WatCard Meal Plan Dashboard, a web-based visualization tool** that helps University of Waterloo students track and analyze their WatCard spending.
+The goal of this project is to develop the **WatCard Plan Dashboard, a web-based visualization tool** that helps University of Waterloo students track and analyze their WatCard spending.
 
 The system will consist of a **Chrome extension** that securely scrapes a user’s WatCard account data upon login and exports it in JSON format. This data will then be sent to the frontend dashboard, where it is visualized and stored in a MySQL database.
 
-The dashboard will present **categorized spending trends, remaining balance visualizations, and monthly summary reports.** Additionally, users can manually log external income or expenses beyond their WatCard balance, providing a complete overview of their financial activity and helping them monitor their monthly spending goals.
+The dashboard will present **categorized spending trends, remaining balance visualizations, and monthly summary reports.** Additionally, users can manually log spending, providing a complete overview of their financial activity and helping them monitor their monthly spending goals at the University of Waterloo.
 
 ## 3. Project Objectives
 - Build a Chrome extension to securely scrape WatCard transaction data after user login.
-- Store parsed transaction data in a MySQL database using JSON-based data exchange.
-- Design an interactive dashboard frontend to visualize:
-- Total balance and category-wise spending.
-- Monthly spending progress vs. user-defined goals.
-- Spending trends and personalized insights (e.g., “You spent 30% less on coffee this month!”).
-- Allow users to input custom spending and income entries.
-- Generate automatic monthly spending summaries and reports.
-- Ensure data privacy and avoid online exposure of personal financial data.
+- Decipher and map scraped data fields (e.g., transaction names, IDs) to their real-world categories for accurate financial tracking.
+- Store parsed transaction data and corresponding JSON files in a MySQL database for persistent and structured data management.
+- Design and develop a web application dashboard (beyond a simple visualization) with advanced, interactive data analytics and visualization features to display:
+    - Total balance and category-wise spending.
+    - Separate monthly spending goal charts for each category (e.g., food, coffee, printing).
+    - Spending trends and personalized insights (e.g., “You spent 30% less on coffee this month!”).
+    - User-added custom transactions and spending categories.
+- Enable secure user authentication, potentially via Google login or a custom account system, to ensure data is tied to individual users.
+- Integrate SMS notifications or interactions, such as monthly summaries or spending alerts sent directly to the user’s phone.
+- Generate automated monthly spending summaries and reports, both within the dashboard and optionally through email or SMS.
+- Redesign and improve the Chrome extension UI for better usability and seamless connection with the web dashboard.
+- Ensure data privacy and security, preventing any online exposure or unauthorized access to personal financial data.
 
 ## 4. Scope
 ### In Scope
@@ -30,13 +34,17 @@ The dashboard will present **categorized spending trends, remaining balance visu
     - Setting monthly category goals.
     - Displaying progress bars and trends.
     - Generating personalized monthly reports.
-- Option to add manual spending/income.
+- Option to add manual spending
+- Hyperlink to actual WatCard website
+- Monthly reports display 
+- SMS/Different method of notifications (ie. monthly report out)
+- Public or multi-user authentication system (may be added later)
 - Local or limited-access server setup (no public hosting yet).
 
 ### Out of Scope
-- Public or multi-user authentication system (may be added later)
 - Cloud deployment and live web hosting
 - Integration with actual WatCard API (scraping-based only for now)
+- External payments scrapping/API outside of WatCard
 
 ## 5. Stakeholders
 | Role               | Name / Group           | Responsibilities                                                 |
@@ -60,8 +68,8 @@ The dashboard will present **categorized spending trends, remaining balance visu
 
 ## 7. Technology Stack
 - **Frontend:** HTML, CSS, JavaScript (React or Vanilla JS)
-- **Backend:** Python (Flask)
-- **Database:** SQLite (or PostgreSQL / MySQL if configured)  
+- **Backend:** JavaScript (express)
+- **Database:**  MySQL
 - **Extension:** Chrome API (JavaScript-based scraper)
 - **Visualization:** Chart.js / D3.js
 - **Version Control:** Git (GitLab)
