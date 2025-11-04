@@ -161,9 +161,32 @@
 ### 3.5 today() Function
 **Tested by:** Liron  
 **Issue:** #6  
-**Status:** 🔄 In Progress
+**Status:** ✅ Complete
 
-[To be completed by Liron]
+**Unit Tests:**
+| Test ID   | Test Case                         | Expected Result                                  | Status |
+| --------- | --------------------------------- | ------------------------------------------------ | ------ |
+| UT-TOD-01 | Return tasks due today            | Returns list of dictionaries with today's tasks | ✅ PASS |
+| UT-TOD-02 | Return empty list no tasks        | Returns empty list when no tasks due today      | ✅ PASS |
+| UT-TOD-03 | Handle SQL errors                 | Raises pymysql.Error, rollback called           | ✅ PASS |
+| UT-TOD-04 | Filter by userid                  | SQL contains correct userid parameter            | ✅ PASS |
+| UT-TOD-05 | Return multiple tasks due today   | Returns all tasks due today for user            | ✅ PASS |
+| UT-TOD-06 | Include completed and incomplete  | Returns both done and undone tasks due today    | ✅ PASS |
+| UT-TOD-07 | Use context manager properly      | Cursor context manager __enter__/__exit__ called | ✅ PASS |
+
+**Integration Tests:**
+| Test ID   | Test Case                              | Expected Result                                    | Status |
+| --------- | -------------------------------------- | -------------------------------------------------- | ------ |
+| IT-TOD-01 | Return real tasks due today            | Tasks with today's due date retrieved from DB     | ✅ PASS |
+| IT-TOD-02 | Empty list when no tasks exist         | Returns [] when user has no tasks at all          | ✅ PASS |
+| IT-TOD-03 | Empty list when no tasks due today     | Returns [] when user has tasks but none due today | ✅ PASS |
+| IT-TOD-04 | Include completed tasks                 | Both completed and incomplete tasks returned      | ✅ PASS |
+| IT-TOD-05 | User isolation in database             | Only returns tasks for specified userid           | ✅ PASS |
+| IT-TOD-06 | Different times same date              | Tasks due at different times on same date included | ✅ PASS |
+| IT-TOD-07 | Ignore null due dates                  | Tasks with due=NULL are not included              | ✅ PASS |
+| IT-TOD-08 | Correct return format                  | Returns list of dicts with correct keys           | ✅ PASS |
+
+**Coverage:** 15/15 tests passing (100%)
 
 ---
 
@@ -250,7 +273,7 @@ python -m unittest test_code.TestUpdateIntegration -v
 | Implement update() tests   | Krish  | Nov 2025 | ✅ Complete    |
 | Implement delete() tests   | Elaine | Nov 2025 | ✅ Complete    |
 | Implement next() tests     | Shiman | Nov 2025 | ✅ Complete    |
-| Implement today() tests    | Liron  | TBD      | 🔄 In Progress |
+| Implement today() tests    | Liron  | Nov 2025 | ✅ Complete  |
 | Implement tomorrow() tests | Ava    | TBD      | 🔄 In Progress |
 | Run all tests              | All    | TBD      | 🔄 In Progress |
 | Write test report          | Krish  | TBD      | 🔄 In Progress |
@@ -259,10 +282,10 @@ python -m unittest test_code.TestUpdateIntegration -v
 
 ## 8. Current Progress
 
-**Completed:** 2/6 functions (33%)  
-**Tests Passing:** 28/28 (100%)  
-**Code Coverage:** 42%  
-**Remaining Work:** 4 functions (delete, next, today, tomorrow)
+**Completed:** 5/6 functions (83%)  
+**Tests Passing:** 55/55 (100%)  
+**Code Coverage:** 75%  
+**Remaining Work:** 1 function (tomorrow)
 
 ---
 
