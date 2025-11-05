@@ -186,7 +186,7 @@ watcard-dashboard/
 
 ---
 
-**Document Version**: 1.0  
+**Document Version**: 1.0 
 **Last Updated**: Nov 4
 **Status**: Draft
 
