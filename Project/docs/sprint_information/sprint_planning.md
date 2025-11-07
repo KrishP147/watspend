@@ -1,4 +1,4 @@
-# 🧭 Sprint Report — Week 1
+# Sprint Report — Week 1
 
 ## Sprint Overview
 | Field | Details |
@@ -23,11 +23,11 @@
 
 ---
 
-## ⚙️ Progress Summary
-### ✅ What was done this week
+## Progress Summary
+### What was done this week
 - (To be filled at end of sprint)
 
-### 🕒 What is in progress
+### What is in progress
 - GitLab repository and environment setup  
 - Drafting project charter, user stories, domain model, and use cases  
 - Confirming team roles and responsibilities  
@@ -36,12 +36,12 @@
 - Cleaning and interpreting JSON data  
 - Creating documentation and testing environment setup  
 
-### ⚠️ Blockers / Delays
+### Blockers / Delays
 - None yet identified; waiting to begin full development after setup is complete.  
 
 ---
 
-## 🧠 Sprint Review (End-of-Week Results)
+## Sprint Review (End-of-Week Results)
 | Area | Description |
 |------|--------------|
 | **Summary** | *(To be completed at the end of the sprint)* |
@@ -50,7 +50,7 @@
 
 ---
 
-## 🔍 Sprint Retrospective
+## Sprint Retrospective
 | Question | Team Notes |
 |-----------|-------------|
 | **What went well?** | *(To be completed at end of sprint)* |
@@ -59,14 +59,14 @@
 
 ---
 
-## 📅 Next Sprint Preview
+## Next Sprint Preview
 | Planned Focus | Example Tasks |
 |----------------|----------------|
 | *(To be determined after Sprint 1 results)* | *(e.g., begin implementation and integration tasks)* |
 
 ---
 
-## 🗂️ Issue Board Summary
+## Issue Board Summary
 | Status | Issues / Tasks |
 |---------|----------------|
 | **To Do** | - Chrome extension setup<br>- Figma design<br>- JSON cleanup<br>- Project charter and documentation |
@@ -78,3 +78,6 @@
 *Prepared by:* Team 10  
 *Date Prepared:* Nov 4, 2025  
 *Date To Be Updated:* Nov 11, 2025
+
+# Sprint Report — Week 2
+...
