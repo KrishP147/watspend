@@ -14,10 +14,10 @@
 | **What can be improved next sprint?**
 - Schedule a quick meeting to clarify technical challenges (especially JSON handling)
 - Establish clearer documentation for backend processes
-- Begin integrating frontend and backend earlier to detect issues sooner
+- Begin integrating frontend and backend earlier
 
 ## Week 1 - Velocity Summary
-| **Metric**              | **Value / Description**                                                                                                                          |
+| **Metric**              | **Value / Description**                                                                                                                           |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Total Planned Tasks** | 8 *(excluding ongoing issues)*                                                                                                                   |
 | **Tasks Completed**     | 7                                                                                                                                                |
