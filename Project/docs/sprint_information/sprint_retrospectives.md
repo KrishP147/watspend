@@ -1,20 +1,20 @@
 ## Week 1 - Sprint Retrospective
 
 | **What went well?** | 
-- Strong collaboration and clear communication among members.
-- Completed nearly all setup and planning tasks on schedule.
-- Effective use of GitLab for coordination and version control.
-- Figma prototype helped visualize the web app early on. 
+- Strong collaboration and clear communication among members
+- Completed nearly all setup and planning tasks on schedule
+- Effective use of GitLab for coordination and version control
+- Figma prototype helped visualize the web app early on
 
 | **What didn’t go well?** | 
-- Encountered difficulties understanding and translating JSON data.
-- Minor confusion in defining the Chrome extension’s scope and data flow.
-- Some dependency issues during environment setup.
+- Encountered difficulties understanding and translating JSON data
+- Minor confusion in defining the Chrome extension’s scope and data flow
+- Some dependency issues during environment setup
 
-| **What can be improved next sprint?** | *(To be completed at end of sprint)* |
-- Schedule a quick meeting to clarify technical challenges (especially JSON handling).
-- Establish clearer documentation for backend processes.
-- Begin integrating frontend and backend earlier to detect issues sooner.
+| **What can be improved next sprint?**
+- Schedule a quick meeting to clarify technical challenges (especially JSON handling)
+- Establish clearer documentation for backend processes
+- Begin integrating frontend and backend earlier to detect issues sooner
 
 ## Week 1 - Velocity Summary
 | **Metric**              | **Value / Description**                                                                                                                          |
