@@ -1,0 +1,30 @@
+{
+    "manifest_version": 3,
+    "name": "MealPlan Dashboard Scraper",
+    "version": "1.0.0",
+    "description": "Extract and upload meal plan transactions to your dashboard",
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "storage"
+    ],
+    "host_permissions": [
+      "https://*.touchnet.net/*",
+      "http://localhost:4000/*", 
+      "http://127.0.0.1:4000/*"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://*.touchnet.net/*"],
+        "js": ["content.js"],
+        "run_at": "document_idle"
+      }
+    ]
+  }
+  
