@@ -12,9 +12,72 @@ This directory contains all database-related files for the WatCard Dashboard pro
 
 ### Option A: Local MySQL Setup (Recommended for Development)
 
-### STEP 1 CREATE DATABASE
+#### Step 0: Install MySQL 8.x
 
-### UW SE101 Shared Server Setup
+**macOS:**
+```bash
+# Using Homebrew
+brew install mysql@8.0
+
+# Start MySQL service
+brew services start mysql@8.0
+
+# Secure the installation (set root password)
+mysql_secure_installation
+```
+
+**Windows:**
+1. Download MySQL 8.x installer from [https://dev.mysql.com/downloads/installer/](https://dev.mysql.com/downloads/installer/)
+2. Run the installer and select "Developer Default" or "Server only"
+3. Follow the setup wizard:
+   - Choose "Standalone MySQL Server"
+   - Set a root password (remember this!)
+   - Configure MySQL to run as a Windows service
+4. Verify installation:
+```cmd
+mysql --version
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+# Update package list
+sudo apt update
+
+# Install MySQL 8.x
+sudo apt install mysql-server
+
+# Start MySQL service
+sudo systemctl start mysql
+sudo systemctl enable mysql
+
+# Secure the installation
+sudo mysql_secure_installation
+```
+
+**Verify Installation:**
+```bash
+# Check MySQL version (should be 8.x)
+mysql --version
+
+# Login to MySQL
+mysql -u root -p
+```
+
+#### Step 1: Create Database
+
+**For Local MySQL:**
+```bash
+# Login to MySQL
+mysql -u root -p
+
+# Create the database
+CREATE DATABASE watcard_dashboard;
+
+# Exit MySQL
+EXIT;
+```
+
+### Option B: UW SE101 Shared Server Setup
 
 If you're using the UW SE101 shared MySQL server (`riku.shoshin.uwaterloo.ca`), you likely **cannot create databases**. Instead:
 
@@ -45,7 +108,7 @@ USE SE101_Team_10;
 
 **Note:** You don't need to create a new database - just use the one you have access to!
 
-### Step 3: Run Schema
+### Step 2: Run Schema
 
 **For Local MySQL:**
 ```bash
@@ -76,18 +139,26 @@ mysql> SOURCE /Users/YOUR_USERNAME/Desktop/SWE/UW_SE/SE101/project_team_10/Proje
 mysql> SOURCE ~/Desktop/SWE/UW_SE/SE101/project_team_10/Project/database/schema.sql;
 ```
 
-### Step 4: Load Sample Data (Optional)
+### Step 3: Load Sample Data (Optional)
 
 ```bash
+# For Local MySQL:
+mysql -u root -p watcard_dashboard < database/seed.sql
+
+# For Shared Server:
 mysql -u YOUR_USERID -p -h riku.shoshin.uwaterloo.ca SE101_Team_10 < Project/database/seed.sql
 ```
 
-### Step 5: Verify Setup
+### Step 4: Verify Setup
 
 ```bash
+# For Local MySQL:
+mysql -u root -p watcard_dashboard
+
+# For Shared Server:
 mysql -u YOUR_USERID -p -h riku.shoshin.uwaterloo.ca
 
-#select SE101_Team_10
+# Select database (if using shared server)
 USE SE101_Team_10
 
 # Check tables
