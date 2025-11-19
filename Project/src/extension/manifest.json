@@ -25,6 +25,11 @@
         "js": ["content.js"],
         "run_at": "document_idle"
       }
-    ]
+    ],
+    "icons": {
+      "16": "icon/university-of-waterloo-1-logo.png",
+      "48": "icon/university-of-waterloo-1-logo.png",
+      "128": "icon/university-of-waterloo-1-logo.png"
+    }
   }
   
