@@ -1,0 +1,3 @@
+## Run locally
+
+`npm start`
