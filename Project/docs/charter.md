@@ -17,12 +17,8 @@ The dashboard will present **categorized spending trends, remaining balance visu
 - Design and develop a web application dashboard (beyond a simple visualization) with advanced, interactive data analytics and visualization features to display:
     - Total balance and category-wise spending.
     - Separate monthly spending goal charts for each category (e.g., food, coffee, printing).
-    - Spending trends and personalized insights (e.g., “You spent 30% less on coffee this month!”).
     - User-added custom transactions and spending categories.
 - Enable secure user authentication, potentially via Google login or a custom account system, to ensure data is tied to individual users.
-- Integrate SMS notifications or interactions, such as monthly summaries or spending alerts sent directly to the user’s phone.
-- Generate automated monthly spending summaries and reports, both within the dashboard and optionally through email or SMS.
-- Redesign and improve the Chrome extension UI for better usability and seamless connection with the web dashboard.
 - Ensure data privacy and security, preventing any online exposure or unauthorized access to personal financial data.
 
 ## 4. Scope
@@ -35,10 +31,7 @@ The dashboard will present **categorized spending trends, remaining balance visu
     - Displaying progress bars and trends.
     - Generating personalized monthly reports.
 - Option to add manual spending
-- Hyperlink to actual WatCard website
 - Monthly reports display 
-- SMS/Different method of notifications (ie. monthly report out)
-- Public or multi-user authentication system (may be added later)
 - Local or limited-access server setup (no public hosting yet)
 
 ### Out of Scope
@@ -67,7 +60,7 @@ The dashboard will present **categorized spending trends, remaining balance visu
 - GitLab repository with branching workflow and approved merge requests
 
 ## 7. Technology Stack
-- **Frontend:** HTML, CSS, JavaScript (React or Vanilla JS)
+- **Frontend:** HTML, CSS, JavaScript (React)
 - **Backend:** JavaScript (express)
 - **Database:**  MySQL
 - **Extension:** Chrome API (JavaScript-based scraper)
@@ -136,58 +129,16 @@ By signing below, all team members agree to:
 
 | **Team Member** | **Role / Responsibility**                                                                                               | **Signature**     | **Date** |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------- | -------- |
-| **Shiman**      | Chrome Extension & Data Pipeline Lead <br> (WatCard scraping, JSON export, backend integration, data interpretation)    | _________________ | _______  |
-| **Ava**         | Frontend & UI/UX Lead <br> (Progress bars, goal tracking, testing, documentation support)                               | _________________ | _______  |
-| **Krish**       | Backend & Repository Lead <br> (MySQL integration, GitLab workflow, testing, use cases, documentation)                  | _________________ | _______  |
-| **Elaine**      | Reporting & Feature Development Lead <br> (PDF summary feature, monthly reports, documentation, demo video)             | _________________ | _______  |
-| **Liron**       | Authentication & Deployment Lead <br> (Google login, Chrome extension publishing, SMS integration, data interpretation) | _________________ | _______  |
+| **Shiman**      | Chrome Extension & Data Pipeline Lead <br> (WatCard scraping, JSON export, backend integration, data interpretation)    | Shiman            | Nov 11   |
+| **Ava**         | Frontend & UI/UX Lead <br> (Progress bars, goal tracking, testing, documentation support)                               | Ava               | Nov 11   |
+| **Krish**       | Backend & Repository Lead <br> (MySQL integration, GitLab workflow, testing, use cases, documentation)                  | Krish             | Nov 11   |
+| **Elaine**      | Reporting & Feature Development Lead <br> (PDF summary feature, monthly reports, documentation, demo video)             | Elaine            | Nov 11   |
+| **Liron**       | Authentication & Deployment Lead <br> (Google login, Chrome extension publishing, SMS integration, data interpretation) | Liron             | Nov 11   |
 
 ---
 
-## Appendix A: Project Directory Structure
-
-```
-watcard-dashboard/
-├── README.md                          # Setup instructions
-├── docs/
-│   ├── charter.md                     # This file
-│   ├── user_stories.md                # User stories (Krish)
-│   ├── domain_model.md                # Domain model (Krish)
-│   ├── use_cases.md                   # Use cases (Krish)
-│   ├── test_plan.md                   # Test plan (Krish, Ava)
-│   ├── test_report.md                 # Test results (Krish, Ava)
-│   ├── user_manual.md                 # User guide (Elaine, Krish)
-│   ├── sprint_retrospectives.md       # Retro notes (Ava)
-│   ├── review_presentation.pdf        # Final presentation (Ava, Shiman)
-│   └── demo.mp4                       # Demo video (Elaine)
-├── src/
-│   ├── backend/                       # Flask backend
-│   │   ├── app.py                     # Main Flask app
-│   │   ├── routes/                    # API endpoints
-│   │   ├── models/                    # Database models
-│   │   └── utils/                     # Helper functions
-│   ├── frontend/                      # Dashboard frontend
-│   │   ├── static/                    # CSS, JS, images
-│   │   └── templates/                 # HTML templates
-│   └── extension/                     # Chrome extension
-│       ├── manifest.json
-│       ├── popup/
-│       ├── content/
-│       └── background/
-├── tests/                             # PyTest tests
-│   ├── test_api.py
-│   ├── test_scraper.py
-│   └── fixtures/
-├── database/
-│   ├── schema.sql                     # Database schema
-│   └── seed.sql                       # Sample data
-└── requirements.txt                   # Python dependencies
-```
-
----
-
-**Document Version**: 1.0  
-**Last Updated**: Nov 4
+**Document Version**: 1.5  
+**Last Updated**: Nov 26
 **Status**: Draft
 
 ---
