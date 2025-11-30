@@ -354,14 +354,14 @@ export function DashboardOverview() {
       {/* All 4 Cards - Responsive Grid */}
       <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Spending Breakdown Card - Deep Purple Theme */}
-        <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center overflow-hidden rounded-xl sm:col-span-2 lg:col-span-1" style={{ background: 'linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%)' }}>
-          <CardHeader className="pb-3 pt-4 sm:pt-6 px-4 sm:px-6 flex flex-col items-center justify-center">
-            <CardTitle className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-5 text-center tracking-tight">
+        <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center overflow-hidden rounded-xl sm:col-span-2 lg:col-span-1 min-h-[220px] sm:min-h-[260px]" style={{ background: 'linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%)' }}>
+          <CardHeader className="pb-4 sm:pb-6 pt-5 sm:pt-7 px-5 sm:px-7 flex flex-col items-center justify-center">
+            <CardTitle className="text-base sm:text-lg font-bold text-white mb-4 sm:mb-6 text-center tracking-tight">
               Spending Breakdown
             </CardTitle>
-            <div className="space-y-2 sm:space-y-3 w-full">
+            <div className="space-y-3 sm:space-y-4 w-full">
               <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-xs sm:text-sm h-8 sm:h-9 transition-all backdrop-blur-sm">
+                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-xs sm:text-sm h-9 sm:h-10 transition-all backdrop-blur-sm">
                   <SelectValue placeholder="Range" className="text-white" />
                 </SelectTrigger>
                 <SelectContent>
@@ -373,7 +373,7 @@ export function DashboardOverview() {
                 </SelectContent>
               </Select>
               <Select value={selectedViewId} onValueChange={setSelectedViewId}>
-                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-xs sm:text-sm h-8 sm:h-9 transition-all backdrop-blur-sm">
+                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-xs sm:text-sm h-9 sm:h-10 transition-all backdrop-blur-sm">
                   <SelectValue placeholder="View" className="text-white" />
                 </SelectTrigger>
                 <SelectContent>
