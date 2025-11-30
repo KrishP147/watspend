@@ -1,4 +1,7 @@
-const API_URL = 'http://localhost:4000/api';
+// Use environment variable for API URL, fallback to localhost for development
+const API_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';  // Use relative path which works with Vite proxy in dev
 
 export interface User {
   id: number;

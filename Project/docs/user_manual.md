@@ -418,6 +418,70 @@ If you encounter issues:
 
 ---
 
+## 11. Deployment Information
+
+### 11.1 Production URLs
+
+The WatSpend application is deployed using:
+
+| Component | Platform | URL |
+|-----------|----------|-----|
+| Frontend | Vercel | `https://watspend.vercel.app` (example) |
+| Backend | Render | `https://watspend-api.onrender.com` (example) |
+| Database | UWaterloo | `riku.shoshin.uwaterloo.ca` |
+
+> **Note**: Replace the example URLs with actual deployment URLs once deployed.
+
+### 11.2 Using the Deployed Version
+
+1. **Dashboard**: Visit the Vercel URL to access the dashboard
+2. **Chrome Extension**: The extension needs to be configured for production:
+   - Open `src/extension/background.js`
+   - Change `API_BASE_URL` to your Render backend URL
+   - Reload the extension in Chrome
+
+### 11.3 Self-Hosting
+
+If you want to deploy your own instance:
+
+**Frontend (Vercel)**:
+1. Fork the repository to your GitHub account
+2. Go to [vercel.com](https://vercel.com) and sign in
+3. Click "New Project" → Import your fork
+4. Set the root directory to `src/`
+5. Add environment variable: `VITE_API_URL=https://your-backend.onrender.com`
+6. Deploy!
+
+**Backend (Render)**:
+1. Go to [render.com](https://render.com) and sign in
+2. Click "New" → "Web Service"
+3. Connect your repository
+4. Set the root directory to `mealplan-server/`
+5. Add environment variables (see below)
+6. Deploy!
+
+**Required Backend Environment Variables**:
+| Variable | Description |
+|----------|-------------|
+| `DB_HOST` | `riku.shoshin.uwaterloo.ca` |
+| `DB_USER` | Your database username |
+| `DB_PASS` | Your database password |
+| `DB_NAME` | `Project_Team_10` |
+| `JWT_SECRET` | Secret key for JWT tokens |
+| `SESSION_SECRET` | Secret key for sessions |
+| `GOOGLE_CLIENT_ID` | From Google Cloud Console |
+| `GOOGLE_CLIENT_SECRET` | From Google Cloud Console |
+| `GOOGLE_CALLBACK_URL` | `https://your-backend.onrender.com/api/auth/google/callback` |
+| `FRONTEND_URL` | `https://your-frontend.vercel.app` |
+
+### 11.4 Important Notes
+
+- **Free Tier Limitations**: Render's free tier spins down after 15 minutes of inactivity. The first request may take 30-60 seconds while it restarts.
+- **Chrome Extension**: For production use, update the `API_BASE_URL` in `background.js` and reload the extension.
+- **Google OAuth**: You must add your production callback URL to your Google Cloud Console OAuth settings.
+
+---
+
 ## Quick Reference Card
 
 | Action | How To |

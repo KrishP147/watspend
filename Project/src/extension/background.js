@@ -1,5 +1,20 @@
 console.log("[Background] Service worker started");
 
+// Configuration - Change this URL for production deployment
+// Development: http://localhost:4000
+// Production: Your Render backend URL (e.g., https://watspend-api.onrender.com)
+const API_BASE_URL = "http://localhost:4000";
+
+// Dashboard URLs to check for auth tokens
+const DASHBOARD_URLS = [
+  "http://localhost:5173/*",
+  "http://localhost:5174/*",
+  "http://localhost:5175/*",
+  "http://localhost:5176/*"
+  // Add your Vercel production URL here when deployed:
+  // "https://your-app.vercel.app/*"
+];
+
 // Get auth token - try storage first, then dashboard tabs
 async function getAuthToken() {
   // Try chrome.storage first
@@ -12,7 +27,7 @@ async function getAuthToken() {
     console.log("[Background] Storage error:", e);
   }
   
-  // Try dashboard tabs
+  // Try dashboard tabs (both localhost and production)
   const ports = [5173, 5174, 5175, 5176];
   for (const port of ports) {
     try {
@@ -41,7 +56,7 @@ async function uploadTransactions(data) {
   }
   
   try {
-    const res = await fetch("http://localhost:4000/api/upload", {
+    const res = await fetch(`${API_BASE_URL}/api/upload`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -67,7 +82,7 @@ async function uploadFunds(data) {
   }
   
   try {
-    const res = await fetch("http://localhost:4000/api/upload-funds", {
+    const res = await fetch(`${API_BASE_URL}/api/upload-funds`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

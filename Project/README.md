@@ -245,6 +245,72 @@ Frontend runs at **http://localhost:5173**
 
 ---
 
+## Deployment
+
+### Frontend - Vercel
+
+1. Fork/push your repository to GitHub
+2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
+3. Click **"New Project"** → Import your repository
+4. Configure the project:
+   - **Root Directory**: \`src\`
+   - **Framework Preset**: Vite
+   - **Build Command**: \`npm run build\`
+   - **Output Directory**: \`build\`
+5. Add environment variable:
+   \`\`\`
+   VITE_API_URL=https://your-render-app.onrender.com
+   \`\`\`
+6. Click **Deploy**
+
+### Backend - Render
+
+1. Go to [render.com](https://render.com) and sign in
+2. Click **"New"** → **"Web Service"**
+3. Connect your GitHub repository
+4. Configure the service:
+   - **Name**: \`watspend-api\`
+   - **Root Directory**: \`mealplan-server\`
+   - **Runtime**: Node
+   - **Build Command**: \`npm install\`
+   - **Start Command**: \`npm start\`
+5. Add environment variables:
+
+   | Variable | Value |
+   |----------|-------|
+   | \`DB_HOST\` | \`riku.shoshin.uwaterloo.ca\` |
+   | \`DB_USER\` | Your MySQL username |
+   | \`DB_PASS\` | Your MySQL password |
+   | \`DB_NAME\` | \`Project_Team_10\` |
+   | \`JWT_SECRET\` | Generate a secure random string |
+   | \`SESSION_SECRET\` | Generate a secure random string |
+   | \`GOOGLE_CLIENT_ID\` | From Google Cloud Console |
+   | \`GOOGLE_CLIENT_SECRET\` | From Google Cloud Console |
+   | \`GOOGLE_CALLBACK_URL\` | \`https://your-app.onrender.com/api/auth/google/callback\` |
+   | \`FRONTEND_URL\` | \`https://your-app.vercel.app\` |
+   | \`NODE_ENV\` | \`production\` |
+
+6. Click **Deploy**
+
+### Post-Deployment Steps
+
+1. **Update Google OAuth**: Add your Render callback URL to Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs → Authorized redirect URIs
+
+2. **Update Chrome Extension**: Edit \`src/extension/background.js\`:
+   \`\`\`javascript
+   const API_BASE_URL = "https://your-render-app.onrender.com";
+   \`\`\`
+   Then reload the extension in Chrome.
+
+3. **Test the deployment**: Visit your Vercel URL and verify login works.
+
+### Free Tier Notes
+
+- **Render Free Tier**: Spins down after 15 minutes of inactivity. First request may take 30-60 seconds.
+- **Vercel Free Tier**: Generous limits for hobby projects. No spin-down issues.
+
+---
+
 ## Usage Guide
 
 ### Quick Start
