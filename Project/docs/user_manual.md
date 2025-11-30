@@ -1,106 +1,46 @@
-# User Manual - WatSpend (WatCard Dashboard)
+# WatSpend User Manual
 
-**Version**: 1.0  
-**Last Updated**: November 2025  
 **Live App**: [https://watspend.vercel.app](https://watspend.vercel.app)
 
 ---
 
-## Table of Contents
+## Getting Started
 
-1. [Introduction](#1-introduction)
-2. [Getting Started](#2-getting-started)
-3. [Dashboard Overview](#3-dashboard-overview)
-4. [Managing Transactions](#4-managing-transactions)
-5. [Setting Up Budgets](#5-setting-up-budgets)
-6. [Using the Chrome Extension](#6-using-the-chrome-extension)
-7. [Goals & Reports](#7-goals--reports)
-8. [Settings](#8-settings)
-9. [Exporting Data](#9-exporting-data)
-10. [Troubleshooting](#10-troubleshooting)
+### Sign In
 
----
+1. Go to [https://watspend.vercel.app](https://watspend.vercel.app)
+2. Click **"Sign in with Google"**
+3. Select your @uwaterloo.ca Google account
+4. You're now on your dashboard!
 
-## 1. Introduction
+### Install the Chrome Extension
 
-### 1.1 What is WatSpend?
+To import transactions from your WatCard account:
 
-WatSpend is a comprehensive budget tracking application designed specifically for University of Waterloo students who use WatCard. It helps you:
+1. Download/clone the repository from GitLab
+2. Open Chrome → `chrome://extensions/`
+3. Enable **Developer mode** (top right toggle)
+4. Click **Load unpacked** → Select the `src/extension` folder
+5. The WatSpend icon appears in your toolbar
 
-- **Track spending** across Meal Plan and Flex accounts
-- **Set budgets** to manage your WatCard balance effectively
-- **Visualize trends** with charts and reports
-- **Auto-import transactions** using our Chrome extension
-- **Categorize expenses** by location or account type
+### Import Your Transactions
 
-### 1.2 Key Features
-
-| Feature | Description |
-|---------|-------------|
-| 🔐 Secure Login | Google OAuth or email/password authentication |
-| 📊 Dashboard | Visual overview of spending with charts |
-| 💰 Budget Tracking | Static and dynamic budget options |
-| 🏷️ Label System | Organize transactions by location or type |
-| 📱 Chrome Extension | Auto-scrape transactions from WatCard portal |
-| 📈 Reports | Monthly spending analysis and comparisons |
-| 🌙 Dark Mode | Easy on the eyes for late-night studying |
+1. Go to the [WatCard portal](https://watcard.uwaterloo.ca) and log in
+2. Navigate to your transaction history
+3. Click the WatSpend extension icon in Chrome
+4. Click **"Scrape Transactions"**
+5. Return to your WatSpend dashboard to see your data
 
 ---
 
-## 2. Getting Started
+## Dashboard
 
-### 2.1 System Requirements
+### Balance Cards
 
-- **Browser**: Google Chrome 90+ (recommended for extension)
-- **Internet**: Stable connection required
-- **Account**: UWaterloo Google account (@uwaterloo.ca)
+Six cards at the top show your current balances:
 
-### 2.2 Accessing the Application
-
-**Option A: Use the Live Deployed Version (Recommended)**
-1. Open your web browser
-2. Go to **[https://watspend.vercel.app](https://watspend.vercel.app)**
-3. You'll see the login page
-
-**Option B: Run Locally (For Development)**
-1. Clone the repository and follow setup instructions in README
-2. Start the backend: `cd mealplan-server && npm start`
-3. Start the frontend: `cd src && npm run dev`
-4. Open `http://localhost:5173`
-
-### 2.3 Creating an Account
-
-**Option A: Google Sign-In (Recommended)**
-1. Click the **"Sign in with Google"** button
-2. Select your @uwaterloo.ca Google account
-3. Grant permissions when prompted
-4. You'll be redirected to your dashboard
-
-**Option B: Email/Password**
-1. Click **"Sign up"**
-2. Enter your email address
-3. Create a secure password
-4. Click **"Create Account"**
-5. You'll be logged in automatically
-
-### 2.4 First-Time Setup
-
-After logging in for the first time:
-1. Two default views are created: **"By Location"** and **"Meal Plan vs Flex"**
-2. Install the Chrome extension (see Section 6)
-3. Import your first transactions
-4. Set up your first budget
-
----
-
-## 3. Dashboard Overview
-
-### 3.1 Balance Cards
-
-At the top of your dashboard, you'll see 6 balance cards:
-
-| Card | Description |
-|------|-------------|
+| Card | What it Shows |
+|------|---------------|
 | Meal Plan Left | Remaining Meal Plan balance |
 | Meal Plan Spent | Total spent from Meal Plan |
 | Flex Left | Remaining Flex balance |
@@ -108,403 +48,150 @@ At the top of your dashboard, you'll see 6 balance cards:
 | Total Left | Combined remaining balance |
 | Total Spent | Combined total spending |
 
-### 3.2 View Selector
+### Views
 
-Switch between different ways to view your spending:
+Switch between two views:
+- **By Location**: Spending grouped by vendor location
+- **Meal Plan vs Flex**: Spending separated by account type
 
-- **By Location**: See spending grouped by vendor/terminal location
-- **Meal Plan vs Flex**: See spending separated by account type
+### Time Range
 
-### 3.3 Time Range Selector
-
-Filter your data by time period:
-
-| Range | Shows |
-|-------|-------|
-| Day | Last 24 hours |
-| Week | Last 8 days |
-| Month | Last 31 days |
-| Year | Last 366 days |
-| All Time | All transactions |
-
-### 3.4 Spending Breakdown
-
-A visual chart showing:
-- Spending per label/category
-- Transaction counts per category
-- Percentage breakdown
+Filter your data by:
+- **Day** - Last 24 hours
+- **Week** - Last 7 days
+- **Month** - Last 30 days
+- **Year** - Last 365 days
+- **All Time** - Everything
 
 ---
 
-## 4. Managing Transactions
+## Transactions
 
-### 4.1 Viewing Transactions
+### View Transactions
 
-1. Click **"Transactions"** in the navigation
-2. Browse your transaction list
-3. Use pagination buttons at the bottom (50 items per page)
+Click **"Transactions"** in the navigation to see all your transactions.
 
-### 4.2 Search and Filter
+### Search & Filter
 
-**Search**: Type in the search box to find transactions by note or terminal
+- Type in the search box to find transactions by note or terminal
+- Filter by label or transaction type
 
-**Filter Options**:
-- **By Label**: Select a specific category
-- **By Type**: Filter by Meal Plan or Flex
+### Add a Manual Transaction
 
-### 4.3 Adding Manual Transactions
-
-1. Click **"+ Add Transaction"** button
-2. Fill in the required fields:
-   - **Date**: Select the transaction date
-   - **Amount**: Enter the dollar amount
-   - **Vendor**: Enter the merchant name
-   - **Label**: Assign a category
+1. Click **"+ Add Transaction"**
+2. Enter date, amount, vendor, and label
 3. Click **"Save"**
 
-> ⚠️ **Note**: Manual transactions won't appear on your official WatCard dashboard - they're for personal tracking only.
+### Edit a Transaction
 
-### 4.4 Editing Transactions
-
-1. Find the transaction in the list
+1. Find the transaction
 2. Click the **Edit** (pencil) icon
-3. Modify the fields as needed
-4. Click **"Save Changes"**
-
-### 4.5 Transaction Columns
-
-| Column | Description |
-|--------|-------------|
-| # | Transaction number |
-| Date | Transaction date |
-| Time | Transaction time |
-| Amount | Dollar amount |
-| Label | Assigned category |
-| Terminal | Point-of-sale terminal ID |
-| Type | Meal Plan or Flex |
-| Note | Optional description |
-| Actions | Edit/Delete buttons |
+3. Make changes and click **Save**
 
 ---
 
-## 5. Setting Up Budgets
+## Budgets
 
-### 5.1 Understanding Budget Types
+### Budget Types
 
-**Static Budget**
-- Fixed amount per time period
-- Example: "$200/month for food"
+**Static Budget**: Fixed amount per period (e.g., $200/month)
 
-**Dynamic Budget**
-- Based on remaining balance and end date
-- Auto-calculates daily spending limit
-- Example: "Make $500 last until December 20"
+**Dynamic Budget**: Auto-calculates daily limit based on remaining balance and end date
 
-### 5.2 Creating a Budget
+### Create a Budget
 
 1. Click **"Create Budget"** or go to Goals page
-2. Choose budget type (Static or Dynamic)
-3. Enter budget details:
+2. Choose Static or Dynamic
+3. Enter details:
+   - **Static**: Budget name, amount, period (day/week/month/year)
+   - **Dynamic**: Budget name, end date, starting balance
+4. Select budget type (Meal Plan or Flex)
+5. Click **"Save Budget"**
 
-**For Static:**
-- Budget name
-- Amount
-- Period (Day, Week, Month, Year)
-- Budget type (Meal Plan or Flex)
+### Allocate Budget to Labels
 
-**For Dynamic:**
-- Budget name
-- End date
-- Starting balance (or use current)
-- Budget type (Meal Plan or Flex)
-
-4. Click **"Save Budget"**
-
-### 5.3 Budget Allocations
-
-Allocate your budget to specific labels:
-
-1. Open the budget on the Goals page
-2. Find the **Label Performance** section
-3. Click the **Edit** button next to a label
-4. Enter the amount to allocate
-5. Click **Save**
-
-> 💡 **Tip**: Labels are greyed out if they don't match your budget type (e.g., Meal Plan labels are greyed out for a Flex-only budget).
-
-### 5.4 Viewing Budget Progress
-
-The dashboard widget shows:
-- Current spending vs. budget
-- Progress bar (green/yellow/red)
-- Daily allowance remaining
-- Days until budget end (dynamic only)
+1. Open your budget on the Goals page
+2. Find **Label Performance** section
+3. Click **Edit** next to a label
+4. Enter allocation amount
+5. Save
 
 ---
 
-## 6. Using the Chrome Extension
+## Goals & Reports
 
-### 6.1 Installing the Extension
+### Goals Page
 
-The Chrome extension is required to import transactions from your WatCard account.
-
-1. **Download the project** from GitLab or clone the repository:
-   ```
-   git clone https://gitlab.uwaterloo.ca/se101-f24/project_team_10.git
-   ```
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable **"Developer mode"** (toggle in top right)
-4. Click **"Load unpacked"**
-5. Navigate to and select the `Project/src/extension` folder
-6. The WatSpend icon appears in your toolbar
-
-> **Note**: The extension works with both the live version ([watspend.vercel.app](https://watspend.vercel.app)) and local development. Make sure you're logged into WatSpend before scraping.
-
-### 6.2 Scraping Transactions
-
-1. Log into your WatCard account at the official WatCard portal
-2. Navigate to your transaction history page
-3. Click the WatSpend extension icon
-4. Click **"Scrape Transactions"**
-5. Wait for the import to complete
-6. Check your dashboard for new transactions
-
-### 6.3 Syncing Balance
-
-The extension automatically syncs:
-- Current Meal Plan balance
-- Current Flex balance
-- Recent transactions
-
-### 6.4 Extension Popup Features
-
-| Button | Function |
-|--------|----------|
-| Scrape Transactions | Import transaction history |
-| Sync Balance | Update account balances |
-| Open Dashboard | Open WatSpend in new tab |
-
----
-
-## 7. Goals & Reports
-
-### 7.1 Goals Page
-
-Access via the navigation menu to see:
-- All your budgets
-- Budget performance charts
+Shows:
+- All your budgets and their progress
 - Label performance breakdown
-- Period comparison (last 5 periods)
+- Period comparisons (last 5 periods)
 - Trophy cabinet (achievements)
 
-### 7.2 Label Performance
+### Monthly Report
 
-For each label, you can see:
-- Amount spent
-- Amount allocated (if budget set)
-- Progress bar showing spent vs. allocated
-- Warning if over budget (red bar)
-
-### 7.3 Monthly Report
-
-The monthly report includes:
 - Total spending for the period
-- Breakdown by category
+- Category breakdown
 - Comparison to previous period
 - Visual charts
 
-### 7.4 Period Comparison
-
-Compare your spending across:
-- Last 5 days
-- Last 5 weeks
-- Last 5 months
-- Last 5 years
-
 ---
 
-## 8. Settings
+## Settings
 
-### 8.1 Accessing Settings
-
-Click the **gear icon** or **"Settings"** in the navigation.
-
-### 8.2 Available Options
+Click the **gear icon** to access settings:
 
 | Setting | Description |
 |---------|-------------|
-| Theme | Toggle between Light and Dark mode |
-| Currency | Choose from 9 supported currencies |
-| Manual Balance | Override synced balance (with warning) |
-| Reset Data | Clear all transactions and start fresh |
+| Theme | Toggle Light/Dark mode |
+| Currency | Choose from 9 currencies (CAD, USD, EUR, etc.) |
+| Manual Balance | Override synced balance |
+| Reset Data | Clear all transactions |
 
-### 8.3 Currency Options
+### Supported Currencies
 
-| Code | Currency |
-|------|----------|
-| CAD | Canadian Dollar ($) |
-| USD | US Dollar ($) |
-| EUR | Euro (€) |
-| GBP | British Pound (£) |
-| JPY | Japanese Yen (¥) |
-| CNY | Chinese Yuan (¥) |
-| INR | Indian Rupee (₹) |
-| AUD | Australian Dollar (A$) |
-| KRW | Korean Won (₩) |
-
-### 8.4 Account Management
-
-- **Change Email**: Update your email address
-- **Change Password**: Set a new password
-- **Delete Account**: Permanently remove your account and data
+CAD, USD, EUR, GBP, JPY, CNY, INR, AUD, KRW
 
 ---
 
-## 9. Exporting Data
+## Exporting Data
 
-### 9.1 Exporting Transactions
-
-1. Click the **"Export"** button on Dashboard or Goals page
-2. Select your filters:
+1. Click **"Export"** button on Dashboard or Transactions page
+2. Select filters:
    - View (By Location or Meal Plan vs Flex)
-   - Time Range (Day, Week, Month, Year, All)
-3. Preview the transaction count
+   - Time Range
+3. Preview transaction count
 4. Click **"Download CSV"**
 
-### 9.2 CSV Format
-
-Exported files include:
-- Date
-- Time
-- Amount
-- Vendor
-- Category/Label
-- Type (Meal Plan/Flex)
-- Notes
-
-### 9.3 File Naming
-
-Files are automatically named:
-`watspend_[view]_[range]_[date].csv`
-
-Example: `watspend_location_month_2025-11-15.csv`
+The CSV includes: Date, Time, Amount, Vendor, Label, Type, Notes
 
 ---
 
-## 10. Troubleshooting
+## Troubleshooting
 
-### 10.1 Common Issues
-
-**Can't log in?**
-- Ensure you're using a @uwaterloo.ca email for Google login
+### Can't log in?
+- Use a @uwaterloo.ca Google account
 - Check your internet connection
-- Try clearing browser cookies
+- Clear browser cookies and try again
 
-**Extension not working?**
+### Extension not working?
 - Make sure you're on the WatCard transactions page
 - Check that the extension is enabled in Chrome
-- Try refreshing the page
+- Refresh the page and try again
 
-**Transactions not syncing?**
-- Check your login status
-- Try manually triggering a sync
-- Verify the extension has proper permissions
+### Transactions not syncing?
+- Verify you're logged into WatSpend
+- Try clicking "Sync Balance" in the extension
+- Check extension permissions
 
-**Budget calculations seem off?**
+### Budget calculations seem wrong?
 - Check the time range selector
-- Verify the budget period matches your expectation
+- Verify budget period matches your expectation
 - Dynamic budgets recalculate daily
 
-### 10.2 Getting Help
-
-If you encounter issues:
-1. Check this manual first
-2. Review the FAQ section
-3. Contact the development team via GitLab issues
-
-### 10.3 Browser Compatibility
-
-| Browser | Support Level |
-|---------|---------------|
-| Chrome | ✅ Full support (extension included) |
-| Firefox | ⚠️ Dashboard only (no extension) |
-| Safari | ⚠️ Dashboard only (no extension) |
-| Edge | ⚠️ Dashboard only (extension may work) |
-
 ---
 
-## 11. Deployment Information
-
-### 11.1 Production URLs
-
-WatSpend is live and deployed!
-
-| Component | Platform | URL |
-|-----------|----------|-----|
-| Frontend | Vercel | [https://watspend.vercel.app](https://watspend.vercel.app) |
-| Backend | Render | [https://watspend-api.onrender.com](https://watspend-api.onrender.com) |
-| Database | UWaterloo | `riku.shoshin.uwaterloo.ca` |
-
-> **Tip**: Just visit [watspend.vercel.app](https://watspend.vercel.app) to start using the app immediately!
-
-### 11.2 Using the Deployed Version
-
-1. **Visit the Dashboard**: Go to [https://watspend.vercel.app](https://watspend.vercel.app)
-2. **Sign in**: Use Google OAuth with your @uwaterloo.ca account
-3. **Install Chrome Extension**:
-   - Clone or download the repository
-   - Go to `chrome://extensions/` in Chrome
-   - Enable Developer mode
-   - Click "Load unpacked" → Select `src/extension` folder
-4. **Import Transactions**:
-   - Log into your WatCard account
-   - Click the WatSpend extension icon
-   - Click "Scrape Transactions"
-5. **View your data** on the dashboard!
-
-### 11.3 Self-Hosting
-
-If you want to deploy your own instance:
-
-**Frontend (Vercel)**:
-1. Fork the repository to your GitHub account
-2. Go to [vercel.com](https://vercel.com) and sign in
-3. Click "New Project" → Import your fork
-4. Set the root directory to `src/`
-5. Add environment variable: `VITE_API_URL=https://your-backend.onrender.com`
-6. Deploy!
-
-**Backend (Render)**:
-1. Go to [render.com](https://render.com) and sign in
-2. Click "New" → "Web Service"
-3. Connect your repository
-4. Set the root directory to `mealplan-server/`
-5. Add environment variables (see below)
-6. Deploy!
-
-**Required Backend Environment Variables**:
-| Variable | Description |
-|----------|-------------|
-| `DB_HOST` | `riku.shoshin.uwaterloo.ca` |
-| `DB_USER` | Your database username |
-| `DB_PASS` | Your database password |
-| `DB_NAME` | `Project_Team_10` |
-| `JWT_SECRET` | Secret key for JWT tokens |
-| `SESSION_SECRET` | Secret key for sessions |
-| `GOOGLE_CLIENT_ID` | From Google Cloud Console |
-| `GOOGLE_CLIENT_SECRET` | From Google Cloud Console |
-| `GOOGLE_CALLBACK_URL` | `https://your-backend.onrender.com/api/auth/google/callback` |
-| `FRONTEND_URL` | `https://your-frontend.vercel.app` |
-
-### 11.4 Important Notes
-
-- **Free Tier Limitations**: Render's free tier spins down after 15 minutes of inactivity. The first request may take 30-60 seconds while it restarts.
-- **Chrome Extension**: For production use, update the `API_BASE_URL` in `background.js` and reload the extension.
-- **Google OAuth**: You must add your production callback URL to your Google Cloud Console OAuth settings.
-
----
-
-## Quick Reference Card
+## Quick Reference
 
 | Action | How To |
 |--------|--------|
@@ -517,7 +204,5 @@ If you want to deploy your own instance:
 | View reports | Goals → Monthly Report section |
 
 ---
-
-**Need more help?** Contact the WatSpend team or submit an issue on GitLab.
 
 *Happy budgeting! 💰*
