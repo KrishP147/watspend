@@ -775,7 +775,7 @@ export default function App() {
           });
         }
       } catch (err) {
-        console.error("Failed to fetch funds:";, err);
+        console.error("Failed to fetch funds:", err);
       }
     };
 
