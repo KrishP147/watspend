@@ -1060,13 +1060,13 @@ export function TransactionManager() {
 
       {/* Export Dialog */}
       <ExportDialog
-        isOpen={isExportDialogOpen}
-        onClose={() => setIsExportDialogOpen(false)}
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
         transactions={transactions}
         categories={categories}
         selectedViewId={selectedViewId}
         dateRange={dateRange}
-        currency={displayCurrency}
+        displayCurrency={displayCurrency}
         viewName={views.find(v => v.id === selectedViewId)?.name || "Unknown"}
       />
     </div>
