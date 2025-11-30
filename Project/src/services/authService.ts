@@ -118,6 +118,23 @@ class AuthService {
     return `${API_URL}/auth/google`;
   }
 
+  // Check if backend is running/available
+  async checkBackendHealth(): Promise<boolean> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch(`${API_URL}/health`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  }
+
   // Helper to get auth headers for API requests
   getAuthHeaders(): HeadersInit {
     if (!this.token) {

@@ -231,6 +231,27 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [isOAuthCallback, setIsOAuthCallback] = useState(false);
+  const [backendReady, setBackendReady] = useState<boolean | null>(null);
+
+  // Check backend health periodically when logged in
+  useEffect(() => {
+    if (!loggedIn) return;
+    
+    const checkBackend = async () => {
+      const isHealthy = await authService.checkBackendHealth();
+      setBackendReady(isHealthy);
+      
+      // If not ready, keep checking every 5 seconds
+      if (!isHealthy) {
+        setTimeout(checkBackend, 5000);
+      }
+    };
+    
+    checkBackend();
+    // Also check every 30 seconds to detect if backend goes down
+    const interval = setInterval(checkBackend, 30000);
+    return () => clearInterval(interval);
+  }, [loggedIn]);
 
   // Check authentication on mount
   useEffect(() => {
@@ -512,6 +533,128 @@ export default function App() {
     }
   }, [settings.theme]);
 
+  // ------------------- SERVER SETTINGS SYNC -------------------
+  // Load settings from server when user logs in
+  const settingsLoadedRef = useRef(false);
+  const transactionCategoryMappingsRef = useRef<Record<string, Record<string, string>>>({});
+  useEffect(() => {
+    const loadSettingsFromServer = async () => {
+      if (!loggedIn || settingsLoadedRef.current) return;
+      
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      try {
+        console.log('📂 Loading settings from server...');
+        const res = await fetch(`${API_BASE}/api/settings`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+          const serverSettings = await res.json();
+          console.log('📂 Loaded settings:', serverSettings);
+          
+          // Apply server settings if they exist (don't overwrite with null/empty)
+          if (serverSettings.views && serverSettings.views.length > 0) {
+            setViews(serverSettings.views);
+          }
+          if (serverSettings.categories && serverSettings.categories.length > 0) {
+            setCategories(serverSettings.categories);
+          }
+          if (serverSettings.budgets && serverSettings.budgets.length > 0) {
+            setBudgets(serverSettings.budgets);
+          }
+          if (serverSettings.labels && serverSettings.labels.length > 0) {
+            setLabels(serverSettings.labels);
+          }
+          if (serverSettings.selectedViewId) {
+            setSelectedViewId(serverSettings.selectedViewId);
+          }
+          if (serverSettings.selectedBudgetId) {
+            setSelectedBudgetId(serverSettings.selectedBudgetId);
+          }
+          if (serverSettings.displayCurrency) {
+            setDisplayCurrency(serverSettings.displayCurrency);
+          }
+          // Store transaction category mappings to apply when transactions load
+          if (serverSettings.transactionCategoryMappings) {
+            transactionCategoryMappingsRef.current = serverSettings.transactionCategoryMappings;
+            console.log('📂 Loaded transaction category mappings:', Object.keys(serverSettings.transactionCategoryMappings).length);
+          }
+          
+          settingsLoadedRef.current = true;
+          console.log('✅ Settings loaded from server');
+        }
+      } catch (err) {
+        console.error('Failed to load settings from server:', err);
+      }
+    };
+
+    loadSettingsFromServer();
+  }, [loggedIn]);
+
+  // Save settings to server when they change (debounced)
+  const saveTimeoutRef = useRef<number | null>(null);
+  useEffect(() => {
+    // Don't save until we've loaded settings first (prevent overwriting server data)
+    if (!loggedIn || !settingsLoadedRef.current) return;
+    
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+    // Debounce save - wait 2 seconds after last change
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = window.setTimeout(async () => {
+      try {
+        console.log('💾 Saving settings to server...');
+        // Build transaction category mappings (transaction ID -> categoryIds map)
+        const transactionCategoryMappings: Record<string, Record<string, string>> = {};
+        transactions.forEach(tx => {
+          if (tx.categoryIds && Object.keys(tx.categoryIds).length > 0) {
+            transactionCategoryMappings[tx.id] = tx.categoryIds;
+          }
+        });
+        
+        const settingsToSave = {
+          views,
+          categories,
+          budgets,
+          labels,
+          selectedViewId,
+          selectedBudgetId,
+          displayCurrency,
+          transactionCategoryMappings
+        };
+
+        const res = await fetch(`${API_BASE}/api/settings`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(settingsToSave)
+        });
+
+        if (res.ok) {
+          console.log('✅ Settings saved to server');
+        } else {
+          console.error('Failed to save settings:', await res.text());
+        }
+      } catch (err) {
+        console.error('Failed to save settings to server:', err);
+      }
+    }, 2000);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [loggedIn, views, categories, budgets, labels, selectedViewId, selectedBudgetId, displayCurrency, transactions]);
+
   // Extension gets auth token directly from localStorage via content script
   // No chrome.storage sync needed - content.js responds to getAuthToken/getUserInfo messages
 
@@ -732,6 +875,24 @@ export default function App() {
             };
           });
 
+        // Apply saved category mappings from server settings
+        const savedMappings = transactionCategoryMappingsRef.current;
+        if (Object.keys(savedMappings).length > 0) {
+          watCardTransactions = watCardTransactions.map(tx => {
+            const savedCategoryIds = savedMappings[tx.id];
+            if (savedCategoryIds) {
+              // Use saved category assignments instead of auto-detected ones
+              return {
+                ...tx,
+                categoryIds: savedCategoryIds,
+                categoryId: savedCategoryIds["view-location"] || savedCategoryIds["view-mealplan-flex"] || Object.values(savedCategoryIds)[0] || tx.categoryId
+              };
+            }
+            return tx;
+          });
+          console.log(`📂 Applied saved category mappings to ${Object.keys(savedMappings).length} transactions`);
+        }
+
         // Merge with current state transactions (filter out old WatCard transactions first)
         setTransactions(currentTransactions => {
           const manualOnly = currentTransactions.filter(t => !t.id.startsWith('watcard-'));
@@ -835,6 +996,18 @@ export default function App() {
       }}
     >
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+        {/* Backend startup warning banner */}
+        {backendReady === false && (
+          <div className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 px-4 py-3">
+            <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-amber-800 dark:text-amber-200">
+              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="text-sm font-medium">Backend is starting up... Please wait 1-2 minutes. Data may not load until the server is ready.</span>
+            </div>
+          </div>
+        )}
         <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">

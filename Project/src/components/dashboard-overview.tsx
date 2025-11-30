@@ -156,7 +156,7 @@ export function DashboardOverview() {
   };
 
   const handleSelectAllTransactions = () => {
-    setSelectedTransactionIds(transactions.map((t: Transaction) => t.id));
+    setSelectedTransactionIds(availableTransactions.map((t: Transaction) => t.id));
   };
 
   const handleDeselectAllTransactions = () => {
@@ -630,7 +630,7 @@ export function DashboardOverview() {
                 placeholder="Search transactions..."
                 value={transactionSearchQuery}
                 onChange={(e) => setTransactionSearchQuery(e.target.value)}
-                        className="flex-1 !text-black dark:!text-black bg-white dark:bg-gray-700"
+                className="flex-1 !text-black dark:!text-black !bg-white dark:!bg-white placeholder:text-gray-500"
               />
               <Button type="button" variant="outline" onClick={handleSelectAllTransactions}>
                 Select All

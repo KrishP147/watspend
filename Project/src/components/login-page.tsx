@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -18,6 +18,24 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [backendReady, setBackendReady] = useState<boolean | null>(null);
+  const [checkingBackend, setCheckingBackend] = useState(true);
+
+  // Check backend health on mount and periodically
+  useEffect(() => {
+    const checkBackend = async () => {
+      const isHealthy = await authService.checkBackendHealth();
+      setBackendReady(isHealthy);
+      setCheckingBackend(false);
+      
+      // If not ready, keep checking every 5 seconds
+      if (!isHealthy) {
+        setTimeout(checkBackend, 5000);
+      }
+    };
+    
+    checkBackend();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +100,19 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Backend startup warning */}
+            {backendReady === false && (
+              <Alert className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+                <AlertDescription className="text-amber-800 dark:text-amber-200 flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Backend is starting up... Please wait 1-2 minutes. This happens when the server hasn't been used recently.</span>
+                </AlertDescription>
+              </Alert>
+            )}
+
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -138,9 +169,9 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             <Button
               type="submit"
               className="w-full"
-              disabled={loading}
+              disabled={loading || backendReady === false}
             >
-              {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
+              {loading ? 'Please wait...' : backendReady === false ? 'Waiting for backend...' : isLogin ? 'Sign In' : 'Create Account'}
             </Button>
 
             <div className="relative">
@@ -159,7 +190,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               variant="outline"
               className="w-full"
               onClick={handleGoogleLogin}
-              disabled={loading}
+              disabled={loading || backendReady === false}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path

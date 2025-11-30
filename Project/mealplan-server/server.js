@@ -232,6 +232,12 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
+// ==================== HEALTH CHECK ====================
+// Simple endpoint to check if backend is running (no auth required)
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // ==================== AUTHENTICATION ROUTES ====================
 
 // Initiate Google OAuth
@@ -535,6 +541,74 @@ app.get("/api/funds", authenticateToken, async (req, res) => {
   } catch (err) {
     console.error("Funds fetch error:", err);
     res.status(500).json({ error: "Failed to fetch funds", message: err.message });
+  }
+});
+
+// ============================================================================
+// USER SETTINGS ENDPOINTS - Save/Load views, labels, budgets
+// ============================================================================
+
+// GET user settings - Load all dashboard settings (views, categories, budgets, labels)
+app.get("/api/settings", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const [rows] = await pool.query(
+      `SELECT settings_json FROM user_settings WHERE user_id = ?`,
+      [userId]
+    );
+
+    if (rows.length > 0) {
+      // Parse JSON and return
+      const settings = typeof rows[0].settings_json === 'string' 
+        ? JSON.parse(rows[0].settings_json) 
+        : rows[0].settings_json;
+      console.log(`📂 Loaded settings for user ${userId}`);
+      res.json(settings);
+    } else {
+      // Return empty settings if none exist
+      console.log(`📂 No settings found for user ${userId}, returning defaults`);
+      res.json({
+        views: null,
+        categories: null,
+        budgets: null,
+        labels: null,
+        selectedViewId: null,
+        selectedBudgetId: null,
+        displayCurrency: 'CAD'
+      });
+    }
+  } catch (err) {
+    console.error("Settings fetch error:", err);
+    res.status(500).json({ error: "Failed to fetch settings", message: err.message });
+  }
+});
+
+// POST user settings - Save all dashboard settings
+app.post("/api/settings", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const settings = req.body;
+
+    console.log(`💾 Saving settings for user ${userId}:`, Object.keys(settings));
+
+    await pool.query(
+      `INSERT INTO user_settings (user_id, settings_json, updated_at)
+       VALUES (?, ?, NOW())
+       ON DUPLICATE KEY UPDATE
+         settings_json = VALUES(settings_json),
+         updated_at = NOW()`,
+      [userId, JSON.stringify(settings)]
+    );
+
+    res.json({
+      status: "success",
+      message: "Settings saved successfully",
+      userId
+    });
+  } catch (err) {
+    console.error("Settings save error:", err);
+    res.status(500).json({ error: "Failed to save settings", message: err.message });
   }
 });
 

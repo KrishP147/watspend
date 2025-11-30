@@ -1,18 +1,41 @@
 console.log("[Background] Service worker started");
 
-// Configuration - Change this URL for production deployment
-// Development: http://localhost:4000
-// Production: Your Render backend URL (e.g., https://watspend-api.onrender.com)
-const API_BASE_URL = "http://localhost:4000";
+// API URLs - try production first, fallback to localhost
+const PRODUCTION_API = "https://watspend-api.onrender.com";
+const LOCAL_API = "http://localhost:4000";
 
-// Dashboard URLs to check for auth tokens
+// Detect which API to use based on which dashboard is open
+async function getApiUrl() {
+  // Check if production dashboard is open
+  try {
+    const prodTabs = await chrome.tabs.query({ url: "https://watspend.vercel.app/*" });
+    if (prodTabs.length > 0) {
+      return PRODUCTION_API;
+    }
+  } catch (e) {}
+  
+  // Check if localhost dashboard is open
+  const ports = [5173, 5174, 5175, 5176];
+  for (const port of ports) {
+    try {
+      const tabs = await chrome.tabs.query({ url: `http://localhost:${port}/*` });
+      if (tabs.length > 0) {
+        return LOCAL_API;
+      }
+    } catch (e) {}
+  }
+  
+  // Default to production
+  return PRODUCTION_API;
+}
+
+// Dashboard URLs to check for auth tokens (both local and production)
 const DASHBOARD_URLS = [
   "http://localhost:5173/*",
   "http://localhost:5174/*",
   "http://localhost:5175/*",
-  "http://localhost:5176/*"
-  // Add your Vercel production URL here when deployed:
-  // "https://your-app.vercel.app/*"
+  "http://localhost:5176/*",
+  "https://watspend.vercel.app/*"
 ];
 
 // Get auth token - try storage first, then dashboard tabs
@@ -27,7 +50,21 @@ async function getAuthToken() {
     console.log("[Background] Storage error:", e);
   }
   
-  // Try dashboard tabs (both localhost and production)
+  // Try production dashboard tab first
+  try {
+    const prodTabs = await chrome.tabs.query({ url: "https://watspend.vercel.app/*" });
+    if (prodTabs.length > 0) {
+      const response = await chrome.tabs.sendMessage(prodTabs[0].id, { action: "getAuthToken" });
+      if (response && response.token) {
+        await chrome.storage.local.set({ authToken: response.token });
+        return response.token;
+      }
+    }
+  } catch (e) {
+    // Continue to localhost
+  }
+  
+  // Try localhost dashboard tabs
   const ports = [5173, 5174, 5175, 5176];
   for (const port of ports) {
     try {
@@ -55,8 +92,11 @@ async function uploadTransactions(data) {
     return { success: false, error: "No token" };
   }
   
+  const apiUrl = await getApiUrl();
+  console.log("[Background] Using API:", apiUrl);
+  
   try {
-    const res = await fetch(`${API_BASE_URL}/api/upload`, {
+    const res = await fetch(`${apiUrl}/api/upload`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,8 +121,11 @@ async function uploadFunds(data) {
     return { success: false, error: "No token" };
   }
   
+  const apiUrl = await getApiUrl();
+  console.log("[Background] Using API:", apiUrl);
+  
   try {
-    const res = await fetch(`${API_BASE_URL}/api/upload-funds`, {
+    const res = await fetch(`${apiUrl}/api/upload-funds`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
