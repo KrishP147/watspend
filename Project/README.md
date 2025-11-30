@@ -1,139 +1,359 @@
-SE101 Team Project – To-Do App Evolution
-Student teams will devise, design, develop, debug, and demo a significant software project using Scrum in GitLab.
-All deliverables live in this GitLab repository.
+# WatSpend - WatCard Meal Plan Dashboard
 
+> ��� A comprehensive budget tracking and spending visualization tool for University of Waterloo students
 
-Project Options
+[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://gitlab.uwaterloo.ca)
+[![Node](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
+[![React](https://img.shields.io/badge/react-18-61dafb.svg)](https://reactjs.org)
 
+---
 
-Extend the To-Do App into a full web application (web-accessible, persistent data).
+## ��� Table of Contents
 
-Extend the To-Do App into a full Android app (Teams 1–23 only).
+- [Overview](#overview)
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#project-structure)
+- [Setup Instructions](#setup-instructions)
+- [Usage Guide](#usage-guide)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [Documentation](#documentation)
+- [Team](#team)
 
-Propose your own project → Must be approved via docs/charter.md.
+---
 
+## Overview
 
+WatSpend is a web-based application that helps University of Waterloo students track and analyze their WatCard spending. The system consists of:
 
-Required Deliverables & Grading
+1. **Chrome Extension** - Automatically scrapes transaction data from the WatCard portal
+2. **React Dashboard** - Visualizes spending patterns with interactive charts
+3. **Node.js Backend** - Handles authentication, data storage, and API endpoints
+4. **MySQL Database** - Stores user accounts, transactions, budgets, and reports
 
+### Key Benefits
 
+- ��� **Visual Insights**: See where your money goes with interactive charts
+- ��� **Budget Tracking**: Set static or dynamic budgets with label allocations
+- ��� **Auto-Import**: Chrome extension scrapes transactions automatically
+- ���️ **Smart Labels**: Organize by location or Meal Plan vs Flex
+- ��� **Modern UI**: Dark mode support and responsive design
+- ��� **Secure**: Google OAuth and JWT authentication
 
-%
-Deliverable
-Path
-Stance
+---
 
+## Features
 
+### ✅ Core Features
 
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **User Authentication** | Google OAuth + Email/Password login | ✅ Complete |
+| **Transaction Import** | Chrome extension auto-scrapes WatCard | ✅ Complete |
+| **Dashboard Overview** | 6 balance cards, charts, spending breakdown | ✅ Complete |
+| **Budget System** | Static and dynamic budgets with label allocations | ✅ Complete |
+| **View System** | By Location / Meal Plan vs Flex views | ✅ Complete |
+| **Transaction Management** | Add, edit, search, filter transactions | ✅ Complete |
+| **Monthly Reports** | Period comparisons and trend analysis | ✅ Complete |
+| **CSV Export** | Export transactions with filters | ✅ Complete |
+| **Dark Mode** | Full dark theme support | ✅ Complete |
+| **Currency Support** | 9 currencies with live conversion | ✅ Complete |
 
-5%
-Project Charter
-docs/charter.md
-Formal agreement on scope, team roles, and success criteria.
+### ��� Budget Features
 
+- **Static Budgets**: Fixed amount per day/week/month/year
+- **Dynamic Budgets**: Auto-calculate based on remaining balance and end date
+- **Label Allocations**: Assign budget portions to specific categories
+- **Progress Tracking**: Visual progress bars with over-budget warnings
+- **Budget Scaling**: View budget amounts scaled to any time range
 
-10%
-Product & Sprint Backlogs
-GitLab Issue Boards
+### ���️ Label System
 
-Live, groomed boards showing prioritized stories and sprint commitments.
+- **By Location View**: Auto-generated labels from terminal IDs (e.g., SLC, DC, V1)
+- **Meal Plan vs Flex View**: Categorize by account type
+- **Multi-View Support**: Different labels per view
+- **Budget Type Filtering**: Labels greyed out based on budget type
 
+---
 
-10%
-Requirements & Design
+## Technology Stack
 
-docs/user_stories.md, docs/domain_model.md, docs/use_cases.md
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for fast development builds
+- **Tailwind CSS** for styling
+- **Shadcn/ui** component library
+- **Recharts** for data visualization
 
-Clear, traceable user needs and system structure.
+### Backend
+- **Node.js** with Express
+- **MySQL 8.0** database
+- **JWT** for authentication
+- **Google OAuth 2.0**
 
+### Extension
+- **Chrome Manifest V3**
+- **Content Scripts** for DOM scraping
+- **Background Service Worker**
 
-15%
-Source Code & Build
+### Testing
+- **pytest** for database tests
+- **Jest** for JavaScript tests
+- **React Testing Library**
 
-src/, build/ (if needed)
-Clean, versioned, buildable code with tagged v1.0 release.
+---
 
+## Project Structure
 
-10%
-Tests & Results
-
-docs/test_plan.md tests/, docs/test_report.md
-
-Automated tests with execution proof and coverage ≥70%.
-
-
-5%
-User Manual
-docs/user_manual.md
-Simple guide for end-users to operate the app.
-
-
-10%
-Final Video Demo
-docs/demo.mp4
-2–4 min walkthrough of all user stories in action.
-
-
-10%
-Final Sprint Review
-
-docs/review_presentation.pdf + live demo
-Summary of increment, velocity, and stakeholder feedback.
-
-
-10%
-Sprint Retrospectives
-docs/sprint_retrospectives.md
-Reflections per sprint on process and improvements.
-
-
-10%
-Weekly Progress & Git Hygiene
-Commits, issues, boards
-Consistent activity, meaningful messages, and backlog updates.
-
-
-5%
-README & Setup Guide
-README.md
-Reproducible instructions to run the app from scratch.
-
-
-
-
-Total: 100%
-
-
-
-Directory Structure (Required)
-
+\`\`\`
 .
 ├── README.md                  ← This file (setup + overview)
-├── docs/
-│   ├── charter.md
-│   ├── user_stories.md
-│   ├── domain_model.md
-│   ├── use_cases.md
-│   ├── test_report.md
-│   ├── user_manual.md
+├── IMPLEMENTATION_STATUS.md   ← Feature completion status
+├── requirements.txt           ← Python dependencies
+│
+├── docs/                      ← All documentation
+│   ├── charter.md            ← Project charter
+│   ├── user_stories.md       ← User stories
+│   ├── domain_model.md       ← Database design
+│   ├── use_cases.md          ← Use case specifications
+│   ├── test_plan.md          ← Testing strategy
+│   ├── test_report.md        ← Test execution results
+│   ├── user_manual.md        ← End-user guide
 │   ├── sprint_retrospectives.md
 │   ├── review_presentation.pdf
-│   └── demo.mp4               ← Final demo video
-├── src/                       ← All source code
-├── tests/                     ← Unit + integration tests
-├── build/                     ← Optional: compiled output
-└── .gitlab-ci.yml             ← Optional: CI pipeline (bonus)
+│   └── demo.mp4              ← Final demo video
+│
+├── src/                       ← Frontend React application
+│   ├── App.tsx               ← Main app component
+│   ├── main.tsx              ← Entry point
+│   ├── package.json          ← Frontend dependencies
+│   ├── vite.config.ts        ← Build configuration
+│   ├── components/           ← React components
+│   │   ├── dashboard-overview.tsx
+│   │   ├── monthly-report.tsx
+│   │   ├── transaction-manager.tsx
+│   │   ├── budget-creator.tsx
+│   │   ├── settings.tsx
+│   │   └── ui/               ← Shadcn UI components
+│   ├── services/             ← API services
+│   ├── utils/                ← Utility functions
+│   │   ├── budgetCalculations.ts
+│   │   ├── currency.ts
+│   │   └── exportCSV.ts
+│   ├── styles/               ← Global styles
+│   └── extension/            ← Chrome extension
+│       ├── manifest.json
+│       ├── background.js
+│       ├── content.js
+│       ├── popup.html
+│       └── popup.js
+│
+├── mealplan-server/           ← Backend API server
+│   ├── server.js             ← Express server
+│   ├── auth.js               ← JWT authentication
+│   └── package.json
+│
+├── database/                  ← Database setup
+│   ├── schema.sql            ← Table definitions
+│   ├── seed.sql              ← Sample data
+│   ├── SETUP.md              ← Setup instructions
+│   └── migrations/           ← Schema migrations
+│
+├── tests/                     ← Test files
+│   └── test_code.py          ← Python database tests
+│
+└── build/                     ← Compiled output (generated)
+\`\`\`
 
+---
 
+## Setup Instructions
 
+### Prerequisites
 
-GitLab Setup
+- **Node.js** 18+ and npm
+- **Python** 3.8+ (for database tests)
+- **MySQL** 8.0+
+- **Google Chrome** (for extension)
 
-Use Issue Boards under Plan > Issue boards
+### 1. Clone the Repository
 
-One board: Product Backlog (label: backlog)
-One board per sprint: Sprint 1, Sprint 2, etc. (use Milestones or Iterations)
+\`\`\`bash
+git clone https://gitlab.uwaterloo.ca/se101-f24/project_team_10.git
+cd project_team_10/Project
+\`\`\`
 
+### 2. Database Setup
 
-Label issues: type::story, type::bug, priority::high, sprint::1, etc.
-Tag final release: git tag v1.0 && git push origin v1.0
+1. Connect to the MySQL server:
+   \`\`\`bash
+   mysql -h riku.shoshin.uwaterloo.ca -u team10 -p
+   \`\`\`
+
+2. Run the schema migrations:
+   \`\`\`bash
+   cd database
+   mysql -h riku.shoshin.uwaterloo.ca -u team10 -p Project_Team_10 < schema.sql
+   \`\`\`
+
+See \`database/SETUP.md\` for detailed instructions.
+
+### 3. Backend Setup
+
+\`\`\`bash
+cd mealplan-server
+npm install
+\`\`\`
+
+Create a \`.env\` file:
+\`\`\`env
+PORT=4000
+DB_HOST=riku.shoshin.uwaterloo.ca
+DB_USER=team10
+DB_PASSWORD=your_password
+DB_NAME=Project_Team_10
+JWT_SECRET=your_jwt_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+\`\`\`
+
+Start the server:
+\`\`\`bash
+npm start
+\`\`\`
+
+Backend runs at **http://localhost:4000**
+
+### 4. Frontend Setup
+
+\`\`\`bash
+cd src
+npm install
+npm run dev
+\`\`\`
+
+Frontend runs at **http://localhost:5173**
+
+### 5. Chrome Extension Setup
+
+1. Open Chrome and navigate to \`chrome://extensions/\`
+2. Enable **Developer mode** (toggle in top right)
+3. Click **Load unpacked**
+4. Select the \`src/extension\` folder
+5. The WatSpend icon appears in your toolbar
+
+---
+
+## Usage Guide
+
+### Quick Start
+
+1. **Login**: Click "Sign in with Google" with your @uwaterloo.ca account
+2. **Import Transactions**: 
+   - Log into WatCard portal
+   - Click the WatSpend extension icon
+   - Click "Scrape Transactions"
+3. **View Dashboard**: See your spending overview with charts
+4. **Create Budget**: Go to Goals → Create Budget
+5. **Track Progress**: Monitor spending against your budget
+
+### Detailed Guide
+
+See \`docs/user_manual.md\` for the complete user manual.
+
+---
+
+## API Documentation
+
+### Authentication Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | \`/api/auth/register\` | Register with email/password |
+| POST | \`/api/auth/login\` | Login with email/password |
+| POST | \`/api/auth/google\` | Google OAuth callback |
+| GET | \`/api/auth/me\` | Get current user |
+
+### Transaction Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | \`/api/transactions\` | Get user's transactions |
+| POST | \`/api/transactions\` | Add manual transaction |
+| PUT | \`/api/transactions/:id\` | Update transaction |
+| DELETE | \`/api/transactions/:id\` | Delete transaction |
+| POST | \`/api/transactions/import\` | Bulk import from extension |
+
+---
+
+## Testing
+
+### Run Python Database Tests
+
+\`\`\`bash
+cd tests
+pip install -r ../requirements.txt
+pytest test_code.py -v
+\`\`\`
+
+### Expected Results
+
+- **21 database tests**: Connection, table structure, CRUD operations
+- **All tests should pass** with proper database configuration
+
+### Test Coverage
+
+| Component | Coverage |
+|-----------|----------|
+| Frontend | ~77% |
+| Backend | ~75% |
+| Database | ~90% |
+
+See \`docs/test_report.md\` for detailed test results.
+
+---
+
+## Documentation
+
+| Document | Path | Description |
+|----------|------|-------------|
+| Project Charter | \`docs/charter.md\` | Scope, team roles, timeline |
+| User Stories | \`docs/user_stories.md\` | Feature requirements |
+| Domain Model | \`docs/domain_model.md\` | Database design |
+| Use Cases | \`docs/use_cases.md\` | Detailed workflows |
+| Test Plan | \`docs/test_plan.md\` | Testing strategy |
+| Test Report | \`docs/test_report.md\` | Test execution results |
+| User Manual | \`docs/user_manual.md\` | End-user guide |
+| Sprint Retrospectives | \`docs/sprint_retrospectives.md\` | Sprint reflections |
+
+---
+
+## Team
+
+| Member | Role | Responsibilities |
+|--------|------|------------------|
+| **Shiman** | Extension Lead | Chrome extension, data scraping, pipeline |
+| **Liron** | Auth Lead | Google OAuth, JWT, SMS integration |
+| **Ava** | Frontend Lead | UI/UX design, progress bars, testing |
+| **Krish** | Backend Lead | MySQL, GitLab workflow, documentation |
+| **Elaine** | Reports Lead | Monthly summaries, demo video, documentation |
+
+---
+
+## GitLab Setup
+
+Use Issue Boards under **Plan > Issue boards**:
+- One board: **Product Backlog** (label: backlog)
+- One board per sprint: **Sprint 1**, **Sprint 2**, etc. (use Milestones or Iterations)
+
+Label issues: \`type::story\`, \`type::bug\`, \`priority::high\`, \`sprint::1\`, etc.
+
+Tag final release:
+\`\`\`bash
+git tag v1.0 && git push origin v1.0
+\`\`\`
+
+---
+
+**Made by Team 10 | SE101 Fall 2025 | University of Waterloo**

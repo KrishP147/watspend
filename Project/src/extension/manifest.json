@@ -1,17 +1,22 @@
 {
     "manifest_version": 3,
-    "name": "MealPlan Dashboard Scraper",
-    "version": "1.0.0",
-    "description": "Extract and upload meal plan transactions to your dashboard",
+    "name": "WatCard Data Scraper",
+    "version": "2.0.0",
+    "description": "Extract WatCard transactions and balance data for your dashboard",
     "permissions": [
       "activeTab",
       "scripting",
+      "tabs",
       "storage"
     ],
     "host_permissions": [
       "https://*.touchnet.net/*",
       "http://localhost:4000/*", 
-      "http://127.0.0.1:4000/*"
+      "http://127.0.0.1:4000/*",
+      "http://localhost:5173/*",
+      "http://localhost:5174/*",
+      "http://localhost:5175/*",
+      "http://localhost:5176/*"
     ],
     "background": {
       "service_worker": "background.js"
@@ -23,6 +28,11 @@
       {
         "matches": ["https://*.touchnet.net/*"],
         "js": ["content.js"],
+        "run_at": "document_idle"
+      },
+      {
+        "matches": ["http://localhost:5173/*", "http://localhost:5174/*", "http://localhost:5175/*", "http://localhost:5176/*"],
+        "js": ["dashboard-sync.js"],
         "run_at": "document_idle"
       }
     ],

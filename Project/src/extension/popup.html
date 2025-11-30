@@ -1,13 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Meal Plan Scraper</title>
+  <title>WatCard Scraper</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h3>Meal Plan Data</h3>
-  <pre id="dataDisplay">Loading...</pre>
-  <button id="refresh">Refresh</button>
+  <div class="header">
+    <h3>WatCard Data Scraper</h3>
+  </div>
+  
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="transactions">Transactions</button>
+    <button class="tab-btn" data-tab="funds">Balance</button>
+  </div>
+  
+  <div class="tab-content" id="transactions-tab">
+    <div class="auth-check" id="auth-status">
+      <div class="status" id="auth-message">Checking login status...</div>
+    </div>
+    <p class="instructions">Navigate to <a href="https://secure.touchnet.net/C22566_oneweb/TransactionHistory/Transactions" target="_blank">WatCard Transaction History</a>, then click Scrape.</p>
+    <button id="scrape-transactions" class="btn-primary" disabled>Scrape Transactions</button>
+    <div class="status" id="transaction-status">Waiting...</div>
+    <pre id="transaction-data">No data yet</pre>
+  </div>
+  
+  <div class="tab-content hidden" id="funds-tab">
+    <div class="auth-check" id="auth-status-funds">
+      <div class="status" id="auth-message-funds">Checking login status...</div>
+    </div>
+    <p class="instructions">Navigate to <a href="https://secure.touchnet.net/C22566_oneweb/Deposit" target="_blank">TouchNet Deposit page</a>, then click Scrape.</p>
+    <button id="scrape-funds" class="btn-primary" disabled>Scrape Balance</button>
+    <div class="status" id="funds-status">Waiting...</div>
+    <pre id="funds-data">No data yet</pre>
+  </div>
+  
   <script src="popup.js"></script>
 </body>
 </html>
