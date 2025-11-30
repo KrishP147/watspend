@@ -11,9 +11,52 @@ function switchTab(tabName) {
   document.getElementById(`${tabName}-tab`).classList.remove('hidden');
 }
 
+// API URLs
+const PRODUCTION_API = "https://watspend-api.onrender.com";
+const LOCAL_API = "http://localhost:4000";
+const PRODUCTION_DASHBOARD = "https://watspend.vercel.app";
+
+// Detect which API to use based on which dashboard is open
+async function getApiUrl() {
+  // Check if production dashboard is open
+  try {
+    const prodTabs = await chrome.tabs.query({ url: "https://watspend.vercel.app/*" });
+    if (prodTabs.length > 0) {
+      return PRODUCTION_API;
+    }
+  } catch (e) {}
+  
+  // Check if localhost dashboard is open
+  const ports = [5173, 5174, 5175, 5176];
+  for (const port of ports) {
+    try {
+      const tabs = await chrome.tabs.query({ url: `http://localhost:${port}/*` });
+      if (tabs.length > 0) {
+        return LOCAL_API;
+      }
+    } catch (e) {}
+  }
+  
+  // Default to production
+  return PRODUCTION_API;
+}
+
 // Get auth token directly from dashboard's localStorage via content script
 async function getAuthToken() {
   try {
+    // Try production dashboard first
+    try {
+      const prodTabs = await chrome.tabs.query({ url: "https://watspend.vercel.app/*" });
+      if (prodTabs.length > 0) {
+        const response = await chrome.tabs.sendMessage(prodTabs[0].id, { action: 'getAuthToken' });
+        if (response && response.token) {
+          return response.token;
+        }
+      }
+    } catch (e) {
+      // Continue to localhost
+    }
+
     // Try different possible dashboard ports
     const ports = [5173, 5174, 5175, 5176];
 
@@ -42,6 +85,19 @@ async function getAuthToken() {
 // Get user info directly from dashboard's localStorage via content script
 async function getUserInfo() {
   try {
+    // Try production dashboard first
+    try {
+      const prodTabs = await chrome.tabs.query({ url: "https://watspend.vercel.app/*" });
+      if (prodTabs.length > 0) {
+        const response = await chrome.tabs.sendMessage(prodTabs[0].id, { action: 'getUserInfo' });
+        if (response && response.user) {
+          return response.user;
+        }
+      }
+    } catch (e) {
+      // Continue to localhost
+    }
+
     // Try different possible dashboard ports
     const ports = [5173, 5174, 5175, 5176];
 
@@ -80,8 +136,11 @@ async function checkDashboardAuth() {
     // Send token to background script so it can use it for uploads
     chrome.runtime.sendMessage({ action: "setAuthToken", token: token });
 
+    // Use the appropriate API URL
+    const apiUrl = await getApiUrl();
+    
     // Try to fetch user's data - if successful, they're logged in
-    const response = await fetch('http://localhost:4000/api/data', {
+    const response = await fetch(`${apiUrl}/api/data`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -124,10 +183,10 @@ async function updateAuthStatus() {
     transactionBtn.disabled = false;
     fundsBtn.disabled = false;
   } else {
-    // Show link when not logged in
-    authMessage.innerHTML = 'Not logged in. <a href="http://localhost:5173" target="_blank" style="color: #667eea; text-decoration: underline;">Open dashboard and sign in</a>';
+    // Show link when not logged in - use production URL
+    authMessage.innerHTML = 'Not logged in. <a href="https://watspend.vercel.app" target="_blank" style="color: #667eea; text-decoration: underline;">Open dashboard and sign in</a>';
     authMessage.className = 'status error';
-    authMessageFunds.innerHTML = 'Not logged in. <a href="http://localhost:5173" target="_blank" style="color: #667eea; text-decoration: underline;">Open dashboard and sign in</a>';
+    authMessageFunds.innerHTML = 'Not logged in. <a href="https://watspend.vercel.app" target="_blank" style="color: #667eea; text-decoration: underline;">Open dashboard and sign in</a>';
     authMessageFunds.className = 'status error';
     transactionBtn.disabled = true;
     fundsBtn.disabled = true;
@@ -180,8 +239,10 @@ async function loadTransactionData() {
   }
 
   try {
+    const apiUrl = await getApiUrl();
+    
     // Fetch transactions from API using token
-    const res = await fetch('http://localhost:4000/api/data', {
+    const res = await fetch(`${apiUrl}/api/data`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -234,8 +295,10 @@ async function loadFundsData() {
   }
 
   try {
+    const apiUrl = await getApiUrl();
+    
     // Fetch funds from API using token
-    const res = await fetch('http://localhost:4000/api/funds', {
+    const res = await fetch(`${apiUrl}/api/funds`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

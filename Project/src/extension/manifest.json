@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "WatCard Data Scraper",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "Extract WatCard transactions and balance data for your dashboard",
     "permissions": [
       "activeTab",
@@ -11,6 +11,8 @@
     ],
     "host_permissions": [
       "https://*.touchnet.net/*",
+      "https://watspend-api.onrender.com/*",
+      "https://watspend.vercel.app/*",
       "http://localhost:4000/*", 
       "http://127.0.0.1:4000/*",
       "http://localhost:5173/*",
@@ -31,7 +33,13 @@
         "run_at": "document_idle"
       },
       {
-        "matches": ["http://localhost:5173/*", "http://localhost:5174/*", "http://localhost:5175/*", "http://localhost:5176/*"],
+        "matches": [
+          "http://localhost:5173/*", 
+          "http://localhost:5174/*", 
+          "http://localhost:5175/*", 
+          "http://localhost:5176/*",
+          "https://watspend.vercel.app/*"
+        ],
         "js": ["dashboard-sync.js"],
         "run_at": "document_idle"
       }
