@@ -99,6 +99,50 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
+// Ensure required tables exist on startup
+async function ensureTablesExist() {
+  try {
+    // Check if user_settings table exists
+    const [tables] = await pool.query(`SHOW TABLES LIKE 'user_settings'`);
+    
+    if (tables.length === 0) {
+      console.log('📋 user_settings table does not exist. Creating it...');
+      
+      const createTableSQL = `
+        CREATE TABLE IF NOT EXISTS user_settings (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          user_id INT NOT NULL,
+          settings_json JSON NOT NULL COMMENT 'JSON object containing views, categories, budgets, labels, and other settings',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+          UNIQUE KEY unique_user_settings (user_id),
+          INDEX idx_user_id (user_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      `;
+      
+      await pool.query(createTableSQL);
+      console.log('✅ user_settings table created successfully!');
+    } else {
+      // Table exists - check if it has the settings_json column
+      const [columns] = await pool.query(`SHOW COLUMNS FROM user_settings LIKE 'settings_json'`);
+      if (columns.length === 0) {
+        console.log('📋 Adding settings_json column to user_settings table...');
+        await pool.query(`ALTER TABLE user_settings ADD COLUMN settings_json JSON NOT NULL DEFAULT (JSON_OBJECT())`);
+        console.log('✅ settings_json column added successfully!');
+      } else {
+        console.log('✅ user_settings table exists with settings_json column');
+      }
+    }
+  } catch (error) {
+    console.error('⚠️ Error checking/creating tables:', error.message);
+    // Don't crash - settings endpoints will just fail gracefully
+  }
+}
+
+// Run table check on startup
+ensureTablesExist();
+
 // Setup authentication with database pool
 setupAuth(pool);
 

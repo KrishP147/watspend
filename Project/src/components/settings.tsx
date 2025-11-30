@@ -306,7 +306,7 @@ export function Settings() {
                   Select your preferred currency for the entire app
                 </p>
                 <Select value={settings.currency} onValueChange={handleCurrencyChange}>
-                  <SelectTrigger id="currency-select" className="max-w-xs bg-white dark:bg-white text-black border-gray-300 h-10">
+                  <SelectTrigger id="currency-select" className="max-w-xs bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -393,7 +393,7 @@ export function Settings() {
                     value={balanceInputValue}
                     onChange={(e) => setBalanceInputValue(e.target.value)}
                     placeholder="e.g., 1000"
-                    className="bg-white dark:bg-white text-black border-gray-300 h-10"
+                    className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-10"
                   />
                   <Button type="submit" variant="outline" className="h-10">Update</Button>
                 </form>

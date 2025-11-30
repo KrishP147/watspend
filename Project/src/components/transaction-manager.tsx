@@ -454,7 +454,7 @@ export function TransactionManager() {
               <div className="flex-1 min-w-0">
                 <Label htmlFor="view-select" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">View</Label>
                 <Select value={selectedViewId} onValueChange={setSelectedViewId}>
-                  <SelectTrigger id="view-select" className="w-full bg-white dark:bg-white text-black border-gray-300">
+                  <SelectTrigger id="view-select" className="w-full bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -469,7 +469,7 @@ export function TransactionManager() {
               <div className="flex-1 min-w-0">
                 <Label htmlFor="date-range" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Date Range</Label>
                 <Select value={dateRange} onValueChange={setDateRange}>
-                  <SelectTrigger id="date-range" className="w-full bg-white dark:bg-white text-black border-gray-300">
+                  <SelectTrigger id="date-range" className="w-full bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -491,27 +491,36 @@ export function TransactionManager() {
           </div>
 
           {/* Second Row: Search and Additional Filters */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {/* Search */}
-            <div className="flex-1 min-w-0">
+            <div className="col-span-1">
               <Label htmlFor="search" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Search</Label>
-              <div className="relative flex items-center">
+              <div className="relative">
                 <Input
                   id="search"
                   type="text"
                   placeholder="Search by keyword"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white dark:bg-white text-black border-gray-300 h-9 sm:h-10"
+                  className="w-full bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-9 sm:h-10 pr-10"
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Label Filter */}
-            <div className="flex-1 xs:flex-none min-w-0">
+            <div className="col-span-1">
               <Label htmlFor="label-filter" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Label</Label>
               <Select value={labelFilter} onValueChange={setLabelFilter}>
-                <SelectTrigger id="label-filter" className="w-full xs:w-40 bg-white dark:bg-white text-black border-gray-300 h-9 sm:h-10">
+                <SelectTrigger id="label-filter" className="w-full bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-9 sm:h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -527,10 +536,12 @@ export function TransactionManager() {
 
             {/* Clear Filters */}
             {(searchQuery || labelFilter !== "all" || dateRange !== "all") && (
-              <Button onClick={handleClearFilters} variant="outline" size="sm" className="w-full xs:w-auto text-xs sm:text-sm h-9 sm:h-10">
-                <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                Clear Filters
-              </Button>
+              <div className="col-span-1 flex items-end">
+                <Button onClick={handleClearFilters} variant="outline" size="sm" className="w-full h-9 sm:h-10 text-xs sm:text-sm">
+                  <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  Clear Filters
+                </Button>
+              </div>
             )}
           </div>
         </div>

@@ -129,7 +129,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
                 required
-                className="bg-white dark:bg-white text-black border-gray-300 h-10 sm:h-11"
+                className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-10 sm:h-11"
               />
             </div>
 
@@ -143,7 +143,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
                 required
-                className="bg-white dark:bg-white text-black border-gray-300 h-10 sm:h-11"
+                className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-10 sm:h-11"
               />
             </div>
 
@@ -155,7 +155,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                   type="password"
                   placeholder="••••••••"
                   value={confirmPassword}
-                  className="bg-white dark:bg-white text-black border-gray-300 h-10 sm:h-11"
+                  className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-10 sm:h-11"
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={loading}
                   required

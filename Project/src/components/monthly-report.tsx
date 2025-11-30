@@ -162,7 +162,7 @@ function MonthlyReportContent() {
             <Label className="text-gray-900 dark:text-white text-xs sm:text-sm">Budget</Label>
             <div className="mt-1.5">
             <Select value={selectedBudgetId || "none"} onValueChange={(v) => setSelectedBudgetId(v === "none" ? null : v)}>
-              <SelectTrigger className="bg-white dark:bg-white border-gray-300 text-black h-9 sm:h-10">
+              <SelectTrigger className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-9 sm:h-10">
                 <SelectValue placeholder="Select budget" />
               </SelectTrigger>
               <SelectContent>
@@ -181,7 +181,7 @@ function MonthlyReportContent() {
             <Label className="text-gray-900 dark:text-white text-xs sm:text-sm">Time Range</Label>
             <div className="mt-1.5">
             <Select value={selectedRange} onValueChange={(v: any) => setSelectedRange(v)}>
-              <SelectTrigger className="bg-white dark:bg-white border-gray-300 text-black h-9 sm:h-10">
+              <SelectTrigger className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-9 sm:h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -199,7 +199,7 @@ function MonthlyReportContent() {
             <Label className="text-gray-900 dark:text-white text-xs sm:text-sm">View</Label>
             <div className="mt-1.5">
             <Select value={selectedViewId} onValueChange={setSelectedViewId}>
-              <SelectTrigger className="bg-white dark:bg-white border-gray-300 text-black h-9 sm:h-10">
+              <SelectTrigger className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-9 sm:h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -564,7 +564,7 @@ function MonthlyReportContent() {
                             value={editingLabelAmount}
                             onChange={(e) => setEditingLabelAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-28 h-8 text-sm bg-white dark:bg-white text-black border-gray-300"
+                            className="w-28 h-8 text-sm bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600"
                             autoFocus
                           />
                           <Button
