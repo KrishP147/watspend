@@ -580,6 +580,31 @@ export default function App() {
           if (serverSettings.transactionCategoryMappings) {
             transactionCategoryMappingsRef.current = serverSettings.transactionCategoryMappings;
             console.log('📂 Loaded transaction category mappings:', Object.keys(serverSettings.transactionCategoryMappings).length);
+            
+            // Apply mappings to any transactions that are already loaded
+            setTransactions(prevTransactions => {
+              if (prevTransactions.length === 0) return prevTransactions;
+              
+              const mappings = serverSettings.transactionCategoryMappings;
+              let appliedCount = 0;
+              const updated = prevTransactions.map(tx => {
+                const savedCategoryIds = mappings[tx.id];
+                if (savedCategoryIds) {
+                  appliedCount++;
+                  return {
+                    ...tx,
+                    categoryIds: savedCategoryIds,
+                    categoryId: savedCategoryIds["view-location"] || savedCategoryIds["view-mealplan-flex"] || Object.values(savedCategoryIds)[0] || tx.categoryId
+                  };
+                }
+                return tx;
+              });
+              
+              if (appliedCount > 0) {
+                console.log(`📂 Applied saved category mappings to ${appliedCount} existing transactions`);
+              }
+              return updated;
+            });
           }
           
           settingsLoadedRef.current = true;
@@ -995,29 +1020,29 @@ export default function App() {
         setSelectedBudgetId,
       }}
     >
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
         {/* Backend startup warning banner */}
         {backendReady === false && (
-          <div className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 px-4 py-3">
+          <div className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 px-3 py-2.5 sm:px-4 sm:py-3">
             <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-amber-800 dark:text-amber-200">
-              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-4 w-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span className="text-sm font-medium">Backend is starting up... Please wait 1-2 minutes. Data may not load until the server is ready.</span>
+              <span className="text-xs sm:text-sm font-medium">Backend is starting up... Please wait 1-2 minutes. Data may not load until the server is ready.</span>
             </div>
           </div>
         )}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 shadow-sm">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Wallet className="w-6 h-6 text-white" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Wallet className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-gray-900 dark:text-white">Meal Plan Dashboard</h1>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="min-w-0">
+                  <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">Meal Plan Dashboard</h1>
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                     Track your campus spending • {displayCurrency} ({SUPPORTED_CURRENCIES[displayCurrency as keyof typeof SUPPORTED_CURRENCIES]})
                   </p>
                 </div>
@@ -1026,24 +1051,24 @@ export default function App() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full max-w-3xl grid-cols-4 mx-auto">
-              <TabsTrigger value="dashboard" className="flex items-center gap-2">
-                <LayoutDashboard className="w-4 h-4" />
-                <span className="hidden sm:inline">Dashboard</span>
+        <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+          <Tabs defaultValue="dashboard" className="space-y-4 sm:space-y-6">
+            <TabsList className="grid w-full max-w-3xl grid-cols-4 mx-auto h-auto p-1">
+              <TabsTrigger value="dashboard" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
+                <LayoutDashboard className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Dashboard</span>
               </TabsTrigger>
-              <TabsTrigger value="transactions" className="flex items-center gap-2">
-                <Wallet className="w-4 h-4" />
-                <span className="hidden sm:inline">Transactions</span>
+              <TabsTrigger value="transactions" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
+                <Wallet className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Transactions</span>
               </TabsTrigger>
-              <TabsTrigger value="reports" className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                <span className="hidden sm:inline">Goals/Budget</span>
+              <TabsTrigger value="reports" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
+                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Budget</span>
               </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2">
-                <SettingsIcon className="w-4 h-4" />
-                <span className="hidden sm:inline">Settings</span>
+              <TabsTrigger value="settings" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
+                <SettingsIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Settings</span>
               </TabsTrigger>
             </TabsList>
 
