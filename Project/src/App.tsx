@@ -536,7 +536,22 @@ export default function App() {
   // ------------------- SERVER SETTINGS SYNC -------------------
   // Load settings from server when user logs in
   const settingsLoadedRef = useRef(false);
+  const [settingsLoaded, setSettingsLoaded] = useState(false); // State to trigger re-renders
   const transactionCategoryMappingsRef = useRef<Record<string, Record<string, string>>>({});
+  const wasLoggedInRef = useRef(false);
+  
+  // Reset settings loaded state when user logs out (only on transition from logged in to logged out)
+  useEffect(() => {
+    if (!loggedIn && wasLoggedInRef.current) {
+      // User just logged out - reset everything
+      console.log('🔓 User logged out, resetting settings state');
+      settingsLoadedRef.current = false;
+      setSettingsLoaded(false);
+      transactionCategoryMappingsRef.current = {};
+    }
+    wasLoggedInRef.current = loggedIn;
+  }, [loggedIn]);
+  
   useEffect(() => {
     const loadSettingsFromServer = async () => {
       if (!loggedIn || settingsLoadedRef.current) return;
@@ -608,10 +623,19 @@ export default function App() {
           }
           
           settingsLoadedRef.current = true;
+          setSettingsLoaded(true);
           console.log('✅ Settings loaded from server');
+        } else {
+          // Even if no settings exist yet, mark as loaded so we can start saving
+          settingsLoadedRef.current = true;
+          setSettingsLoaded(true);
+          console.log('📂 No existing settings on server, starting fresh');
         }
       } catch (err) {
         console.error('Failed to load settings from server:', err);
+        // Still mark as loaded so we can save settings
+        settingsLoadedRef.current = true;
+        setSettingsLoaded(true);
       }
     };
 
@@ -622,10 +646,42 @@ export default function App() {
   const saveTimeoutRef = useRef<number | null>(null);
   useEffect(() => {
     // Don't save until we've loaded settings first (prevent overwriting server data)
-    if (!loggedIn || !settingsLoadedRef.current) return;
+    if (!loggedIn) {
+      console.log('🔒 Not saving settings: not logged in');
+      return;
+    }
+    if (!settingsLoadedRef.current) {
+      console.log('⏳ Not saving settings: settings not loaded yet');
+      return;
+    }
     
     const token = localStorage.getItem('authToken');
-    if (!token) return;
+    if (!token) {
+      console.log('🔑 Not saving settings: no auth token');
+      return;
+    }
+
+    console.log('📝 Settings change detected, will save in 2s...');
+
+    // Build transaction category mappings immediately (don't wait for debounce)
+    const transactionCategoryMappings: Record<string, Record<string, string>> = {};
+    transactions.forEach(tx => {
+      if (tx.categoryIds && Object.keys(tx.categoryIds).length > 0) {
+        transactionCategoryMappings[tx.id] = tx.categoryIds;
+      }
+    });
+    
+    // Debug: Log a sample to see what we're saving
+    const sampleTx = transactions.find(tx => tx.categoryIds && Object.keys(tx.categoryIds).length > 0);
+    if (sampleTx) {
+      console.log('📝 Sample transaction categoryIds being saved:', sampleTx.id, sampleTx.categoryIds);
+    }
+
+    // Only update the ref if we have actual mappings (don't overwrite loaded mappings with empty)
+    // This prevents the save effect from clearing mappings loaded from server before WatCard fetch runs
+    if (Object.keys(transactionCategoryMappings).length > 0) {
+      transactionCategoryMappingsRef.current = transactionCategoryMappings;
+    }
 
     // Debounce save - wait 2 seconds after last change
     if (saveTimeoutRef.current) {
@@ -635,14 +691,8 @@ export default function App() {
     saveTimeoutRef.current = window.setTimeout(async () => {
       try {
         console.log('💾 Saving settings to server...');
-        // Build transaction category mappings (transaction ID -> categoryIds map)
-        const transactionCategoryMappings: Record<string, Record<string, string>> = {};
-        transactions.forEach(tx => {
-          if (tx.categoryIds && Object.keys(tx.categoryIds).length > 0) {
-            transactionCategoryMappings[tx.id] = tx.categoryIds;
-          }
-        });
-        
+        console.log(`📊 Saving ${Object.keys(transactionCategoryMappings).length} transaction category mappings`);
+
         const settingsToSave = {
           views,
           categories,
@@ -688,6 +738,12 @@ export default function App() {
   const hasFetchedOnceRef = useRef(false);
   useEffect(() => {
     const fetchWatCardTransactions = async () => {
+      // Wait for settings to load first (so we have transaction category mappings)
+      if (!settingsLoadedRef.current) {
+        console.log("⏳ Waiting for settings to load before fetching transactions...");
+        return;
+      }
+      
       // Prevent concurrent fetches
       if (isFetchingRef.current) return;
       isFetchingRef.current = true;
@@ -796,7 +852,7 @@ export default function App() {
         // Now use the updated categories ref
         const allCategories = categoriesRef.current;
         
-        const watCardTransactions: Transaction[] = data.transactions
+        let watCardTransactions: Transaction[] = data.transactions
           .filter((tx: any) => {
             // Filter out PREPAYMENT (ADMIN) and ACCOUNT ADJUSTMENT
             const type = tx.type || '';
@@ -889,8 +945,12 @@ export default function App() {
             // Use location view category as legacy categoryId for backwards compatibility
             const legacyCategoryId = categoryIds["view-location"] || categoryIds["view-mealplan-flex"] || Object.values(categoryIds)[0] || "";
 
+            // Create a stable ID that doesn't depend on array order
+            // Use dateTime + amount + terminal to create unique identifier
+            const stableId = `watcard-${tx.dateTime}-${amountStr}-${(tx.terminal || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20)}`;
+
             return {
-              id: `watcard-${tx.dateTime}-${index}`,
+              id: stableId,
               amount,
               date: tx.dateTime.split(' ')[0], // Extract date part
               categoryId: legacyCategoryId,
@@ -902,10 +962,25 @@ export default function App() {
 
         // Apply saved category mappings from server settings
         const savedMappings = transactionCategoryMappingsRef.current;
+        console.log(`📂 Checking saved mappings: ${Object.keys(savedMappings).length} mappings in ref`);
         if (Object.keys(savedMappings).length > 0) {
+          console.log(`📂 Have ${Object.keys(savedMappings).length} saved category mappings to apply`);
+          // Debug: Log a sample mapping to see structure
+          const sampleKey = Object.keys(savedMappings)[0];
+          if (sampleKey) {
+            console.log(`📂 Sample saved mapping for ${sampleKey}:`, savedMappings[sampleKey]);
+          }
+          let appliedCount = 0;
+          let shwarmaCount = 0;
           watCardTransactions = watCardTransactions.map(tx => {
             const savedCategoryIds = savedMappings[tx.id];
             if (savedCategoryIds) {
+              appliedCount++;
+              // Check if any category in the saved mappings is the shwarma category
+              if (Object.values(savedCategoryIds).some(catId => catId === '1764493443971')) {
+                shwarmaCount++;
+                console.log(`📂 Transaction ${tx.id} has shwarma category in saved mappings`);
+              }
               // Use saved category assignments instead of auto-detected ones
               return {
                 ...tx,
@@ -915,14 +990,44 @@ export default function App() {
             }
             return tx;
           });
-          console.log(`📂 Applied saved category mappings to ${Object.keys(savedMappings).length} transactions`);
+          console.log(`📂 Applied saved category mappings to ${appliedCount} of ${watCardTransactions.length} transactions`);
+          console.log(`📂 Found ${shwarmaCount} transactions with shwarma category`);
         }
 
         // Merge with current state transactions (filter out old WatCard transactions first)
         setTransactions(currentTransactions => {
+          // Save existing categoryIds from current state (includes unsaved changes)
+          const existingMappings = new Map();
+          currentTransactions.forEach(tx => {
+            if (tx.categoryIds && Object.keys(tx.categoryIds).length > 0) {
+              existingMappings.set(tx.id, tx.categoryIds);
+            }
+          });
+
           const manualOnly = currentTransactions.filter(t => !t.id.startsWith('watcard-'));
-          const merged = [...manualOnly, ...watCardTransactions];
-          console.log(`Total transactions after merge: ${merged.length} (${manualOnly.length} manual + ${watCardTransactions.length} WatCard)`);
+
+          // Apply existing categoryIds to fresh WatCard transactions
+          const watCardWithPreservedCategories = watCardTransactions.map(tx => {
+            const existingCategories = existingMappings.get(tx.id);
+            if (existingCategories) {
+              // Preserve existing categoryIds (includes unsaved changes)
+              return {
+                ...tx,
+                categoryIds: existingCategories,
+                categoryId: existingCategories["view-location"] || existingCategories["view-mealplan-flex"] || Object.values(existingCategories)[0] || tx.categoryId
+              };
+            }
+            return tx;
+          });
+
+          const merged = [...manualOnly, ...watCardWithPreservedCategories];
+          console.log(`Total transactions after merge: ${merged.length} (${manualOnly.length} manual + ${watCardWithPreservedCategories.length} WatCard)`);
+
+          const preservedCount = watCardWithPreservedCategories.filter(tx => existingMappings.has(tx.id)).length;
+          if (preservedCount > 0) {
+            console.log(`✅ Preserved categoryIds for ${preservedCount} transactions during merge`);
+          }
+
           return merged;
         });
       } catch (err) {
@@ -932,11 +1037,11 @@ export default function App() {
       }
     };
 
-    // Fetch on mount and every 30 seconds
+    // Fetch on mount and every 30 seconds (but wait for settings to load first)
     fetchWatCardTransactions();
     const interval = setInterval(fetchWatCardTransactions, 30000);
     return () => clearInterval(interval);
-  }, []); // Empty dependency array - only run on mount
+  }, [settingsLoaded]); // Re-run when settings finish loading
 
   // Fetch funds data
   useEffect(() => {
@@ -1020,7 +1125,10 @@ export default function App() {
         setSelectedBudgetId,
       }}
     >
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+      <div
+        className="min-h-screen transition-colors"
+        style={{ backgroundColor: settings.theme === 'dark' ? '#000000' : '#f9fafb' }}
+      >
         {/* Backend startup warning banner */}
         {backendReady === false && (
           <div className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 px-3 py-2.5 sm:px-4 sm:py-3">
@@ -1053,7 +1161,10 @@ export default function App() {
 
         <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
           <Tabs defaultValue="dashboard" className="space-y-4 sm:space-y-6">
-            <TabsList className="grid w-full max-w-3xl grid-cols-4 mx-auto h-auto p-1">
+            <TabsList
+              className="grid w-full max-w-3xl grid-cols-4 mx-auto h-auto p-1"
+              style={{ backgroundColor: settings.theme === 'dark' ? '#1a1a1a' : '#ffffff' }}
+            >
               <TabsTrigger value="dashboard" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
                 <LayoutDashboard className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden xs:inline">Dashboard</span>

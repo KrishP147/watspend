@@ -224,6 +224,7 @@ export function DashboardOverview() {
 
       setCategories(categories.map((cat: Category) => cat.id === editingLabel.id ? updatedLabel : cat));
       setTransactions(updatedTransactions);
+      console.log(`✏️ Updated label "${updatedLabel.name}" with ${selectedTransactionIds.length} transactions`);
     } else {
       const newLabel: Category = {
         id: Date.now().toString(),
@@ -245,6 +246,7 @@ export function DashboardOverview() {
 
       setCategories([...categories, newLabel]);
       setTransactions(updatedTransactions);
+      console.log(`➕ Created new label "${newLabel.name}" with ${selectedTransactionIds.length} transactions`);
     }
 
     setIsLabelDialogOpen(false);
@@ -463,7 +465,7 @@ export function DashboardOverview() {
                         onChange={(e) => setViewFormData({ name: e.target.value })}
                         placeholder="e.g., By Building"
                         required
-                        className="bg-white dark:bg-white text-black border-gray-300 dark:border-gray-600 mt-1.5"
+                        className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 mt-1.5"
                       />
                     </div>
                     <div className="flex gap-2 pt-4">
@@ -504,7 +506,7 @@ export function DashboardOverview() {
                           onChange={(e) => setLabelFormData({ ...labelFormData, name: e.target.value })}
                           placeholder="e.g., Coffee"
                           required
-                          className="bg-white dark:bg-white text-black border-gray-300 dark:border-gray-600 mt-1.5"
+                          className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 mt-1.5"
                         />
                       </div>
 
@@ -639,7 +641,7 @@ export function DashboardOverview() {
                 placeholder="Search transactions..."
                 value={transactionSearchQuery}
                 onChange={(e) => setTransactionSearchQuery(e.target.value)}
-                className="flex-1 !text-black !bg-white placeholder:text-gray-500 border-gray-300"
+                className="flex-1 bg-white dark:bg-gray-800 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 border-gray-300 dark:border-gray-600"
               />
               <div className="flex gap-2">
                 <Button type="button" variant="outline" onClick={handleSelectAllTransactions} className="flex-1 sm:flex-none text-xs sm:text-sm">
