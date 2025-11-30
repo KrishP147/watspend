@@ -112,8 +112,7 @@ export function DashboardOverview() {
         color: cat.color,
         transactionCount: categoryTransactions.length,
       };
-    }).filter((item: SpendingItem) => item.spent > 0) // Only show labels with spending
-      .sort((a: SpendingItem, b: SpendingItem) => b.spent - a.spent); // Sort by amount descending
+    }).sort((a: SpendingItem, b: SpendingItem) => b.spent - a.spent); // Sort by amount descending (show all labels, even empty ones)
   };
 
   const spendingData = getSpendingByCategory();
@@ -342,18 +341,18 @@ export function DashboardOverview() {
   });
 
   return (
-    <div className="space-y-6">
-      {/* All 4 Cards in 1 Row - Enhanced Design */}
-      <div className="grid gap-6 grid-cols-4">
+    <div className="space-y-4 sm:space-y-6">
+      {/* All 4 Cards - Responsive Grid */}
+      <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Spending Breakdown Card - Deep Purple Theme */}
-        <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center overflow-hidden rounded-xl" style={{ background: 'linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%)' }}>
-          <CardHeader className="pb-4 pt-6 px-6 flex flex-col items-center justify-center">
-            <CardTitle className="text-lg font-bold text-white mb-5 text-center tracking-tight">
+        <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center overflow-hidden rounded-xl sm:col-span-2 lg:col-span-1" style={{ background: 'linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%)' }}>
+          <CardHeader className="pb-3 pt-4 sm:pt-6 px-4 sm:px-6 flex flex-col items-center justify-center">
+            <CardTitle className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-5 text-center tracking-tight">
               Spending Breakdown
             </CardTitle>
-            <div className="space-y-3 w-full">
+            <div className="space-y-2 sm:space-y-3 w-full">
               <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-sm h-9 transition-all backdrop-blur-sm">
+                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-xs sm:text-sm h-8 sm:h-9 transition-all backdrop-blur-sm">
                   <SelectValue placeholder="Range" className="text-white" />
                 </SelectTrigger>
                 <SelectContent>
@@ -365,7 +364,7 @@ export function DashboardOverview() {
                 </SelectContent>
               </Select>
               <Select value={selectedViewId} onValueChange={setSelectedViewId}>
-                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-sm h-9 transition-all backdrop-blur-sm">
+                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-xs sm:text-sm h-8 sm:h-9 transition-all backdrop-blur-sm">
                   <SelectValue placeholder="View" className="text-white" />
                 </SelectTrigger>
                 <SelectContent>
@@ -382,14 +381,14 @@ export function DashboardOverview() {
 
         {/* Meal Plan Balance - Green Theme */}
         <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center items-center overflow-hidden rounded-xl" style={{ background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)' }}>
-          <CardHeader className="pb-0 pt-6 px-6 flex flex-col items-center justify-center">
-            <CardTitle className="text-lg font-bold flex items-center justify-center gap-2 text-white mb-2 tracking-tight">
-              <Wallet className="w-5 h-5" />
+          <CardHeader className="pb-0 pt-4 sm:pt-6 px-4 sm:px-6 flex flex-col items-center justify-center">
+            <CardTitle className="text-sm sm:text-base lg:text-lg font-bold flex items-center justify-center gap-1.5 sm:gap-2 text-white mb-1 sm:mb-2 tracking-tight">
+              <Wallet className="w-4 h-4 sm:w-5 sm:h-5" />
               Meal Plan Left
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-2 pb-6 px-6 text-center flex flex-col items-center justify-center">
-            <p className="text-8xl font-black text-white leading-none drop-shadow-lg">
+          <CardContent className="pt-1 sm:pt-2 pb-4 sm:pb-6 px-4 sm:px-6 text-center flex flex-col items-center justify-center">
+            <p className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-none drop-shadow-lg">
               {formatCurrency(fundsData.mealPlanBalance, displayCurrency)}
             </p>
           </CardContent>
@@ -397,14 +396,14 @@ export function DashboardOverview() {
 
         {/* Flex Dollars Balance - Blue Theme */}
         <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center items-center overflow-hidden rounded-xl" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' }}>
-          <CardHeader className="pb-0 pt-6 px-6 flex flex-col items-center justify-center">
-            <CardTitle className="text-lg font-bold flex items-center justify-center gap-2 text-white mb-2 tracking-tight">
-              <DollarSign className="w-5 h-5" />
+          <CardHeader className="pb-0 pt-4 sm:pt-6 px-4 sm:px-6 flex flex-col items-center justify-center">
+            <CardTitle className="text-sm sm:text-base lg:text-lg font-bold flex items-center justify-center gap-1.5 sm:gap-2 text-white mb-1 sm:mb-2 tracking-tight">
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
               Flex Left
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-2 pb-6 px-6 text-center flex flex-col items-center justify-center">
-            <p className="text-8xl font-black text-white leading-none drop-shadow-lg">
+          <CardContent className="pt-1 sm:pt-2 pb-4 sm:pb-6 px-4 sm:px-6 text-center flex flex-col items-center justify-center">
+            <p className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-none drop-shadow-lg">
               {formatCurrency(fundsData.flexDollarsBalance, displayCurrency)}
             </p>
           </CardContent>
@@ -412,17 +411,17 @@ export function DashboardOverview() {
 
         {/* Total Spent - Orange Theme */}
         <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center items-center overflow-hidden rounded-xl" style={{ background: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)' }}>
-          <CardHeader className="pb-0 pt-6 px-6 flex flex-col items-center justify-center">
-            <CardTitle className="text-lg font-bold flex items-center justify-center gap-2 text-white mb-2 tracking-tight">
-              <TrendingDown className="w-5 h-5" />
+          <CardHeader className="pb-0 pt-4 sm:pt-6 px-4 sm:px-6 flex flex-col items-center justify-center">
+            <CardTitle className="text-sm sm:text-base lg:text-lg font-bold flex items-center justify-center gap-1.5 sm:gap-2 text-white mb-1 sm:mb-2 tracking-tight">
+              <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5" />
               Total Spent
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-2 pb-6 px-6 text-center flex flex-col items-center justify-center">
-            <p className="text-8xl font-black text-white leading-none drop-shadow-lg">
+          <CardContent className="pt-1 sm:pt-2 pb-4 sm:pb-6 px-4 sm:px-6 text-center flex flex-col items-center justify-center">
+            <p className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-none drop-shadow-lg">
               {formatCurrency(totalSpent, displayCurrency)}
             </p>
-            <p className="text-sm text-white/90 mt-3 font-semibold">
+            <p className="text-xs sm:text-sm text-white/90 mt-2 sm:mt-3 font-semibold">
               {transactionCount} transaction{transactionCount !== 1 ? 's' : ''}
             </p>
           </CardContent>
@@ -432,32 +431,32 @@ export function DashboardOverview() {
 
       {/* Spending List - Full Height */}
       <Card className="flex-1">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Spending by Label</CardTitle>
-            <div className="flex items-center gap-2">
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
+            <CardTitle className="text-base sm:text-lg font-bold">Spending by Label</CardTitle>
+            <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
               <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" onClick={() => setViewFormData({ name: "" })}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create View
+                  <Button variant="outline" size="sm" onClick={() => setViewFormData({ name: "" })} className="text-xs sm:text-sm">
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Create View</span>
+                    <span className="xs:hidden">View</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <DialogContent className="max-w-[90vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 mx-3">
                   <DialogHeader>
-                    <DialogTitle>Create New View</DialogTitle>
+                    <DialogTitle className="text-gray-900 dark:text-white">Create New View</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleViewSubmit} className="space-y-4 mt-4">
                     <div>
-                      <Label htmlFor="view-name">View Name</Label>
+                      <Label htmlFor="view-name" className="text-gray-900 dark:text-white">View Name</Label>
                       <Input
                         id="view-name"
                         value={viewFormData.name}
                         onChange={(e) => setViewFormData({ name: e.target.value })}
                         placeholder="e.g., By Building"
                         required
-                        className="bg-white dark:bg-gray-700"
-                        style={{ color: 'black' }}
+                        className="bg-white dark:bg-white text-black border-gray-300 dark:border-gray-600 mt-1.5"
                       />
                     </div>
                     <div className="flex gap-2 pt-4">
@@ -476,47 +475,47 @@ export function DashboardOverview() {
                     setEditingLabel(null);
                     setSelectedTransactionIds([]);
                     setLabelFormData({ name: "", color: PRESET_COLORS[0] });
-                  }}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Label
+                  }} className="text-xs sm:text-sm">
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Add Label</span>
+                    <span className="xs:hidden">Label</span>
                   </Button>
                 </DialogTrigger>
 
-                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+                <DialogContent className="max-w-[90vw] sm:max-w-2xl max-h-[90vh] flex flex-col mx-3 bg-white dark:bg-gray-900">
                   <DialogHeader className="flex-shrink-0">
-                    <DialogTitle>{editingLabel ? "Edit Label" : "Add New Label"}</DialogTitle>
+                    <DialogTitle className="text-gray-900 dark:text-white">{editingLabel ? "Edit Label" : "Add New Label"}</DialogTitle>
                   </DialogHeader>
 
                   <form onSubmit={handleLabelSubmit} className="space-y-4 mt-4 flex-1 flex flex-col overflow-hidden">
                     <div className="flex-shrink-0 space-y-4 overflow-y-auto pr-2">
                       <div>
-                        <Label htmlFor="name">Label Name</Label>
+                        <Label htmlFor="name" className="text-gray-900 dark:text-white">Label Name</Label>
                         <Input
                           id="name"
                           value={labelFormData.name}
                           onChange={(e) => setLabelFormData({ ...labelFormData, name: e.target.value })}
                           placeholder="e.g., Coffee"
                           required
-                          className="bg-white dark:bg-gray-700"
-                        style={{ color: 'black' }}
+                          className="bg-white dark:bg-white text-black border-gray-300 dark:border-gray-600 mt-1.5"
                         />
                       </div>
 
                       <div>
-                        <Label>Label Color</Label>
-                        <div className="flex items-center gap-3">
+                        <Label className="text-gray-900 dark:text-white">Label Color</Label>
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-1.5">
                           <Input
                             type="color"
                             value={labelFormData.color}
                             onChange={(e) => setLabelFormData({ ...labelFormData, color: e.target.value })}
-                            className="w-16 h-10 p-0 border-0 rounded"
+                            className="w-16 h-10 p-0 border-0 rounded flex-shrink-0"
                           />
-                          <div className="flex flex-wrap gap-1 max-w-xs">
+                          <div className="flex flex-wrap gap-1 max-w-full">
                             {PRESET_COLORS.map((color) => (
                               <button
                                 key={color}
                                 type="button"
-                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform flex-shrink-0"
                                 style={{ backgroundColor: color }}
                                 onClick={() => setLabelFormData({ ...labelFormData, color })}
                                 title={color}
@@ -527,8 +526,8 @@ export function DashboardOverview() {
                       </div>
 
                       <div>
-                        <Label>Assign Transactions</Label>
-                        <p className="text-xs text-gray-500 mb-2">
+                        <Label className="text-gray-900 dark:text-white">Assign Transactions</Label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                           Select which transactions belong to this label.
                         </p>
                         <Button
@@ -558,32 +557,33 @@ export function DashboardOverview() {
                 variant={isEditMode ? "default" : "outline"}
                 size="sm"
                 onClick={() => setIsEditMode(!isEditMode)}
+                className="text-xs sm:text-sm"
               >
-                <Edit2 className="w-4 h-4 mr-2" />
+                <Edit2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 {isEditMode ? "Done" : "Edit"}
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           {spendingData.length > 0 ? (
-            <div className="space-y-3 min-h-[600px] max-h-[700px] overflow-y-auto">
+            <div className="space-y-2 sm:space-y-3 min-h-[400px] sm:min-h-[600px] max-h-[500px] sm:max-h-[700px] overflow-y-auto">
               {spendingData.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-3">
+                <div key={index} className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-muted/50 gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     <div
-                      className="w-5 h-5 rounded-full"
+                      className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex-shrink-0"
                       style={{ backgroundColor: item.color }}
                     />
-                    <div>
-                      <p className="font-medium text-base">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm sm:text-base truncate">{item.name}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {item.transactionCount} transaction{item.transactionCount !== 1 ? 's' : ''}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-xl font-semibold">
+                  <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+                    <p className="text-base sm:text-xl font-semibold whitespace-nowrap">
                       {formatCurrency(item.spent, displayCurrency)}
                     </p>
                     {isEditMode && (
@@ -592,16 +592,18 @@ export function DashboardOverview() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditLabel(item.name)}
+                          className="h-8 w-8 p-0"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />
                         </Button>
                         {item.name !== "Other" && (
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteLabel(item.name)}
+                            className="h-8 w-8 p-0"
                           >
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
                           </Button>
                         )}
                       </>
@@ -611,7 +613,7 @@ export function DashboardOverview() {
               ))}
             </div>
           ) : (
-            <p className="text-center text-muted-foreground py-8">
+            <p className="text-center text-muted-foreground py-8 text-sm sm:text-base">
               No transactions for this view yet.
             </p>
           )}
@@ -620,28 +622,30 @@ export function DashboardOverview() {
 
       {/* Transaction Selection Dialog */}
       <Dialog open={isTransactionDialogOpen} onOpenChange={setIsTransactionDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[85vh] flex flex-col mx-3 bg-white dark:bg-gray-900">
           <DialogHeader className="flex-shrink-0 pb-2">
-            <DialogTitle className="text-gray-900 dark:text-white">Select Transactions for Label</DialogTitle>
+            <DialogTitle className="text-gray-900 dark:text-white text-base sm:text-lg">Select Transactions for Label</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col space-y-3 flex-1 min-h-0">
-            <div className="flex-shrink-0 flex gap-2">
+            <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2">
               <Input
                 placeholder="Search transactions..."
                 value={transactionSearchQuery}
                 onChange={(e) => setTransactionSearchQuery(e.target.value)}
-                className="flex-1 !text-black dark:!text-black !bg-white dark:!bg-white placeholder:text-gray-500"
+                className="flex-1 !text-black !bg-white placeholder:text-gray-500 border-gray-300"
               />
-              <Button type="button" variant="outline" onClick={handleSelectAllTransactions}>
-                Select All
-              </Button>
-              <Button type="button" variant="outline" onClick={handleDeselectAllTransactions}>
-                Deselect All
-              </Button>
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" onClick={handleSelectAllTransactions} className="flex-1 sm:flex-none text-xs sm:text-sm">
+                  Select All
+                </Button>
+                <Button type="button" variant="outline" onClick={handleDeselectAllTransactions} className="flex-1 sm:flex-none text-xs sm:text-sm">
+                  Deselect All
+                </Button>
+              </div>
             </div>
-            <div className="flex-1 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded p-4 min-h-0" style={{maxHeight: '50vh'}}>
+            <div className="flex-1 overflow-y-auto border border-gray-200 dark:border-gray-800 rounded p-3 sm:p-4 min-h-0" style={{maxHeight: '50vh'}}>
               {availableTransactions.length === 0 ? (
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">No transactions available</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center py-8">No transactions available</p>
               ) : (
                 <div className="space-y-2">
                   {availableTransactions.map((tx) => {
@@ -653,10 +657,10 @@ export function DashboardOverview() {
                     return (
                       <div
                         key={tx.id}
-                        className={`p-3 rounded border cursor-pointer transition-colors ${
+                        className={`p-2 sm:p-3 rounded border cursor-pointer transition-colors ${
                           isSelected
                             ? "bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700"
-                            : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
                         }`}
                         onClick={() => {
                           setSelectedTransactionIds(prev =>
@@ -666,19 +670,19 @@ export function DashboardOverview() {
                           );
                         }}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
                               {formatCurrency(tx.amount, displayCurrency)} • {tx.date}
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{tx.note || "No note"}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{tx.note || "No note"}</p>
                             {currentLabel && (
                               <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                                 Currently in: {currentLabel.name}
                               </p>
                             )}
                           </div>
-                          <div className="ml-4">
+                          <div className="ml-2 flex-shrink-0">
                             {isSelected ? (
                               <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center">
                                 <span className="text-white text-xs">✓</span>
@@ -694,11 +698,11 @@ export function DashboardOverview() {
                 </div>
               )}
             </div>
-            <div className="flex-shrink-0 flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex-shrink-0 flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 border-t border-gray-200 dark:border-gray-800">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 {selectedTransactionIds.length} transaction{selectedTransactionIds.length !== 1 ? 's' : ''} selected
               </p>
-              <Button type="button" onClick={() => setIsTransactionDialogOpen(false)}>
+              <Button type="button" onClick={() => setIsTransactionDialogOpen(false)} className="w-full sm:w-auto">
                 Done
               </Button>
             </div>
