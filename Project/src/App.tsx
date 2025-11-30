@@ -13,6 +13,9 @@ import { SUPPORTED_CURRENCIES } from "./utils/currency";
 import { authService } from "./services/authService";
 import { startAuthSync, notifyExtensionLoggedOut } from "./utils/chromeStorage";
 
+// API base URL - uses environment variable in production, empty string for local dev (Vite proxy)
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const PRESET_COLORS = [
   "#8B4513", "#FF6B6B", "#4ECDC4", "#45B7D1", "#95A5A6",
   "#F39C12", "#9B59B6", "#E74C3C", "#1ABC9C", "#3498DB",
@@ -529,7 +532,7 @@ export default function App() {
           return;
         }
 
-        const res = await fetch("/api/data", {
+        const res = await fetch(`${API_BASE}/api/data`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -759,7 +762,7 @@ export default function App() {
           return;
         }
 
-        const res = await fetch("/api/funds", {
+        const res = await fetch(`${API_BASE}/api/funds`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -772,7 +775,7 @@ export default function App() {
           });
         }
       } catch (err) {
-        console.error("Failed to fetch funds:", err);
+        console.error("Failed to fetch funds:";, err);
       }
     };
 
