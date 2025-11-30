@@ -1,10 +1,13 @@
 # WatSpend - WatCard Meal Plan Dashboard
 
-> ��� A comprehensive budget tracking and spending visualization tool for University of Waterloo students
+> 💰 A comprehensive budget tracking and spending visualization tool for University of Waterloo students
+
+**🚀 Live Demo: [https://watspend.vercel.app](https://watspend.vercel.app)**
 
 [![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://gitlab.uwaterloo.ca)
 [![Node](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
 [![React](https://img.shields.io/badge/react-18-61dafb.svg)](https://reactjs.org)
+[![Deployed](https://img.shields.io/badge/deployed-vercel-black.svg)](https://watspend.vercel.app)
 
 ---
 
@@ -168,7 +171,29 @@ WatSpend is a web-based application that helps University of Waterloo students t
 
 ---
 
-## Setup Instructions
+## Quick Start (Live Version)
+
+The easiest way to use WatSpend is through our deployed version:
+
+1. **Visit** [https://watspend.vercel.app](https://watspend.vercel.app)
+2. **Sign in** with your Google account
+3. **Install the Chrome Extension** (see below)
+4. **Import your transactions** from the WatCard portal
+
+### Installing the Chrome Extension
+
+1. Download/clone this repository
+2. Open Chrome → `chrome://extensions/`
+3. Enable **Developer mode** (top right toggle)
+4. Click **Load unpacked** → Select `src/extension` folder
+5. The WatSpend icon appears in your toolbar
+6. Visit [WatCard portal](https://watcard.uwaterloo.ca), click the extension, and scrape!
+
+---
+
+## Local Development Setup
+
+If you want to run WatSpend locally for development:
 
 ### Prerequisites
 
@@ -247,7 +272,16 @@ Frontend runs at **http://localhost:5173**
 
 ## Deployment
 
-### Frontend - Vercel
+### Live Production URLs
+
+| Component | URL |
+|-----------|-----|
+| **Frontend** | [https://watspend.vercel.app](https://watspend.vercel.app) |
+| **Backend API** | [https://watspend-api.onrender.com](https://watspend-api.onrender.com) |
+
+### Deploying Your Own Instance
+
+#### Frontend - Vercel
 
 1. Fork/push your repository to GitHub
 2. Go to [vercel.com](https://vercel.com) and sign in with GitHub

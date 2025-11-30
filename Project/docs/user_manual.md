@@ -1,7 +1,8 @@
 # User Manual - WatSpend (WatCard Dashboard)
 
 **Version**: 1.0  
-**Last Updated**: November 2025
+**Last Updated**: November 2025  
+**Live App**: [https://watspend.vercel.app](https://watspend.vercel.app)
 
 ---
 
@@ -56,9 +57,16 @@ WatSpend is a comprehensive budget tracking application designed specifically fo
 
 ### 2.2 Accessing the Application
 
+**Option A: Use the Live Deployed Version (Recommended)**
 1. Open your web browser
-2. Navigate to the WatSpend dashboard URL
+2. Go to **[https://watspend.vercel.app](https://watspend.vercel.app)**
 3. You'll see the login page
+
+**Option B: Run Locally (For Development)**
+1. Clone the repository and follow setup instructions in README
+2. Start the backend: `cd mealplan-server && npm start`
+3. Start the frontend: `cd src && npm run dev`
+4. Open `http://localhost:5173`
 
 ### 2.3 Creating an Account
 
@@ -238,12 +246,19 @@ The dashboard widget shows:
 
 ### 6.1 Installing the Extension
 
-1. Download the extension files from the project
+The Chrome extension is required to import transactions from your WatCard account.
+
+1. **Download the project** from GitLab or clone the repository:
+   ```
+   git clone https://gitlab.uwaterloo.ca/se101-f24/project_team_10.git
+   ```
 2. Open Chrome and go to `chrome://extensions/`
-3. Enable **"Developer mode"** (top right)
+3. Enable **"Developer mode"** (toggle in top right)
 4. Click **"Load unpacked"**
-5. Select the `src/extension` folder
+5. Navigate to and select the `Project/src/extension` folder
 6. The WatSpend icon appears in your toolbar
+
+> **Note**: The extension works with both the live version ([watspend.vercel.app](https://watspend.vercel.app)) and local development. Make sure you're logged into WatSpend before scraping.
 
 ### 6.2 Scraping Transactions
 
@@ -422,23 +437,30 @@ If you encounter issues:
 
 ### 11.1 Production URLs
 
-The WatSpend application is deployed using:
+WatSpend is live and deployed!
 
 | Component | Platform | URL |
 |-----------|----------|-----|
-| Frontend | Vercel | `https://watspend.vercel.app` (example) |
-| Backend | Render | `https://watspend-api.onrender.com` (example) |
+| Frontend | Vercel | [https://watspend.vercel.app](https://watspend.vercel.app) |
+| Backend | Render | [https://watspend-api.onrender.com](https://watspend-api.onrender.com) |
 | Database | UWaterloo | `riku.shoshin.uwaterloo.ca` |
 
-> **Note**: Replace the example URLs with actual deployment URLs once deployed.
+> **Tip**: Just visit [watspend.vercel.app](https://watspend.vercel.app) to start using the app immediately!
 
 ### 11.2 Using the Deployed Version
 
-1. **Dashboard**: Visit the Vercel URL to access the dashboard
-2. **Chrome Extension**: The extension needs to be configured for production:
-   - Open `src/extension/background.js`
-   - Change `API_BASE_URL` to your Render backend URL
-   - Reload the extension in Chrome
+1. **Visit the Dashboard**: Go to [https://watspend.vercel.app](https://watspend.vercel.app)
+2. **Sign in**: Use Google OAuth with your @uwaterloo.ca account
+3. **Install Chrome Extension**:
+   - Clone or download the repository
+   - Go to `chrome://extensions/` in Chrome
+   - Enable Developer mode
+   - Click "Load unpacked" → Select `src/extension` folder
+4. **Import Transactions**:
+   - Log into your WatCard account
+   - Click the WatSpend extension icon
+   - Click "Scrape Transactions"
+5. **View your data** on the dashboard!
 
 ### 11.3 Self-Hosting
 
