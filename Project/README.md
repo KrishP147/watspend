@@ -6,18 +6,35 @@
 
 ---
 
-## Quick Start (Deployed Version)
+## For End Users (Recommended)
 
-The fastest way to use WatSpend:
+### Step 1: Use the Live App
 
-1. Visit [https://watspend.vercel.app](https://watspend.vercel.app)
-2. Sign in with your Google account
-3. Install the Chrome Extension (see [Chrome Extension Setup](#chrome-extension-setup))
-4. Import transactions from the WatCard portal
+Go to **[https://watspend.vercel.app](https://watspend.vercel.app)** and sign in with your Google account.
+
+### Step 2: Install the Chrome Extension
+
+1. **Download** the extension: [Download ZIP](https://github.com/KrishP147/watspend/archive/refs/heads/main.zip)
+2. **Extract** the ZIP file
+3. Open Chrome and go to `chrome://extensions/`
+4. Enable **Developer mode** (toggle in top right)
+5. Click **Load unpacked**
+6. Select the `Project/src/extension` folder from the extracted files
+7. The WatSpend icon appears in your toolbar
+
+### Step 3: Import Your Transactions
+
+1. Go to the [WatCard portal](https://watcard.uwaterloo.ca) and log in
+2. Navigate to your transaction history
+3. Click the WatSpend extension icon
+4. Click **"Scrape Transactions"**
+5. Return to [watspend.vercel.app](https://watspend.vercel.app) to see your data!
 
 ---
 
-## Running Locally from Scratch
+## For Developers (Local Setup)
+
+If you want to run WatSpend locally for development:
 
 ### Prerequisites
 
@@ -25,8 +42,6 @@ The fastest way to use WatSpend:
 |-------------|---------|----------|
 | Node.js | 18+ | https://nodejs.org |
 | npm | 9+ | Included with Node.js |
-| MySQL | 8.0+ | https://mysql.com |
-| Python | 3.8+ | https://python.org |
 | Google Chrome | Latest | https://google.com/chrome |
 
 ### Step 1: Clone the Repository
@@ -36,19 +51,20 @@ git clone https://gitlab.uwaterloo.ca/se101-f24/project_team_10.git
 cd project_team_10/Project
 ```
 
-### Step 2: Database Setup
+### Step 2: Create Google OAuth Credentials
 
-1. **Connect to MySQL**:
-   ```bash
-   mysql -h riku.shoshin.uwaterloo.ca -u team10 -p
-   ```
+You need your own Google OAuth credentials for local login to work:
 
-2. **Run the schema**:
-   ```bash
-   mysql -h riku.shoshin.uwaterloo.ca -u team10 -p Project_Team_10 < database/schema.sql
-   ```
-
-   See `database/SETUP.md` for detailed database instructions.
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project (or select existing)
+3. Navigate to **APIs & Services → Credentials**
+4. Click **Create Credentials → OAuth 2.0 Client ID**
+5. Configure consent screen if prompted (External, add your email as test user)
+6. Select **Web application** as application type
+7. Add authorized origins and redirects:
+   - **Authorized JavaScript origins**: `http://localhost:5173`
+   - **Authorized redirect URIs**: `http://localhost:4000/api/auth/google/callback`
+8. Click **Create** and copy your **Client ID** and **Client Secret**
 
 ### Step 3: Backend Setup
 
@@ -61,13 +77,13 @@ Create `mealplan-server/.env`:
 ```env
 PORT=4000
 DB_HOST=riku.shoshin.uwaterloo.ca
-DB_USER=team10
-DB_PASS=your_password
-DB_NAME=Project_Team_10
-JWT_SECRET=your_jwt_secret
-SESSION_SECRET=your_session_secret
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
+DB_USER=<your_uwaterloo_db_username>
+DB_PASS=<your_uwaterloo_db_password>
+DB_NAME=SE101_Team_10
+JWT_SECRET=any-random-string-here
+SESSION_SECRET=another-random-string-here
+GOOGLE_CLIENT_ID=<your_google_client_id_from_step_2>
+GOOGLE_CLIENT_SECRET=<your_google_client_secret_from_step_2>
 GOOGLE_CALLBACK_URL=http://localhost:4000/api/auth/google/callback
 FRONTEND_URL=http://localhost:5173
 NODE_ENV=development
@@ -107,7 +123,7 @@ Frontend runs at **http://localhost:5173**
 4. Select the `src/extension` folder
 5. The WatSpend icon appears in your toolbar
 
-### Step 6: Verify Everything Works
+### Step 6: Test It
 
 1. Open http://localhost:5173 in Chrome
 2. Click "Sign in with Google"
@@ -120,15 +136,11 @@ Frontend runs at **http://localhost:5173**
 
 ## Running Tests
 
-### Python Database Tests
-
 ```bash
 cd tests
 pip install -r ../requirements.txt
 pytest test_code.py -v
 ```
-
-Expected: 21 tests passing
 
 ---
 
@@ -136,39 +148,16 @@ Expected: 21 tests passing
 
 ```
 Project/
-├── README.md              ← This file (setup instructions)
+├── README.md              ← This file
 ├── requirements.txt       ← Python dependencies
 ├── build/                 ← Compiled output (generated)
 ├── database/              ← Database schema and migrations
-│   ├── schema.sql
-│   ├── seed.sql
-│   └── SETUP.md
 ├── docs/                  ← Documentation
-│   ├── user_manual.md     ← End-user guide
-│   ├── charter.md
-│   ├── user_stories.md
-│   ├── domain_model.md
-│   ├── use_cases.md
-│   ├── test_plan.md
-│   └── test_report.md
+│   └── user_manual.md     ← End-user guide
 ├── mealplan-server/       ← Backend API (Node.js/Express)
-│   ├── server.js
-│   ├── auth.js
-│   └── package.json
 ├── src/                   ← Frontend (React/TypeScript/Vite)
-│   ├── App.tsx
-│   ├── main.tsx
-│   ├── package.json
-│   ├── components/
-│   ├── services/
-│   ├── utils/
 │   └── extension/         ← Chrome extension
-│       ├── manifest.json
-│       ├── background.js
-│       ├── content.js
-│       └── popup.html
 └── tests/                 ← Test files
-    └── test_code.py
 ```
 
 ---
@@ -196,11 +185,7 @@ Project/
 
 1. Go to [render.com](https://render.com) → New Web Service
 2. Connect repository, set root to `mealplan-server`
-3. Add environment variables:
-   - `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`
-   - `JWT_SECRET`, `SESSION_SECRET`
-   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`
-   - `FRONTEND_URL`, `NODE_ENV=production`
+3. Add environment variables (same as local `.env` but with production URLs)
 4. Deploy
 
 #### Post-Deployment
@@ -219,7 +204,6 @@ Project/
 | Backend | Node.js, Express, JWT, Google OAuth 2.0 |
 | Database | MySQL 8.0 |
 | Extension | Chrome Manifest V3 |
-| Testing | pytest, Jest |
 
 ---
 
