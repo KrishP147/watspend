@@ -258,7 +258,7 @@ async function scrapeAllPages() {
   };
 }
 
-// Save scraped data to storage
+// Save scraped data - send to background script (like funds does)
 function saveSnapshot(transactions, pageCount = null) {
   if (transactions.length === 0) {
     console.warn("[MealPlanScraper] No transactions to save.");
@@ -271,43 +271,27 @@ function saveSnapshot(transactions, pageCount = null) {
     transactions
   };
 
-  chrome.storage.local.get(["mealPlanHistory"], (res) => {
-    let history = res.mealPlanHistory || [];
-    const last = history[history.length - 1];
-
-    // Avoid duplicate saves if data identical
-    if (last && JSON.stringify(last.transactions) === JSON.stringify(newSnapshot.transactions)) {
-      console.log("[MealPlanScraper] No change in transactions, skipping save.");
-      if (transactionsPassPromiseResolver) {
-        transactionsPassPromiseResolver();
-        transactionsPassPromiseResolver = null;
-        waitingForTransactionsPass = false;
-      }
-      return;
-    }
-
-    history.push(newSnapshot);
-    chrome.storage.local.set({ mealPlanHistory: history, mealPlanData: newSnapshot }, () => {
-      console.log("[MealPlanScraper] Snapshot saved! Total:", history.length);
-    });
-    
-    chrome.runtime.sendMessage({
-      action: "uploadSnapshot",
-      data: newSnapshot
-    });
-
-    // Show notification
-    if (pageCount !== null) {
-      showScrapingCompleteNotification(transactions.length, pageCount);
-    }
-
-    // Resolve promise if we're waiting for TransactionsPass
-    if (transactionsPassPromiseResolver) {
-      transactionsPassPromiseResolver();
-      transactionsPassPromiseResolver = null;
-      waitingForTransactionsPass = false;
-    }
+  console.log("[MealPlanScraper] Sending", transactions.length, "transactions to background...");
+  
+  // Send to background script (same as funds)
+  chrome.runtime.sendMessage({
+    action: "uploadSnapshot",
+    data: newSnapshot
   });
+
+  console.log("[MealPlanScraper] Upload message sent to background");
+
+  // Show notification
+  if (pageCount !== null) {
+    showScrapingCompleteNotification(transactions.length, pageCount);
+  }
+
+  // Resolve promise if we're waiting for TransactionsPass
+  if (transactionsPassPromiseResolver) {
+    transactionsPassPromiseResolver();
+    transactionsPassPromiseResolver = null;
+    waitingForTransactionsPass = false;
+  }
 }
 
 // Trigger TransactionsPass request
@@ -350,6 +334,86 @@ function triggerTransactionsPassRequest() {
   };
 })();
 
+// Scrape funds from the deposit page
+function scrapeFundsData() {
+  console.log("[MealPlanScraper] Scraping funds from deposit page...");
+
+  let mealPlanBalance = null;
+  let flexDollarsBalance = null;
+
+  const allText = document.body.innerText;
+  console.log("[MealPlanScraper] Page text preview:", allText.substring(0, 500));
+
+  // Find all dollar amounts on the page - match $XXX.XX format
+  const allAmounts = allText.match(/\$[\d,]+\.?\d*/g) || [];
+  console.log("[MealPlanScraper] All dollar amounts on page:", allAmounts);
+  
+  // Parse amounts and filter non-zero
+  const parsedAmounts = [];
+  for (const amountStr of allAmounts) {
+    // Remove $ and commas, parse as float
+    const cleaned = amountStr.replace(/[$,]/g, '');
+    const value = parseFloat(cleaned);
+    console.log("[MealPlanScraper] Parsing:", amountStr, "->", cleaned, "->", value);
+    if (!isNaN(value) && value > 0) {
+      parsedAmounts.push(value);
+    }
+  }
+  
+  console.log("[MealPlanScraper] Non-zero amounts:", parsedAmounts);
+  
+  // Check if page contains the expected labels
+  const hasResidencePlan = allText.includes('RESIDENCE PLAN') || allText.includes('Residence Plan');
+  const hasFlexible = allText.includes('FLEXIBLE') || allText.includes('Flexible');
+  
+  console.log("[MealPlanScraper] Found RESIDENCE PLAN:", hasResidencePlan, "FLEXIBLE:", hasFlexible);
+  
+  // Assign balances based on non-zero amounts found
+  if (parsedAmounts.length >= 2) {
+    mealPlanBalance = parsedAmounts[0];
+    flexDollarsBalance = parsedAmounts[1];
+    console.log("[MealPlanScraper] Found Meal Plan: $" + mealPlanBalance + ", Flex: $" + flexDollarsBalance);
+  } else if (parsedAmounts.length === 1) {
+    // Only one balance found - determine which one based on labels
+    if (hasResidencePlan && !hasFlexible) {
+      mealPlanBalance = parsedAmounts[0];
+    } else if (hasFlexible && !hasResidencePlan) {
+      flexDollarsBalance = parsedAmounts[0];
+    } else {
+      // Default to meal plan
+      mealPlanBalance = parsedAmounts[0];
+    }
+    console.log("[MealPlanScraper] Found one balance: Meal=$" + mealPlanBalance + ", Flex=$" + flexDollarsBalance);
+  }
+
+  if (mealPlanBalance === null && flexDollarsBalance === null) {
+    console.log("[MealPlanScraper] No balance data found");
+  }
+
+  return {
+    mealPlanBalance,
+    flexDollarsBalance,
+    timestamp: new Date().toISOString()
+  };
+}
+
+// Save funds data - send directly to backend (no chrome.storage)
+function saveFundsData(fundsData) {
+  if (fundsData.mealPlanBalance === null && fundsData.flexDollarsBalance === null) {
+    console.warn("[MealPlanScraper] No balance data found on page");
+    return false;
+  }
+
+  // Send to backend
+  chrome.runtime.sendMessage({
+    action: "uploadFunds",
+    data: fundsData
+  });
+
+  console.log("[MealPlanScraper] Funds data sent to backend:", fundsData);
+  return true;
+}
+
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "refreshScrape") {
@@ -391,10 +455,26 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     
     return true; // Keep the message channel open for async response
   }
+  
+  if (msg.action === "scrapeFunds") {
+    console.log("[MealPlanScraper] Funds scrape requested...");
+    
+    try {
+      const fundsData = scrapeFundsData();
+      const success = saveFundsData(fundsData);
+      
+      if (success) {
+        sendResponse({ success: true, data: fundsData });
+      } else {
+        sendResponse({ success: false, error: "No balance data found on this page" });
+      }
+    } catch (error) {
+      console.error("[MealPlanScraper] Error scraping funds:", error);
+      sendResponse({ success: false, error: error.message });
+    }
+    
+    return true; // Keep channel open for async response
+  }
 });
 
-// Fallback: try after 5s just in case
-setTimeout(async () => {
-  const result = await scrapeAllPages();
-  saveSnapshot(result.transactions, result.pageCount);
-}, 5000);
+// Note: Removed automatic fallback scrape - only scrape when user clicks button
