@@ -13,15 +13,47 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Production-ready CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'http://localhost:5176',
+  'https://secure.touchnet.net',
+  'https://*.touchnet.net'
+];
+
+// Add production frontend URL if different from FRONTEND_URL
+if (process.env.VERCEL_URL) {
+  allowedOrigins.push(`https://${process.env.VERCEL_URL}`);
+}
+
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175',
-    'http://localhost:5176',
-    'https://secure.touchnet.net',
-    'https://*.touchnet.net'
-  ],
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or extensions)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is allowed
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed.includes('*')) {
+        const pattern = allowed.replace('*', '.*');
+        return new RegExp(pattern).test(origin);
+      }
+      return allowed === origin;
+    });
+    
+    if (isAllowed || origin.startsWith('chrome-extension://')) {
+      return callback(null, true);
+    }
+    
+    // In production, be more permissive for Vercel preview URLs
+    if (origin.includes('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 // Also allow requests from touchnet and extensions
@@ -48,7 +80,10 @@ app.use(
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { 
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Required for cross-origin cookies
+    }
   })
 );
 
