@@ -205,9 +205,9 @@ export function Settings() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      <Card className="p-6">
-        <h3 className="text-gray-900 dark:text-white mb-2">Settings</h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-6">
+      <Card className="p-4 sm:p-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-lg">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">Settings</h3>
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-6">
           Customize your dashboard preferences
         </p>
 
@@ -306,8 +306,8 @@ export function Settings() {
                   Select your preferred currency for the entire app
                 </p>
                 <Select value={settings.currency} onValueChange={handleCurrencyChange}>
-                  <SelectTrigger id="currency-select" className="max-w-xs bg-white dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-700" style={{ color: 'black' }}>
-                    <SelectValue style={{ color: 'black' }} />
+                  <SelectTrigger id="currency-select" className="max-w-xs bg-white dark:bg-white text-black border-gray-300 h-10">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {currencyCodes.map((currencyCode) => (
@@ -393,10 +393,9 @@ export function Settings() {
                     value={balanceInputValue}
                     onChange={(e) => setBalanceInputValue(e.target.value)}
                     placeholder="e.g., 1000"
-                    className="bg-white dark:bg-gray-700"
-                    style={{ color: 'black' }}
+                    className="bg-white dark:bg-white text-black border-gray-300 h-10"
                   />
-                  <Button type="submit" variant="outline">Update</Button>
+                  <Button type="submit" variant="outline" className="h-10">Update</Button>
                 </form>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   Current {balanceType === 'mealplan' ? 'Meal Plan' : 'Flex'} Balance: {getCurrencySymbol(settings.currency)}

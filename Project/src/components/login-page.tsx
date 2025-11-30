@@ -85,26 +85,26 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-gray-900 p-3 sm:p-4">
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="space-y-1 px-4 sm:px-6 pt-6 sm:pt-8">
+          <CardTitle className="text-xl sm:text-2xl font-bold text-center">
             {isLogin ? 'Welcome to WatSpend' : 'Create Account'}
           </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className="text-center text-sm sm:text-base">
             {isLogin
               ? 'Sign in to manage your WatCard spending'
               : 'Sign up to start tracking your expenses'}
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Backend startup warning */}
             {backendReady === false && (
               <Alert className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
-                <AlertDescription className="text-amber-800 dark:text-amber-200 flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <AlertDescription className="text-amber-800 dark:text-amber-200 flex items-center gap-2 text-xs sm:text-sm">
+                  <svg className="animate-spin h-4 w-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -120,7 +120,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -129,13 +129,12 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
                 required
-                className="bg-white dark:bg-gray-700"
-                style={{ color: 'black' }}
+                className="bg-white dark:bg-white text-black border-gray-300 h-10 sm:h-11"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -144,21 +143,19 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
                 required
-                className="bg-white dark:bg-gray-700"
-                style={{ color: 'black' }}
+                className="bg-white dark:bg-white text-black border-gray-300 h-10 sm:h-11"
               />
             </div>
 
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   placeholder="••••••••"
                   value={confirmPassword}
-                  className="bg-white dark:bg-gray-700"
-                style={{ color: 'black' }}
+                  className="bg-white dark:bg-white text-black border-gray-300 h-10 sm:h-11"
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={loading}
                   required
@@ -168,7 +165,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-10 sm:h-11 font-semibold"
               disabled={loading || backendReady === false}
             >
               {loading ? 'Please wait...' : backendReady === false ? 'Waiting for backend...' : isLogin ? 'Sign In' : 'Create Account'}
@@ -188,11 +185,11 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full h-10 sm:h-11 font-semibold"
               onClick={handleGoogleLogin}
               disabled={loading || backendReady === false}
             >
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+              <svg className="mr-2 h-4 w-4 flex-shrink-0" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -210,16 +207,16 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Sign in with Google
+              <span className="truncate">Sign in with Google</span>
             </Button>
 
-            <div className="text-center text-sm">
+            <div className="text-center text-xs sm:text-sm">
               {isLogin ? (
                 <>
                   Don't have an account?{' '}
                   <button
                     type="button"
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
                     onClick={() => setIsLogin(false)}
                     disabled={loading}
                   >
@@ -231,7 +228,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                   Already have an account?{' '}
                   <button
                     type="button"
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
                     onClick={() => setIsLogin(true)}
                     disabled={loading}
                   >
