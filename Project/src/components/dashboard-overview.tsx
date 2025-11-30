@@ -202,16 +202,23 @@ export function DashboardOverview() {
       const otherLabel = viewCategories.find((c: Category) => c.name === "Other" && c.id !== updatedLabel.id);
       const updatedTransactions = transactions.map((tx: Transaction) => {
         const txCategoryId = tx.categoryIds?.[selectedViewId] || tx.categoryId;
-        if (txCategoryId === editingLabel.id) {
+        const isCurrentlyInThisLabel = txCategoryId === editingLabel.id;
+        const isSelected = selectedTransactionIds.includes(tx.id);
+        
+        // Case 1: Transaction is selected - assign it to this label
+        if (isSelected) {
           const categoryIds = { ...tx.categoryIds };
-          if (selectedTransactionIds.includes(tx.id)) {
-            categoryIds[selectedViewId] = updatedLabel.id;
-            return { ...tx, categoryIds, categoryId: updatedLabel.id };
-          } else if (otherLabel) {
-            categoryIds[selectedViewId] = otherLabel.id;
-            return { ...tx, categoryIds, categoryId: otherLabel.id };
-          }
+          categoryIds[selectedViewId] = updatedLabel.id;
+          return { ...tx, categoryIds, categoryId: updatedLabel.id };
         }
+        
+        // Case 2: Transaction was in this label but is now deselected - move to Other
+        if (isCurrentlyInThisLabel && !isSelected && otherLabel) {
+          const categoryIds = { ...tx.categoryIds };
+          categoryIds[selectedViewId] = otherLabel.id;
+          return { ...tx, categoryIds, categoryId: otherLabel.id };
+        }
+        
         return tx;
       });
 
@@ -430,10 +437,10 @@ export function DashboardOverview() {
 
 
       {/* Spending List - Full Height */}
-      <Card className="flex-1">
-        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+      <Card className="flex-1 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-lg">
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-100 dark:border-gray-800">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
-            <CardTitle className="text-base sm:text-lg font-bold">Spending by Label</CardTitle>
+            <CardTitle className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Spending by Label</CardTitle>
             <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
               <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
                 <DialogTrigger asChild>
@@ -565,25 +572,25 @@ export function DashboardOverview() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="px-4 sm:px-6">
+        <CardContent className="px-4 sm:px-6 py-4">
           {spendingData.length > 0 ? (
-            <div className="space-y-2 sm:space-y-3 min-h-[400px] sm:min-h-[600px] max-h-[500px] sm:max-h-[700px] overflow-y-auto">
+            <div className="space-y-2 sm:space-y-2.5 min-h-[400px] sm:min-h-[600px] max-h-[500px] sm:max-h-[700px] overflow-y-auto pr-1">
               {spendingData.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-muted/50 gap-2">
+                <div key={index} className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-800/50 hover:shadow-md transition-all duration-200 gap-2 border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     <div
-                      className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex-shrink-0"
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex-shrink-0 shadow-sm ring-2 ring-white dark:ring-gray-800"
                       style={{ backgroundColor: item.color }}
                     />
                     <div className="min-w-0">
-                      <p className="font-medium text-sm sm:text-base truncate">{item.name}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">
+                      <p className="font-semibold text-sm sm:text-base truncate text-gray-900 dark:text-white">{item.name}</p>
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                         {item.transactionCount} transaction{item.transactionCount !== 1 ? 's' : ''}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-                    <p className="text-base sm:text-xl font-semibold whitespace-nowrap">
+                    <p className="text-base sm:text-xl font-bold whitespace-nowrap text-gray-900 dark:text-white">
                       {formatCurrency(item.spent, displayCurrency)}
                     </p>
                     {isEditMode && (

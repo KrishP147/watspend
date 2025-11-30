@@ -444,18 +444,18 @@ export function TransactionManager() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* View Selection and Filters */}
-      <Card className="p-4">
-        <div className="space-y-4">
+      <Card className="p-3 sm:p-4 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className="space-y-3 sm:space-y-4">
           {/* Top Row: View and Date Range */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4 flex-wrap">
-              <div>
-                <Label htmlFor="view-select" className="block text-sm font-medium mb-2">View</Label>
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-3 sm:gap-4">
+              <div className="flex-1 min-w-0">
+                <Label htmlFor="view-select" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">View</Label>
                 <Select value={selectedViewId} onValueChange={setSelectedViewId}>
-                  <SelectTrigger id="view-select" className="w-48 bg-white dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-700" style={{ color: 'black' }}>
-                    <SelectValue style={{ color: 'black' }} />
+                  <SelectTrigger id="view-select" className="w-full bg-white dark:bg-white text-black border-gray-300">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {views.map((view) => (
@@ -466,11 +466,11 @@ export function TransactionManager() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="date-range" className="block text-sm font-medium mb-2">Date Range</Label>
+              <div className="flex-1 min-w-0">
+                <Label htmlFor="date-range" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Date Range</Label>
                 <Select value={dateRange} onValueChange={setDateRange}>
-                  <SelectTrigger id="date-range" className="w-36 bg-white dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-700" style={{ color: 'black' }}>
-                    <SelectValue style={{ color: 'black' }} />
+                  <SelectTrigger id="date-range" className="w-full bg-white dark:bg-white text-black border-gray-300">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="day">Today</SelectItem>
@@ -481,20 +481,20 @@ export function TransactionManager() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button onClick={() => setIsExportDialogOpen(true)} variant="outline">
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
+              <div className="flex items-end">
+                <Button onClick={() => setIsExportDialogOpen(true)} variant="outline" className="w-full xs:w-auto text-xs sm:text-sm h-9 sm:h-10">
+                  <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  Export
+                </Button>
+              </div>
             </div>
           </div>
 
           {/* Second Row: Search and Additional Filters */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 flex-wrap">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-4">
             {/* Search */}
-            <div className="flex-1 min-w-[250px]">
-              <Label htmlFor="search" className="block text-sm font-medium mb-3">Search</Label>
+            <div className="flex-1 min-w-0">
+              <Label htmlFor="search" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Search</Label>
               <div className="relative flex items-center">
                 <Input
                   id="search"
@@ -502,18 +502,17 @@ export function TransactionManager() {
                   placeholder="Search by keyword"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-4 py-2.5 bg-white dark:bg-gray-700 w-full hover:bg-white dark:hover:bg-gray-700"
-                  style={{ color: 'black' }}
+                  className="w-full bg-white dark:bg-white text-black border-gray-300 h-9 sm:h-10"
                 />
               </div>
             </div>
 
             {/* Label Filter */}
-            <div>
-              <Label htmlFor="label-filter" className="block text-sm font-medium mb-2">Label</Label>
+            <div className="flex-1 xs:flex-none min-w-0">
+              <Label htmlFor="label-filter" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Label</Label>
               <Select value={labelFilter} onValueChange={setLabelFilter}>
-                <SelectTrigger id="label-filter" className="w-40 bg-white dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-700" style={{ color: 'black' }}>
-                  <SelectValue style={{ color: 'black' }} />
+                <SelectTrigger id="label-filter" className="w-full xs:w-40 bg-white dark:bg-white text-black border-gray-300 h-9 sm:h-10">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Labels</SelectItem>
@@ -528,8 +527,8 @@ export function TransactionManager() {
 
             {/* Clear Filters */}
             {(searchQuery || labelFilter !== "all" || dateRange !== "all") && (
-              <Button onClick={handleClearFilters} variant="outline" size="sm">
-                <X className="w-4 h-4 mr-2" />
+              <Button onClick={handleClearFilters} variant="outline" size="sm" className="w-full xs:w-auto text-xs sm:text-sm h-9 sm:h-10">
+                <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Clear Filters
               </Button>
             )}
@@ -537,11 +536,11 @@ export function TransactionManager() {
         </div>
       </Card>
 
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      <Card className="p-4 sm:p-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div>
-            <h3 className="text-gray-900 dark:text-white">Transaction History</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Transaction History</h3>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
               Track all your expenses and income
               {displayCurrency !== "CAD" && (
                 <span className="ml-2 text-blue-600 dark:text-blue-400">
@@ -945,39 +944,42 @@ export function TransactionManager() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+        <div className="flex flex-col items-center justify-center mt-6 gap-3 sm:gap-4">
           {/* Page Info */}
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </div>
 
-          {/* Page Controls */}
-          <div className="flex items-center gap-2 flex-wrap justify-center">
-            {/* Previous */}
-            <Button
-              onClick={handlePrevPage}
-              disabled={currentPage === 1}
-              variant="outline"
-              size="sm"
-            >
-              Previous
-            </Button>
+          {/* Page Controls - Mobile Optimized */}
+          <div className="flex flex-col xs:flex-row items-center gap-2 w-full sm:w-auto">
+            {/* Previous & First */}
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                variant="outline"
+                size="sm"
+                className="text-xs sm:text-sm px-3 sm:px-4"
+              >
+                Previous
+              </Button>
+            </div>
 
-            {/* Page Numbers */}
-            <div className="flex items-center gap-1">
+            {/* Page Numbers - Scrollable on mobile */}
+            <div className="flex items-center gap-1 overflow-x-auto max-w-full px-2 scrollbar-hide">
               {/* First page */}
               {currentPage > 3 && (
                 <>
                   <Button
                     onClick={() => setCurrentPage(1)}
-                    variant={currentPage === 1 ? "default" : "outline"}
+                    variant="outline"
                     size="sm"
-                    className="w-10"
+                    className="w-8 sm:w-10 h-8 sm:h-9 text-xs sm:text-sm flex-shrink-0"
                   >
                     1
                   </Button>
                   {currentPage > 4 && (
-                    <span className="px-2 text-gray-500">...</span>
+                    <span className="px-1 sm:px-2 text-gray-500 dark:text-gray-400 text-xs">...</span>
                   )}
                 </>
               )}
@@ -994,7 +996,9 @@ export function TransactionManager() {
                     onClick={() => setCurrentPage(page)}
                     variant={currentPage === page ? "default" : "outline"}
                     size="sm"
-                    className="w-10"
+                    className={`w-8 sm:w-10 h-8 sm:h-9 text-xs sm:text-sm flex-shrink-0 ${
+                      currentPage === page ? 'bg-blue-600 text-white hover:bg-blue-700' : ''
+                    }`}
                   >
                     {page}
                   </Button>
@@ -1004,13 +1008,13 @@ export function TransactionManager() {
               {currentPage < totalPages - 2 && (
                 <>
                   {currentPage < totalPages - 3 && (
-                    <span className="px-2 text-gray-500">...</span>
+                    <span className="px-1 sm:px-2 text-gray-500 dark:text-gray-400 text-xs">...</span>
                   )}
                   <Button
                     onClick={() => setCurrentPage(totalPages)}
-                    variant={currentPage === totalPages ? "default" : "outline"}
+                    variant="outline"
                     size="sm"
-                    className="w-10"
+                    className="w-8 sm:w-10 h-8 sm:h-9 text-xs sm:text-sm flex-shrink-0"
                   >
                     {totalPages}
                   </Button>
@@ -1018,25 +1022,27 @@ export function TransactionManager() {
               )}
             </div>
 
-            {/* Next */}
-            <Button
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-              variant="outline"
-              size="sm"
-            >
-              Next
-            </Button>
-
-            {/* Jump to Last */}
-            <Button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-              variant="outline"
-              size="sm"
-            >
-              Jump to Last
-            </Button>
+            {/* Next & Last */}
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                variant="outline"
+                size="sm"
+                className="text-xs sm:text-sm px-3 sm:px-4"
+              >
+                Next
+              </Button>
+              <Button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                variant="outline"
+                size="sm"
+                className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3"
+              >
+                Last
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
