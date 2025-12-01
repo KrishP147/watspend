@@ -86,7 +86,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-gray-900 p-3 sm:p-4">
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md shadow-xl" style={{ maxWidth: '448px' }}>
         <CardHeader className="space-y-1 px-4 sm:px-6 pt-6 sm:pt-8">
           <CardTitle className="text-xl sm:text-2xl font-bold text-center">
             {isLogin ? 'Welcome to WatSpend' : 'Create Account'}
