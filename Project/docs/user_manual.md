@@ -68,7 +68,7 @@ Filter your data by:
 ## Transactions
 
 ### View Transactions
-
+****
 Click **"Transactions"** in the navigation to see all your transactions.
 
 ### Search & Filter
