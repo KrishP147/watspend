@@ -132,7 +132,7 @@ function MonthlyReportContent() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Goals & Budget</h2>
+        <h1 className="text-10xl font-bold text-gray-900 dark:text-white">Budget dashboard & trophies</h1>
         <Dialog open={isBudgetDialogOpen} onOpenChange={setIsBudgetDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setEditingBudget(null)}>
@@ -140,7 +140,7 @@ function MonthlyReportContent() {
               Create Budget
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[95vw] sm:max-w-2xl h-[70vh] flex flex-col overflow-hidden mx-3 bg-white dark:bg-gray-900">
+          <DialogContent className="max-w-[95vw] h-[70vh] flex flex-col overflow-hidden mx-3 bg-white dark:bg-gray-900">
             <DialogHeader className="flex-shrink-0">
               <DialogTitle className="text-gray-900 dark:text-white">{editingBudget ? "Edit Budget" : "Create New Budget"}</DialogTitle>
             </DialogHeader>
@@ -280,6 +280,131 @@ function MonthlyReportContent() {
           )}
         </div>
       </Card>
+
+       {/* Period Comparison Graph */}
+      <Card className="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-gray-900 dark:text-white">Compare Periods</CardTitle>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Compare spending across different {selectedRange === 'day' ? 'days' : selectedRange === 'week' ? 'weeks' : selectedRange === 'month' ? 'months' : 'years'}
+          </p>
+        </CardHeader>
+        <CardContent>
+          {(() => {
+            // Generate comparison data for the last several periods
+            const now = new Date();
+            const comparisonData: { period: string; spent: number }[] = [];
+            
+            // Determine how many periods to show
+            const periodCount = selectedRange === 'day' ? 7 : selectedRange === 'week' ? 5 : selectedRange === 'month' ? 6 : 5;
+            
+            for (let i = periodCount - 1; i >= 0; i--) {
+              let periodDate = new Date(now);
+              let periodLabel = '';
+              
+              switch (selectedRange) {
+                case 'day':
+                  // Show last 7 days
+                  periodDate.setDate(now.getDate() - i);
+                  periodLabel = periodDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                  break;
+                case 'week':
+                  // Show last 5 weeks, labeled as "Week of [Monday date]"
+                  periodDate.setDate(now.getDate() - (i * 7));
+                  // Get the Monday of that week
+                  const dayOfWeek = periodDate.getDay();
+                  const daysToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1); // Sunday is 0
+                  const monday = new Date(periodDate);
+                  monday.setDate(periodDate.getDate() - daysToMonday);
+                  periodLabel = `Week of ${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                  break;
+                case 'month':
+                  // Show last 6 months
+                  periodDate.setMonth(now.getMonth() - i);
+                  periodLabel = periodDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                  break;
+                case 'year':
+                  periodDate.setFullYear(now.getFullYear() - i);
+                  periodLabel = periodDate.getFullYear().toString();
+                  break;
+                default:
+                  continue;
+              }
+              
+              // Calculate spent for this period
+              const spent = transactions
+                .filter(t => {
+                  // Fix timezone issue for transaction dates
+                  const [year, month, day] = t.date.split('-').map(Number);
+                  const txDate = new Date(year, month - 1, day);
+                  const txViewCategoryId = t.categoryIds?.[selectedViewId] || t.categoryId;
+                  const isInView = categories.some(c => c.id === txViewCategoryId && c.viewId === selectedViewId);
+                  
+                  switch (selectedRange) {
+                    case 'day': {
+                      const checkDate = new Date(periodDate);
+                      return txDate.toDateString() === checkDate.toDateString() && isInView && t.type === 'expense';
+                    }
+                    case 'week': {
+                      // Get Monday of the period's week
+                      const dayOfWeek = periodDate.getDay();
+                      const daysToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+                      const weekStart = new Date(periodDate);
+                      weekStart.setDate(periodDate.getDate() - daysToMonday);
+                      weekStart.setHours(0, 0, 0, 0);
+                      const weekEnd = new Date(weekStart);
+                      weekEnd.setDate(weekEnd.getDate() + 7);
+                      return txDate >= weekStart && txDate < weekEnd && isInView && t.type === 'expense';
+                    }
+                    case 'month': {
+                      return txDate.getMonth() === periodDate.getMonth() && 
+                             txDate.getFullYear() === periodDate.getFullYear() && 
+                             isInView && t.type === 'expense';
+                    }
+                    case 'year': {
+                      return txDate.getFullYear() === periodDate.getFullYear() && 
+                             isInView && t.type === 'expense';
+                    }
+                    default:
+                      return false;
+                  }
+                })
+                .reduce((sum, t) => sum + t.amount, 0);
+              
+              // Round to 2 decimal places
+              comparisonData.push({ period: periodLabel, spent: Math.round(spent * 100) / 100 });
+            }
+            
+            if (selectedRange === 'all') {
+              return (
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
+                  Period comparison is not available for "All Time" range. Please select a specific time range.
+                </p>
+              );
+            }
+            
+            return (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={comparisonData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis dataKey="period" stroke="#9CA3AF" />
+                  <YAxis stroke="#9CA3AF" />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '0.5rem' }}
+                    labelStyle={{ color: '#F9FAFB' }}
+                    itemStyle={{ color: '#F9FAFB' }}
+                    formatter={(value: number) => `$${value.toFixed(2)}`}
+                    labelFormatter={(label) => label}
+                  />
+                  <Legend wrapperStyle={{ color: '#F9FAFB' }} />
+                  <Bar dataKey="spent" fill="#3B82F6" name="" />
+                </BarChart>
+              </ResponsiveContainer>
+            );
+          })()}
+        </CardContent>
+      </Card>
+
 
       {/* Label Performance */}
       <Card className="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
@@ -759,130 +884,6 @@ function MonthlyReportContent() {
           </CardContent>
         </Card>
       )}
-
-      {/* Period Comparison Graph */}
-      <Card className="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Compare Periods</CardTitle>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Compare spending across different {selectedRange === 'day' ? 'days' : selectedRange === 'week' ? 'weeks' : selectedRange === 'month' ? 'months' : 'years'}
-          </p>
-        </CardHeader>
-        <CardContent>
-          {(() => {
-            // Generate comparison data for the last several periods
-            const now = new Date();
-            const comparisonData: { period: string; spent: number }[] = [];
-            
-            // Determine how many periods to show
-            const periodCount = selectedRange === 'day' ? 7 : selectedRange === 'week' ? 5 : selectedRange === 'month' ? 6 : 5;
-            
-            for (let i = periodCount - 1; i >= 0; i--) {
-              let periodDate = new Date(now);
-              let periodLabel = '';
-              
-              switch (selectedRange) {
-                case 'day':
-                  // Show last 7 days
-                  periodDate.setDate(now.getDate() - i);
-                  periodLabel = periodDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                  break;
-                case 'week':
-                  // Show last 5 weeks, labeled as "Week of [Monday date]"
-                  periodDate.setDate(now.getDate() - (i * 7));
-                  // Get the Monday of that week
-                  const dayOfWeek = periodDate.getDay();
-                  const daysToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1); // Sunday is 0
-                  const monday = new Date(periodDate);
-                  monday.setDate(periodDate.getDate() - daysToMonday);
-                  periodLabel = `Week of ${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-                  break;
-                case 'month':
-                  // Show last 6 months
-                  periodDate.setMonth(now.getMonth() - i);
-                  periodLabel = periodDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-                  break;
-                case 'year':
-                  periodDate.setFullYear(now.getFullYear() - i);
-                  periodLabel = periodDate.getFullYear().toString();
-                  break;
-                default:
-                  continue;
-              }
-              
-              // Calculate spent for this period
-              const spent = transactions
-                .filter(t => {
-                  // Fix timezone issue for transaction dates
-                  const [year, month, day] = t.date.split('-').map(Number);
-                  const txDate = new Date(year, month - 1, day);
-                  const txViewCategoryId = t.categoryIds?.[selectedViewId] || t.categoryId;
-                  const isInView = categories.some(c => c.id === txViewCategoryId && c.viewId === selectedViewId);
-                  
-                  switch (selectedRange) {
-                    case 'day': {
-                      const checkDate = new Date(periodDate);
-                      return txDate.toDateString() === checkDate.toDateString() && isInView && t.type === 'expense';
-                    }
-                    case 'week': {
-                      // Get Monday of the period's week
-                      const dayOfWeek = periodDate.getDay();
-                      const daysToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
-                      const weekStart = new Date(periodDate);
-                      weekStart.setDate(periodDate.getDate() - daysToMonday);
-                      weekStart.setHours(0, 0, 0, 0);
-                      const weekEnd = new Date(weekStart);
-                      weekEnd.setDate(weekEnd.getDate() + 7);
-                      return txDate >= weekStart && txDate < weekEnd && isInView && t.type === 'expense';
-                    }
-                    case 'month': {
-                      return txDate.getMonth() === periodDate.getMonth() && 
-                             txDate.getFullYear() === periodDate.getFullYear() && 
-                             isInView && t.type === 'expense';
-                    }
-                    case 'year': {
-                      return txDate.getFullYear() === periodDate.getFullYear() && 
-                             isInView && t.type === 'expense';
-                    }
-                    default:
-                      return false;
-                  }
-                })
-                .reduce((sum, t) => sum + t.amount, 0);
-              
-              // Round to 2 decimal places
-              comparisonData.push({ period: periodLabel, spent: Math.round(spent * 100) / 100 });
-            }
-            
-            if (selectedRange === 'all') {
-              return (
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
-                  Period comparison is not available for "All Time" range. Please select a specific time range.
-                </p>
-              );
-            }
-            
-            return (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={comparisonData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="period" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '0.5rem' }}
-                    labelStyle={{ color: '#F9FAFB' }}
-                    itemStyle={{ color: '#F9FAFB' }}
-                    formatter={(value: number) => `$${value.toFixed(2)}`}
-                    labelFormatter={(label) => label}
-                  />
-                  <Legend wrapperStyle={{ color: '#F9FAFB' }} />
-                  <Bar dataKey="spent" fill="#3B82F6" name="" />
-                </BarChart>
-              </ResponsiveContainer>
-            );
-          })()}
-        </CardContent>
-      </Card>
 
       {/* Trophy Shelf */}
       <Card className="p-6 bg-gradient-to-br from-purple-600 to-blue-600">
