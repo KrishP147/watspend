@@ -87,7 +87,7 @@ export function ExportDialog({
         <div className="space-y-4 mt-4">
           {/* Filter Options */}
           <div className="space-y-3">
-            <Label className="text-gray-900 dark:text-white font-medium">Filter Options</Label>
+            <Label className="text-gray-900 dark:text-white font-medium">Filter Options:</Label>
             
             <div className="flex items-center space-x-2">
               <Checkbox

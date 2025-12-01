@@ -30,12 +30,11 @@ interface SpendingItem {
 }
 
 const PRESET_COLORS = [
-  "#8B4513", "#FF6B6B", "#4ECDC4", "#45B7D1", "#95A5A6",
-  "#F39C12", "#9B59B6", "#E74C3C", "#1ABC9C", "#3498DB",
-  "#E67E22", "#16A085", "#D35400", "#C0392B", "#8E44AD",
-  "#2980B9", "#27AE60", "#F1C40F", "#34495E", "#2C3E50",
-  "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3",
-  "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39",
+  "#E74C3C", // Red
+  "#F39C12", // Orange
+  "#F1C40F", // Yellow
+  "#1ABC9C", // Teal
+  "#3498DB", // Blue
 ];
 
 export function DashboardOverview() {
@@ -67,6 +66,7 @@ export function DashboardOverview() {
   const [showLabelShake, setShowLabelShake] = useState(false);
   const [isFieldDropdownOpen, setIsFieldDropdownOpen] = useState(false);
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Filter categories by selected view
   const viewCategories: Category[] = categories.filter((cat: Category) => cat.viewId === selectedViewId);
@@ -525,20 +525,20 @@ export function DashboardOverview() {
                     <span className="xs:hidden">Label Field</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-[90vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 mx-3">
+                <DialogContent className="max-w-[90vw] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 mx-3">
                   <DialogHeader>
-                    <DialogTitle className="text-gray-900 dark:text-white">Create New View</DialogTitle>
+                    <DialogTitle className="text-gray-900 dark:text-white">Create New Label Field</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleViewSubmit} className="space-y-4 mt-4">
-                    <div>
-                      <Label htmlFor="view-name" className="text-gray-900 dark:text-white">View Name</Label>
+                  <form onSubmit={handleViewSubmit} className="space-y-6 mt-4 flex flex-col">
+                    <div className="flex flex-col space-y-2">
+                      <Label htmlFor="view-name" className="text-gray-900 dark:text-white">Field name</Label>
                       <Input
                         id="view-name"
                         value={viewFormData.name}
                         onChange={(e) => setViewFormData({ name: e.target.value })}
                         placeholder="e.g. Res hall spending"
                         required
-                        className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 mt-1.5"
+                        className="w-full bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 mt-2"
                       />
                     </div>
                     <div className="flex gap-2 pt-4">
@@ -564,7 +564,7 @@ export function DashboardOverview() {
                   </Button>
                 </DialogTrigger>
 
-                <DialogContent className="max-w-[90vw] sm:max-w-2xl max-h-[90vh] flex flex-col mx-3 bg-white dark:bg-gray-900">
+                <DialogContent className="max-w-[90vw] max-h-[90vh] flex flex-col mx-3 bg-white dark:bg-gray-900">
                   <DialogHeader className="flex-shrink-0">
                     <DialogTitle className="text-gray-900 dark:text-white">{editingLabel ? "Edit Label" : "Add New Label"}</DialogTitle>
                   </DialogHeader>
@@ -577,7 +577,7 @@ export function DashboardOverview() {
                           id="name"
                           value={labelFormData.name}
                           onChange={(e) => setLabelFormData({ ...labelFormData, name: e.target.value })}
-                          placeholder="e.g., Coffee"
+                          placeholder="e.g. Coffee"
                           required
                           className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 mt-1.5"
                         />
@@ -585,25 +585,37 @@ export function DashboardOverview() {
 
                       <div>
                         <Label className="text-gray-900 dark:text-white">Label Color</Label>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-1.5">
-                          <Input
-                            type="color"
-                            value={labelFormData.color}
-                            onChange={(e) => setLabelFormData({ ...labelFormData, color: e.target.value })}
-                            className="w-16 h-10 p-0 border-0 rounded flex-shrink-0"
-                          />
+                        <div className="flex items-center gap-3 mt-1.5">
                           <div className="flex flex-wrap gap-1 max-w-full">
                             {PRESET_COLORS.map((color) => (
                               <button
                                 key={color}
                                 type="button"
-                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform flex-shrink-0"
+                                className={`w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform flex-shrink-0 ${labelFormData.color === color ? 'ring-2 ring-offset-1 ring-blue-500' : ''}`}
                                 style={{ backgroundColor: color }}
                                 onClick={() => setLabelFormData({ ...labelFormData, color })}
                                 title={color}
                               />
                             ))}
                           </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setShowColorPicker(!showColorPicker)}
+                            className="ml-2 w-8 h-8 rounded border border-gray-300 dark:border-gray-700 flex items-center justify-center text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                            title="Custom color"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+
+                          {showColorPicker && (
+                            <Input
+                              type="color"
+                              value={labelFormData.color}
+                              onChange={(e) => setLabelFormData({ ...labelFormData, color: e.target.value })}
+                              className="w-10 h-10 p-0 border-0 rounded ml-2"
+                            />
+                          )}
                         </div>
                       </div>
 
@@ -794,7 +806,7 @@ export function DashboardOverview() {
 
       {/* Transaction Selection Dialog */}
       <Dialog open={isTransactionDialogOpen} onOpenChange={setIsTransactionDialogOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[85vh] flex flex-col mx-3 bg-white dark:bg-gray-900">
+        <DialogContent className="max-w-[95vw] max-h-[85vh] flex flex-col mx-3 bg-white dark:bg-gray-900">
           <DialogHeader className="flex-shrink-0 pb-2">
             <DialogTitle className="text-gray-900 dark:text-white text-base sm:text-lg">Select Transactions for Label</DialogTitle>
           </DialogHeader>

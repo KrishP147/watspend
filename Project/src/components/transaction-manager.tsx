@@ -546,7 +546,7 @@ export function TransactionManager() {
           <div>
             <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Transaction History</h3>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Track all your expenses and income
+              Track all your spending entries here.
               {displayCurrency !== "CAD" && (
                 <span className="ml-2 text-blue-600 dark:text-blue-400">
                   (Converted from CAD)
@@ -558,7 +558,6 @@ export function TransactionManager() {
           <div className="flex items-center gap-4">
             {/* Currency Selector */}
             <div className="w-40">
-              <Label htmlFor="display-currency">Display Currency</Label>
               <Select value={displayCurrency} onValueChange={handleDisplayCurrencyChange}>
                 <SelectTrigger id="display-currency">
                   <SelectValue />
@@ -846,10 +845,8 @@ export function TransactionManager() {
                 <TableHead>Time</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Label</TableHead>
-                <TableHead>Terminal</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead className="max-w-xs">Note</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -911,10 +908,6 @@ export function TransactionManager() {
                         </div>
                       </TableCell>
 
-                      <TableCell className="text-sm">
-                        {terminal || "-"}
-                      </TableCell>
-
                       <TableCell>
                         <Badge
                           variant="outline"
@@ -924,12 +917,8 @@ export function TransactionManager() {
                         </Badge>
                       </TableCell>
 
-                      <TableCell className="max-w-xs truncate text-sm">
-                        {transaction.note || "-"}
-                      </TableCell>
-
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
+                      <TableCell>
+                        <div className="flex items-center justify-start gap-1">
                           <Button variant="ghost" size="sm" onClick={() => handleEdit(transaction)}>
                             <Edit className="w-4 h-4 text-blue-500" />
                           </Button>
@@ -943,7 +932,7 @@ export function TransactionManager() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  <TableCell colSpan={7} className="text-center py-12 text-gray-500 dark:text-gray-400">
                     {transactions.length === 0
                       ? "No transactions yet. Add your first transaction to get started!"
                       : "No transactions match the selected filters."}
