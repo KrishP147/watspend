@@ -4,6 +4,7 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import React, { useState, useEffect } from "react";
+const API_BASE = import.meta.env.VITE_API_URL || '';
 import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
 import { Moon, Sun, DollarSign, RefreshCw, User } from "lucide-react";
@@ -153,29 +154,52 @@ export function Settings() {
     }
   };
 
-  const handleResetData = () => {
-    if (
-      confirm(
-        "Are you sure you want to reset all data? This will delete all transactions and labels, restoring default views. Location labels will be recreated automatically from your WatCard data. This action cannot be undone."
-      )
-    ) {
-      // Clear localStorage
-      localStorage.removeItem("mealplan-categories");
-      localStorage.removeItem("mealplan-categories-version");
-      localStorage.removeItem("mealplan-views");
-      localStorage.removeItem("mealplan-labels");
-      localStorage.removeItem("mealplan-transactions");
-      
-      // Reset to proper defaults
-      setTransactions([]);
-      setCategories(defaultCategories);
-      setViews(defaultViews);
-      setLabels([]);
-      setInitialBalance(1000);
-      
-      alert("Data reset complete! The page will now reload.");
-      window.location.reload();
+  const handleResetData = async () => {
+    if (!confirm(
+      "Are you sure you want to reset all data? This will delete all transactions and labels, restoring default views. Location labels will be recreated automatically from your WatCard data. This action cannot be undone."
+    )) return;
+
+    // Call backend to delete server-side data for this user (requires auth)
+    try {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        const res = await fetch(`${API_BASE}/api/reset`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          console.error('Server reset failed:', txt);
+          alert('Failed to reset server data: ' + (txt || res.statusText));
+          return;
+        }
+      }
+    } catch (err) {
+      console.error('Reset request failed:', err);
+      alert('Failed to contact server to reset data. See console for details.');
+      return;
     }
+
+    // Clear localStorage
+    localStorage.removeItem("mealplan-categories");
+    localStorage.removeItem("mealplan-categories-version");
+    localStorage.removeItem("mealplan-views");
+    localStorage.removeItem("mealplan-labels");
+    localStorage.removeItem("mealplan-transactions");
+
+    // Reset to proper defaults
+    setTransactions([]);
+    setCategories(defaultCategories);
+    setViews(defaultViews);
+    setLabels([]);
+    setInitialBalance(1000);
+
+    alert("Data reset complete! The page will now reload.");
+    window.location.reload();
   };
 
   // Helper function to get currency symbols
@@ -241,7 +265,7 @@ export function Settings() {
                         window.location.reload();
                       }
                     }}>
-                      Logout
+                      Log out
                     </Button>
                     <Button size="sm" variant="destructive" onClick={() => {
                       if (confirm('⚠️ WARNING: This will permanently delete your account and ALL data including transactions, budgets, and settings. This action CANNOT be undone. Are you absolutely sure?')) {
@@ -332,14 +356,12 @@ export function Settings() {
           {/* Manual Balance Adjustment */}
           <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-start gap-3 mb-3">
-              <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+              <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </div>
               <div className="flex-1">
-                <Label className="text-gray-900 dark:text-white">
-                  Manual Balance Adjustment
-                </Label>
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
+                <Label className="text-gray-900 dark:text-white">Manual Balance Adjustment</Label>
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-3 mt-2">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium mb-1">
                     ⚠️ Warning: Manual Adjustment
                   </p>
@@ -347,9 +369,9 @@ export function Settings() {
                     Changing this balance will override automatic WatCard syncing. Use this only if your actual balance differs from what's displayed. This change is permanent and cannot be undone automatically.
                   </p>
                 </div>
-                
+
                 {/* Balance Type Selection */}
-                <div className="mb-3">
+                <div className="mb-3 mt-2">
                   <Label className="text-gray-900 dark:text-white text-sm mb-2 block">Balance Type</Label>
                   <div className="flex gap-4">
                     <div className="flex items-center space-x-2">

@@ -1,10 +1,9 @@
-import React, { useState, useEffect, createContext, useContext, useRef } from "react";
+import { useState, useEffect, createContext, useContext, useRef } from "react";
 import { DashboardOverview } from "./components/dashboard-overview";
 import { CategoryManager } from "./components/category-manager";
 import { TransactionManager } from "./components/transaction-manager";
 import { MonthlyReport } from "./components/monthly-report";
 import { Settings } from "./components/settings";
-import RawMealPlanData from "./components/RawMealPlanData";
 import { LoginPage } from "./components/login-page";
 import { AuthCallback } from "./components/auth-callback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
@@ -1145,8 +1144,22 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Wallet className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+                <div className="w-10 h-10 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  {settings.theme === 'dark' ? (
+                    <img
+                      src="./icon/watspend_darkmode_icon.png"
+                      alt="Watspend logo (dark)"
+                      aria-hidden="true"
+                      className="block"
+                    />
+                  ) : (
+                    <img
+                      src="./icon/watspend_lightmode_icon.png"
+                      alt="Watspend logo (light)"
+                      aria-hidden="true"
+                      className="block"
+                    />
+                  )}
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">WELCOME BACK WARRIOR!</h1>
@@ -1159,27 +1172,24 @@ export default function App() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
-          <Tabs defaultValue="dashboard" className="space-y-4 sm:space-y-6">
-            <TabsList
-              className="grid w-full max-w-3xl grid-cols-4 mx-auto h-auto p-1"
-              style={{ backgroundColor: settings.theme === 'dark' ? '#1a1a1a' : '#ffffff' }}
-            >
-              <TabsTrigger value="dashboard" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
-                <LayoutDashboard className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Dashboard</span>
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Tabs defaultValue="dashboard" className="space-y-6">
+            <TabsList className="grid w-full max-w-2xl grid-cols-4 mx-auto">
+              <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                <LayoutDashboard className="w-4 h-4" />
+                <span className="hidden sm:inline">Dashboard</span>
               </TabsTrigger>
-              <TabsTrigger value="transactions" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
-                <Wallet className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Transactions</span>
+              <TabsTrigger value="transactions" className="flex items-center gap-2">
+                <Wallet className="w-4 h-4" />
+                <span className="hidden sm:inline">Transactions</span>
               </TabsTrigger>
-              <TabsTrigger value="reports" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
-                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Budget</span>
+              <TabsTrigger value="reports" className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                <span className="hidden sm:inline">Reports</span>
               </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-1 sm:px-3">
-                <SettingsIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Settings</span>
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                <SettingsIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Settings</span>
               </TabsTrigger>
             </TabsList>
 

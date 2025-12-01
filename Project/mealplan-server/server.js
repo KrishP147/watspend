@@ -657,6 +657,41 @@ app.post("/api/settings", authenticateToken, async (req, res) => {
 });
 
 //###################################################################
+app.get("/.well-known/appspecific/com.chrome.devtools.json", (req, res) => {
+  res.status(404).json({});
+});
+
+// Delete all user data (transactions, funds, settings) - REQUIRES AUTH
+app.delete("/api/reset", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    console.log(`🗑️ Reset requested for user ${userId}`);
+
+    // Use transaction to ensure all-or-nothing
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      await conn.query(`DELETE FROM transactions WHERE user_id = ?`, [userId]);
+      await conn.query(`DELETE FROM watcard_funds WHERE user_id = ?`, [userId]);
+      await conn.query(`DELETE FROM user_settings WHERE user_id = ?`, [userId]);
+
+      await conn.commit();
+      console.log(`✅ Deleted data for user ${userId}`);
+      res.json({ status: 'success', message: 'User data deleted' });
+    } catch (txErr) {
+      await conn.rollback();
+      console.error('Error deleting user data, rolled back:', txErr.message);
+      res.status(500).json({ error: 'Failed to delete user data', message: txErr.message });
+    } finally {
+      conn.release();
+    }
+  } catch (err) {
+    console.error('Reset error:', err.message);
+    res.status(500).json({ error: 'Reset failed', message: err.message });
+  }
+});
 
 app.get("/.well-known/appspecific/com.chrome.devtools.json", (req, res) => {
   res.status(404).json({});
