@@ -481,12 +481,6 @@ export function TransactionManager() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-end">
-                <Button onClick={() => setIsExportDialogOpen(true)} variant="outline" className="w-full xs:w-auto text-xs sm:text-sm h-9 sm:h-10">
-                  <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Export
-                </Button>
-              </div>
             </div>
           </div>
 
@@ -835,6 +829,12 @@ export function TransactionManager() {
         <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
           Showing {start + 1}-{Math.min(start + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} transactions
         </div>
+        <div className="flex items-end">
+                <Button onClick={() => setIsExportDialogOpen(true)} variant="outline" className="w-full xs:w-auto text-xs sm:text-sm h-9 sm:h-10">
+                  <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  Export Filtered Entries
+                </Button>
+          </div>
 
         {/* Table */}
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">

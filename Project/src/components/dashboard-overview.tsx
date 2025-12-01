@@ -51,6 +51,7 @@ export function DashboardOverview() {
   const [viewFormData, setViewFormData] = useState({ name: "" });
   const [labelFormData, setLabelFormData] = useState({ name: "", color: PRESET_COLORS[0] });
   const [selectedTransactionIds, setSelectedTransactionIds] = useState<string[]>([]);
+  const [cardTransforms, setCardTransforms] = useState<{ [key: string]: { rotateX: number; rotateY: number; scale: number } }>({});
 
   // Filter categories by selected view
   const viewCategories: Category[] = categories.filter((cat: Category) => cat.viewId === selectedViewId);
@@ -349,50 +350,52 @@ export function DashboardOverview() {
     return note.includes(transactionSearchQuery.toLowerCase());
   });
 
+  // Handle mouse movement for 3D card effect
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>, cardId: string) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = (y - centerY) / 25;
+    const rotateY = (centerX - x) / 25;
+    const scale = 1.03;
+    
+    setCardTransforms(prev => ({
+      ...prev,
+      [cardId]: { rotateX, rotateY, scale }
+    }));
+  };
+
+  const handleMouseLeave = (cardId: string) => {
+    setCardTransforms(prev => ({
+      ...prev,
+      [cardId]: { rotateX: 0, rotateY: 0, scale: 1 }
+    }));
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* All 4 Cards - Responsive Grid */}
-      <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Spending Breakdown Card - Deep Purple Theme */}
-        <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center overflow-hidden rounded-xl sm:col-span-2 lg:col-span-1 min-h-[220px] sm:min-h-[260px]" style={{ background: 'linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%)' }}>
-          <CardHeader className="pb-4 sm:pb-6 pt-5 sm:pt-7 px-5 sm:px-7 flex flex-col items-center justify-center">
-            <CardTitle className="text-base sm:text-lg font-bold text-white mb-4 sm:mb-6 text-center tracking-tight">
-              Spending Breakdown
-            </CardTitle>
-            <div className="space-y-3 sm:space-y-4 w-full">
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-xs sm:text-sm h-9 sm:h-10 transition-all backdrop-blur-sm">
-                  <SelectValue placeholder="Range" className="text-white" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="day">Today</SelectItem>
-                  <SelectItem value="week">Last 7 Days</SelectItem>
-                  <SelectItem value="month">Last 30 Days</SelectItem>
-                  <SelectItem value="year">Last Year</SelectItem>
-                  <SelectItem value="all">All Time</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={selectedViewId} onValueChange={setSelectedViewId}>
-                <SelectTrigger className="text-white bg-white/20 hover:bg-white/30 border-white/30 text-xs sm:text-sm h-9 sm:h-10 transition-all backdrop-blur-sm">
-                  <SelectValue placeholder="View" className="text-white" />
-                </SelectTrigger>
-                <SelectContent>
-                  {views.map((view: View) => (
-                    <SelectItem key={view.id} value={view.id}>
-                      {view.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardHeader>
-        </Card>
-
+      {/* All 3 Cards - Responsive Grid */}
+      <div className="flex flex-row gap-3 sm:gap-4 lg:gap-6 flex-wrap" style={{ perspective: '1000px' }}>
         {/* Meal Plan Balance - Green Theme */}
-        <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center items-center overflow-hidden rounded-xl" style={{ background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)' }}>
+        <Card 
+          className="flex-1 text-white border-0 shadow-lg hover:shadow-xl flex flex-col justify-center items-center overflow-hidden rounded-xl" 
+          style={{ 
+            background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+            transform: `perspective(1000px) rotateX(${cardTransforms.mealPlan?.rotateX || 0}deg) rotateY(${cardTransforms.mealPlan?.rotateY || 0}deg) scale(${cardTransforms.mealPlan?.scale || 1})`,
+            transformStyle: 'preserve-3d',
+            transition: 'transform 0.1s ease-out'
+          }}
+          onMouseMove={(e) => handleMouseMove(e, 'mealPlan')}
+          onMouseLeave={() => handleMouseLeave('mealPlan')}
+        >
           <CardHeader className="pb-0 pt-4 sm:pt-6 px-4 sm:px-6 flex flex-col items-center justify-center">
             <CardTitle className="text-sm sm:text-base lg:text-lg font-bold flex items-center justify-center gap-1.5 sm:gap-2 text-white mb-1 sm:mb-2 tracking-tight">
-              <Wallet className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Wallet className="w-10 h-10 sm:w-5 sm:h-5" />
               Meal Plan Left
             </CardTitle>
           </CardHeader>
@@ -404,10 +407,20 @@ export function DashboardOverview() {
         </Card>
 
         {/* Flex Dollars Balance - Blue Theme */}
-        <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center items-center overflow-hidden rounded-xl" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' }}>
+        <Card 
+          className="flex-1 text-white border-0 shadow-lg hover:shadow-xl flex flex-col justify-center items-center overflow-hidden rounded-xl" 
+          style={{ 
+            background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+            transform: `perspective(1000px) rotateX(${cardTransforms.flexDollars?.rotateX || 0}deg) rotateY(${cardTransforms.flexDollars?.rotateY || 0}deg) scale(${cardTransforms.flexDollars?.scale || 1})`,
+            transformStyle: 'preserve-3d',
+            transition: 'transform 0.1s ease-out'
+          }}
+          onMouseMove={(e) => handleMouseMove(e, 'flexDollars')}
+          onMouseLeave={() => handleMouseLeave('flexDollars')}
+        >
           <CardHeader className="pb-0 pt-4 sm:pt-6 px-4 sm:px-6 flex flex-col items-center justify-center">
             <CardTitle className="text-sm sm:text-base lg:text-lg font-bold flex items-center justify-center gap-1.5 sm:gap-2 text-white mb-1 sm:mb-2 tracking-tight">
-              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
+              <DollarSign className="w-10 h-10 sm:w-5 sm:h-5" />
               Flex Left
             </CardTitle>
           </CardHeader>
@@ -419,10 +432,20 @@ export function DashboardOverview() {
         </Card>
 
         {/* Total Spent - Orange Theme */}
-        <Card className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center items-center overflow-hidden rounded-xl" style={{ background: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)' }}>
+        <Card 
+          className="flex-1 text-white border-0 shadow-lg hover:shadow-xl flex flex-col justify-center items-center overflow-hidden rounded-xl" 
+          style={{ 
+            background: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)',
+            transform: `perspective(1000px) rotateX(${cardTransforms.totalSpent?.rotateX || 0}deg) rotateY(${cardTransforms.totalSpent?.rotateY || 0}deg) scale(${cardTransforms.totalSpent?.scale || 1})`,
+            transformStyle: 'preserve-3d',
+            transition: 'transform 0.1s ease-out'
+          }}
+          onMouseMove={(e) => handleMouseMove(e, 'totalSpent')}
+          onMouseLeave={() => handleMouseLeave('totalSpent')}
+        >
           <CardHeader className="pb-0 pt-4 sm:pt-6 px-4 sm:px-6 flex flex-col items-center justify-center">
             <CardTitle className="text-sm sm:text-base lg:text-lg font-bold flex items-center justify-center gap-1.5 sm:gap-2 text-white mb-1 sm:mb-2 tracking-tight">
-              <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5" />
+              <TrendingDown className="w-10 h-10 sm:w-5 sm:h-5" />
               Total Spent
             </CardTitle>
           </CardHeader>
@@ -441,9 +464,10 @@ export function DashboardOverview() {
       {/* Spending List - Full Height */}
       <Card className="flex-1 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-lg">
         <CardHeader className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-100 dark:border-gray-800">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
-            <CardTitle className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Spending by Label</CardTitle>
-            <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
+              <CardTitle className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Spending by Label</CardTitle>
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
               <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" onClick={() => setViewFormData({ name: "" })} className="text-xs sm:text-sm">
@@ -571,6 +595,34 @@ export function DashboardOverview() {
                 <Edit2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 {isEditMode ? "Done" : "Edit"}
               </Button>
+            </div>
+            </div>
+            {/* Filters */}
+            <div className="flex flex-row gap-2 sm:gap-3">
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10">
+                  <SelectValue placeholder="Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="day">Today</SelectItem>
+                  <SelectItem value="week">Last 7 Days</SelectItem>
+                  <SelectItem value="month">Last 30 Days</SelectItem>
+                  <SelectItem value="year">Last Year</SelectItem>
+                  <SelectItem value="all">All Time</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={selectedViewId} onValueChange={setSelectedViewId}>
+                <SelectTrigger className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10">
+                  <SelectValue placeholder="View" />
+                </SelectTrigger>
+                <SelectContent>
+                  {views.map((view: View) => (
+                    <SelectItem key={view.id} value={view.id}>
+                      {view.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>

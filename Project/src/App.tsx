@@ -8,7 +8,7 @@ import RawMealPlanData from "./components/RawMealPlanData";
 import { LoginPage } from "./components/login-page";
 import { AuthCallback } from "./components/auth-callback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { LayoutDashboard, Wallet, TrendingUp, Settings as SettingsIcon } from "lucide-react";
+import { LayoutDashboard, Wallet, TrendingUp, Settings as SettingsIcon, User } from "lucide-react";
 import { SUPPORTED_CURRENCIES } from "./utils/currency";
 import { authService } from "./services/authService";
 import { startAuthSync, notifyExtensionLoggedOut } from "./utils/chromeStorage";
@@ -1149,7 +1149,7 @@ export default function App() {
                   <Wallet className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">Meal Plan Dashboard</h1>
+                  <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">WELCOME BACK WARRIOR!</h1>
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                     Track your campus spending • {displayCurrency} ({SUPPORTED_CURRENCIES[displayCurrency as keyof typeof SUPPORTED_CURRENCIES]})
                   </p>
