@@ -21,6 +21,18 @@ import { Download } from "lucide-react";
 import { ExportDialog } from "./export-dialog";
 import { Progress } from "./ui/progress";
 
+// Trophy animation styles
+const trophyAnimationStyle = `
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+    20%, 40%, 60%, 80% { transform: translateX(3px); }
+  }
+  .trophy-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+`;
+
 // Error Boundary to catch rendering errors
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -85,6 +97,7 @@ function MonthlyReportContent() {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [editingLabelAmount, setEditingLabelAmount] = useState<string>('');
+  const [shakingTrophy, setShakingTrophy] = useState<string | null>(null);
 
   console.log("Context loaded:", { 
     categories: categories?.length,
@@ -92,6 +105,93 @@ function MonthlyReportContent() {
     budgets: budgets?.length,
     fundsData
   });
+
+  // Trophy calculation helpers
+  const calculateTrophies = () => {
+    const trophies = {
+      budgetMaster: false,
+      goalAchiever: false,
+      savingsStar: false,
+      trackingPro: false
+    };
+
+    // Trophy 1: Budget Master - Stay under budget 5 times
+    if (budgets.length > 0) {
+      let timesUnderBudget = 0;
+      budgets.forEach(budget => {
+        const budgetForRange = calculateBudgetForRange(budget, 'month', fundsData);
+        const allocations = budget.labelAllocations?.[selectedViewId] || [];
+        
+        allocations.forEach(allocation => {
+          const categoryId = allocation.categoryId;
+          const isDateInRange = (dateStr: string): boolean => {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            return date >= monthAgo;
+          };
+
+          const spent = transactions
+            .filter(t => {
+              const txCategoryId = t.categoryIds?.[selectedViewId] || t.categoryId;
+              return txCategoryId === categoryId && t.type === "expense" && isDateInRange(t.date);
+            })
+            .reduce((sum, t) => sum + t.amount, 0);
+
+          const allocated = allocation.amount;
+          if (spent <= allocated) {
+            timesUnderBudget++;
+          }
+        });
+      });
+      
+      trophies.budgetMaster = timesUnderBudget >= 5;
+    }
+
+    // Trophy 2: Goal Achiever - Create 3 budgets
+    trophies.goalAchiever = budgets.length >= 3;
+
+    // Trophy 3: Savings Star - Have total spending below $100 this month
+    const isDateInRange = (dateStr: string): boolean => {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const date = new Date(year, month - 1, day);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const monthAgo = new Date(today);
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      return date >= monthAgo;
+    };
+
+    const monthlySpent = transactions
+      .filter(t => {
+        const txCategoryId = t.categoryIds?.[selectedViewId] || t.categoryId;
+        const cat = categories.find(c => c.id === txCategoryId);
+        return cat?.viewId === selectedViewId && t.type === "expense" && isDateInRange(t.date);
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    trophies.savingsStar = monthlySpent < 100;
+
+    // Trophy 4: Tracking Pro - Create 5+ labels
+    const viewCategories = categories.filter(c => c.viewId === selectedViewId);
+    trophies.trackingPro = viewCategories.length >= 5;
+
+    return trophies;
+  };
+
+  const trophies = calculateTrophies();
+
+  // Trophy click handler
+  const handleTrophyClick = (trophyId: string) => {
+    setShakingTrophy(trophyId);
+    
+    setTimeout(() => {
+      setShakingTrophy(null);
+    }, 500);
+  };
 
   // Safety check - render loading state if essential data is missing
   // NOTE: This must be AFTER all hooks!
@@ -132,7 +232,7 @@ function MonthlyReportContent() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-10xl font-bold text-gray-900 dark:text-white">Budget dashboard & trophies</h1>
+        <h1 className="text-10xl font-bold text-gray-900 dark:text-white">Budget Dashboard & Trophies</h1>
         <Dialog open={isBudgetDialogOpen} onOpenChange={setIsBudgetDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setEditingBudget(null)}>
@@ -185,18 +285,17 @@ function MonthlyReportContent() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="day">Today</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-                <SelectItem value="year">This Year</SelectItem>
-                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="day">Daliy</SelectItem>
+                <SelectItem value="week">Weekly</SelectItem>
+                <SelectItem value="month">Monthly</SelectItem>
+                <SelectItem value="year">Yearly</SelectItem>
               </SelectContent>
             </Select>
           </div>
           </div>
 
           <div className="flex-1 min-w-0">
-            <Label className="text-gray-900 dark:text-white text-xs sm:text-sm">View</Label>
+            <Label className="text-gray-900 dark:text-white text-xs sm:text-sm">Label Field</Label>
             <div className="mt-1.5">
             <Select value={selectedViewId} onValueChange={setSelectedViewId}>
               <SelectTrigger className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 h-9 sm:h-10">
@@ -373,14 +472,6 @@ function MonthlyReportContent() {
               
               // Round to 2 decimal places
               comparisonData.push({ period: periodLabel, spent: Math.round(spent * 100) / 100 });
-            }
-            
-            if (selectedRange === 'all') {
-              return (
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
-                  Period comparison is not available for "All Time" range. Please select a specific time range.
-                </p>
-              );
             }
             
             return (
@@ -855,12 +946,12 @@ function MonthlyReportContent() {
                   budget: Math.round(budgetForCat * 100) / 100,
                   spent: Math.round(spentForCat * 100) / 100,
                 };
-              });
+              }).filter(item => item.budget > 0);
 
               if (budgetPerformanceData.length === 0) {
                 return (
                   <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
-                    No available labels for this budget type in this view.
+                    No allocated budgets for this budget type in this view.
                   </p>
                 );
               }
@@ -886,28 +977,64 @@ function MonthlyReportContent() {
       )}
 
       {/* Trophy Shelf */}
-      <Card className="p-6 bg-gradient-to-br from-purple-600 to-blue-600">
-        <h3 className="text-lg font-semibold text-white mb-4">🏆 Trophy Cabinet</h3>
+      <style>{trophyAnimationStyle}</style>
+      <Card className="p-6 bg-gradient-to-br from-purple-600 to-blue-600 relative">
+        <h3 className="text-lg font-semibold text-white mb-4">Trophy Cabinet</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-white/20 backdrop-blur rounded-lg">
-            <div className="text-4xl mb-2">🏆</div>
+          {/* Budget Master */}
+          <div 
+            onClick={() => handleTrophyClick('budgetMaster')}
+            className={`text-center p-4 rounded-lg transition-all ${
+              trophies.budgetMaster 
+                ? `bg-white/20 backdrop-blur hover:scale-110 cursor-pointer` 
+                : `bg-white/10 backdrop-blur opacity-50 cursor-pointer ${shakingTrophy === 'budgetMaster' ? 'trophy-shake' : ''}`
+            }`}
+          >
+            <div className="text-4xl mb-2">{trophies.budgetMaster ? '🏆' : '🔒'}</div>
             <p className="text-sm font-medium text-white">Budget Master</p>
-            <p className="text-xs text-white/90">Stay under budget 5 times</p>
+            <p className="text-xs text-white/90">{trophies.budgetMaster ? 'Earned!' : 'Stay under budget 5 times'}</p>
           </div>
-          <div className="text-center p-4 bg-white/10 backdrop-blur rounded-lg opacity-50">
-            <div className="text-4xl mb-2">🎯</div>
+          
+          {/* Goal Achiever */}
+          <div 
+            onClick={() => handleTrophyClick('goalAchiever')}
+            className={`text-center p-4 rounded-lg transition-all ${
+              trophies.goalAchiever 
+                ? `bg-white/20 backdrop-blur hover:scale-110 cursor-pointer` 
+                : `bg-white/10 backdrop-blur opacity-50 cursor-pointer ${shakingTrophy === 'goalAchiever' ? 'trophy-shake' : ''}`
+            }`}
+          >
+            <div className="text-4xl mb-2">{trophies.goalAchiever ? '🎯' : '🔒'}</div>
             <p className="text-sm font-medium text-white">Goal Achiever</p>
-            <p className="text-xs text-white/90">Locked</p>
+            <p className="text-xs text-white/90">{trophies.goalAchiever ? 'Earned!' : `Create 3 budgets (${budgets.length}/3)`}</p>
           </div>
-          <div className="text-center p-4 bg-white/10 backdrop-blur rounded-lg opacity-50">
-            <div className="text-4xl mb-2">💰</div>
+          
+          {/* Savings Star */}
+          <div 
+            onClick={() => handleTrophyClick('savingsStar')}
+            className={`text-center p-4 rounded-lg transition-all ${
+              trophies.savingsStar 
+                ? `bg-white/20 backdrop-blur hover:scale-110 cursor-pointer` 
+                : `bg-white/10 backdrop-blur opacity-50 cursor-pointer ${shakingTrophy === 'savingsStar' ? 'trophy-shake' : ''}`
+            }`}
+          >
+            <div className="text-4xl mb-2">{trophies.savingsStar ? '💰' : '🔒'}</div>
             <p className="text-sm font-medium text-white">Savings Star</p>
-            <p className="text-xs text-white/90">Locked</p>
+            <p className="text-xs text-white/90">{trophies.savingsStar ? 'Earned!' : 'Spend < $100/month'}</p>
           </div>
-          <div className="text-center p-4 bg-white/10 backdrop-blur rounded-lg opacity-50">
-            <div className="text-4xl mb-2">📊</div>
+          
+          {/* Tracking Pro */}
+          <div 
+            onClick={() => handleTrophyClick('trackingPro')}
+            className={`text-center p-4 rounded-lg transition-all ${
+              trophies.trackingPro 
+                ? `bg-white/20 backdrop-blur hover:scale-110 cursor-pointer` 
+                : `bg-white/10 backdrop-blur opacity-50 cursor-pointer ${shakingTrophy === 'trackingPro' ? 'trophy-shake' : ''}`
+            }`}
+          >
+            <div className="text-4xl mb-2">{trophies.trackingPro ? '📊' : '🔒'}</div>
             <p className="text-sm font-medium text-white">Tracking Pro</p>
-            <p className="text-xs text-white/90">Locked</p>
+            <p className="text-xs text-white/90">{trophies.trackingPro ? 'Earned!' : `Create 5+ labels (${categories.filter(c => c.viewId === selectedViewId).length}/5)`}</p>
           </div>
         </div>
       </Card>

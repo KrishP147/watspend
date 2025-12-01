@@ -452,7 +452,7 @@ export function TransactionManager() {
           <div className="flex flex-col gap-3 sm:gap-4">
             <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-3 sm:gap-4">
               <div className="flex-1 min-w-0">
-                <Label htmlFor="view-select" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">View</Label>
+                <Label htmlFor="view-select" className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Label Field</Label>
                 <Select value={selectedViewId} onValueChange={setSelectedViewId}>
                   <SelectTrigger id="view-select" className="w-full bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600">
                     <SelectValue />
@@ -555,7 +555,7 @@ export function TransactionManager() {
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {/* Currency Selector */}
             <div className="w-40">
               <Select value={displayCurrency} onValueChange={handleDisplayCurrencyChange}>
@@ -614,7 +614,7 @@ export function TransactionManager() {
                         if ((cleanValue.match(/\./g) || []).length > 1) return;
                         setFormData({ ...formData, amount: cleanValue });
                       }}
-                      placeholder="e.g., 5.50"
+                      placeholder="e.g. 5.50"
                       required
                     />
                     <p className="text-xs text-gray-500 mt-1">
