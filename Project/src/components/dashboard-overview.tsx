@@ -886,7 +886,7 @@ export function DashboardOverview() {
               <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 {selectedTransactionIds.length} transaction{selectedTransactionIds.length !== 1 ? 's' : ''} selected
               </p>
-              <Button type="button" onClick={() => setIsTransactionDialogOpen(false)} className="w-full sm:w-auto">
+              <Button type="button" onClick={() => setIsTransactionDialogOpen(false)} className="w-50% sm:w-50%">
                 Done
               </Button>
             </div>
