@@ -3,12 +3,24 @@ import { useAppContext, Category, Transaction, View } from "../App";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { formatCurrency } from "../utils/currency";
-import { Wallet, DollarSign, TrendingDown, Plus, Edit2, Trash2, Search, Download } from "lucide-react";
+import { Wallet, DollarSign, TrendingDown, Plus, Edit2, Trash2, Search, Download, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { ExportDialog } from "./export-dialog";
+
+// Shake animation keyframes
+const shakeAnimationStyle = `
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+  .shake-animation {
+    animation: shake 0.5s ease-in-out;
+  }
+`;
 
 interface SpendingItem {
   name: string;
@@ -52,6 +64,9 @@ export function DashboardOverview() {
   const [labelFormData, setLabelFormData] = useState({ name: "", color: PRESET_COLORS[0] });
   const [selectedTransactionIds, setSelectedTransactionIds] = useState<string[]>([]);
   const [cardTransforms, setCardTransforms] = useState<{ [key: string]: { rotateX: number; rotateY: number; scale: number } }>({});
+  const [showLabelShake, setShowLabelShake] = useState(false);
+  const [isFieldDropdownOpen, setIsFieldDropdownOpen] = useState(false);
+  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
 
   // Filter categories by selected view
   const viewCategories: Category[] = categories.filter((cat: Category) => cat.viewId === selectedViewId);
@@ -248,6 +263,10 @@ export function DashboardOverview() {
       setCategories([...categories, newLabel]);
       setTransactions(updatedTransactions);
       console.log(`➕ Created new label "${newLabel.name}" with ${selectedTransactionIds.length} transactions`);
+      
+      // Trigger shake animation on label button
+      setShowLabelShake(true);
+      setTimeout(() => setShowLabelShake(false), 1000);
     }
 
     setIsLabelDialogOpen(false);
@@ -342,6 +361,34 @@ export function DashboardOverview() {
     setTransactions(updatedTransactions);
     setViewFormData({ name: "" });
     setIsViewDialogOpen(false);
+    
+    // Auto-switch to the newly created view and trigger shake animation
+    setSelectedViewId(newView.id);
+    setShowLabelShake(true);
+    setTimeout(() => setShowLabelShake(false), 1000);
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    // Prevent deletion if it's the only view
+    if (views.length <= 1) {
+      alert("You must have at least one view. Create another view before deleting this one.");
+      return;
+    }
+
+    if (confirm("Are you sure you want to delete this view? All associated labels and transactions will be affected.")) {
+      // Delete the view
+      const updatedViews = views.filter((v: View) => v.id !== viewId);
+      setViews(updatedViews);
+      
+      // Delete all categories associated with this view
+      const updatedCategories = categories.filter((cat: Category) => cat.viewId !== viewId);
+      setCategories(updatedCategories);
+      
+      // If the deleted view was selected, switch to the first available view
+      if (selectedViewId === viewId) {
+        setSelectedViewId(updatedViews[0].id);
+      }
+    }
   };
 
   const availableTransactions = transactions.filter((t: Transaction) => {
@@ -462,18 +509,20 @@ export function DashboardOverview() {
 
 
       {/* Spending List - Full Height */}
+      <style>{shakeAnimationStyle}</style>
       <Card className="flex-1 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-lg">
         <CardHeader className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-100 dark:border-gray-800">
           <div className="flex flex-col gap-3 sm:gap-4">
+            {/* Title and Buttons Row */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
-              <CardTitle className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Spending by Label</CardTitle>
-              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+              <CardTitle className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Spending by Label Field</CardTitle>
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap justify-start sm:justify-end">
               <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" onClick={() => setViewFormData({ name: "" })} className="text-xs sm:text-sm">
                     <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     <span className="hidden xs:inline">Create View</span>
-                    <span className="xs:hidden">View</span>
+                    <span className="xs:hidden">Label Field</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-[90vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 mx-3">
@@ -487,7 +536,7 @@ export function DashboardOverview() {
                         id="view-name"
                         value={viewFormData.name}
                         onChange={(e) => setViewFormData({ name: e.target.value })}
-                        placeholder="e.g., By Building"
+                        placeholder="e.g. Res hall spending"
                         required
                         className="bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 mt-1.5"
                       />
@@ -508,7 +557,7 @@ export function DashboardOverview() {
                     setEditingLabel(null);
                     setSelectedTransactionIds([]);
                     setLabelFormData({ name: "", color: PRESET_COLORS[0] });
-                  }} className="text-xs sm:text-sm">
+                  }} className={`text-xs sm:text-sm ${showLabelShake ? 'shake-animation' : ''}`}>
                     <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     <span className="hidden xs:inline">Add Label</span>
                     <span className="xs:hidden">Label</span>
@@ -597,32 +646,94 @@ export function DashboardOverview() {
               </Button>
             </div>
             </div>
-            {/* Filters */}
-            <div className="flex flex-row gap-2 sm:gap-3">
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10">
-                  <SelectValue placeholder="Range" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="day">Today</SelectItem>
-                  <SelectItem value="week">Last 7 Days</SelectItem>
-                  <SelectItem value="month">Last 30 Days</SelectItem>
-                  <SelectItem value="year">Last Year</SelectItem>
-                  <SelectItem value="all">All Time</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={selectedViewId} onValueChange={setSelectedViewId}>
-                <SelectTrigger className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10">
-                  <SelectValue placeholder="View" />
-                </SelectTrigger>
-                <SelectContent>
-                  {views.map((view: View) => (
-                    <SelectItem key={view.id} value={view.id}>
-                      {view.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* Filters Row */}
+            <div className="flex flex-row gap-2 sm:gap-3 w-full">
+              <div className="flex flex-col gap-1 flex-1 sm:flex-none relative">
+                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Time</label>
+                <div className="relative">
+                  <button
+                    onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
+                    className="w-full text-xs sm:text-sm h-9 sm:h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between"
+                  >
+                    <span>
+                      {dateRange === 'day' && 'Today'}
+                      {dateRange === 'week' && 'Last 7 Days'}
+                      {dateRange === 'month' && 'Last 30 Days'}
+                      {dateRange === 'year' && 'Last Year'}
+                      {dateRange === 'all' && 'All Time'}
+                    </span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </button>
+                  {isTimeDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg z-50">
+                      {[
+                        { value: 'day', label: 'Today' },
+                        { value: 'week', label: 'Last 7 Days' },
+                        { value: 'month', label: 'Last 30 Days' },
+                        { value: 'year', label: 'Last Year' },
+                        { value: 'all', label: 'All Time' }
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            setDateRange(option.value);
+                            setIsTimeDropdownOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs sm:text-sm text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 flex-1 sm:flex-none relative">
+                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Field</label>
+                <div className="relative">
+                  <button
+                    onClick={() => setIsFieldDropdownOpen(!isFieldDropdownOpen)}
+                    className="w-full text-xs sm:text-sm h-9 sm:h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between"
+                  >
+                    <span>{views.find((v: View) => v.id === selectedViewId)?.name || 'View'}</span>
+                    <svg className={`w-4 h-4 transition-transform ${isFieldDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </button>
+                  {isFieldDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg z-50 w-full">
+                      {views.map((view: View) => (
+                        <div
+                          key={view.id}
+                          className="flex items-center justify-between px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs sm:text-sm text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                        >
+                          <button
+                            onClick={() => {
+                              setSelectedViewId(view.id);
+                              setIsFieldDropdownOpen(false);
+                            }}
+                            className="flex-1 text-left truncate"
+                          >
+                            {view.name}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteView(view.id);
+                            }}
+                            className="ml-2 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-500 hover:text-red-700 flex-shrink-0"
+                            title="Delete view"
+                          >
+                            <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </CardHeader>
