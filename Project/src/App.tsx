@@ -1147,14 +1147,14 @@ export default function App() {
                 <div className="w-10 h-10 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0">
                   {settings.theme === 'dark' ? (
                     <img
-                      src="./icon/watspend_darkmode_icon.png"
+                      src="/watspend_darkmode_icon.png"
                       alt="Watspend logo (dark)"
                       aria-hidden="true"
                       className="block"
                     />
                   ) : (
                     <img
-                      src="./icon/watspend_lightmode_icon.png"
+                      src="/watspend_lightmode_icon.png"
                       alt="Watspend logo (light)"
                       aria-hidden="true"
                       className="block"
