@@ -19,7 +19,7 @@ Go to **[https://watspend.vercel.app](https://watspend.vercel.app)** and sign in
 3. Open Chrome and go to `chrome://extensions/`
 4. Enable **Developer mode** (toggle in top right)
 5. Click **Load unpacked**
-6. Select the `Project/src/extension` folder from the extracted files
+6. Select the `src/extension` folder from the extracted files
 7. The WatSpend icon appears in your toolbar
 
 ### Step 3: Import Your Transactions
@@ -48,7 +48,7 @@ If you want to run WatSpend locally for development:
 
 ```bash
 git clone https://gitlab.uwaterloo.ca/se101-f24/project_team_10.git
-cd project_team_10/Project
+cd project_team_10
 ```
 
 ### Step 2: Create Google OAuth Credentials
@@ -147,7 +147,6 @@ pytest test_code.py -v
 ## Project Structure
 
 ```
-Project/
 ├── README.md              ← This file
 ├── requirements.txt       ← Python dependencies
 ├── build/                 ← Compiled output (generated)
@@ -177,14 +176,14 @@ Project/
 
 1. Push to GitHub
 2. Go to [vercel.com](https://vercel.com) → New Project
-3. Import repository, set root to `src`
+3. Import repository
 4. Add env: `VITE_API_URL=https://your-backend.onrender.com`
 5. Deploy
 
 #### Backend (Render)
 
 1. Go to [render.com](https://render.com) → New Web Service
-2. Connect repository, set root to `mealplan-server`
+2. Connect repository
 3. Add environment variables (same as local `.env` but with production URLs)
 4. Deploy
 
