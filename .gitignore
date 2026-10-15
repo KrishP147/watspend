@@ -2,3 +2,7 @@ node_modules
 .env
 __pycache__
 
+
+# runtime funds snapshot written by POST /api/funds (real balances, keep local)
+mealplan-server/data/fundsData.json
+src/build/
