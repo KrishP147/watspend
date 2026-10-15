@@ -1,0 +1,80 @@
+{
+  "_note": "Synthetic demo data. Fake terminals, amounts and dates; not real WatCard records.",
+  "timestamp": "2025-01-18T00:00:00.000Z",
+  "transactionCount": 8,
+  "transactions": [
+    {
+      "dateTime": "2025-01-17 12:30:00",
+      "type": "104 : FINANCIAL VEND",
+      "terminal": "00001 : POS-DEMO MARKET-1",
+      "status": "Approved",
+      "balance": "1",
+      "units": "0",
+      "amount": "$-9.50"
+    },
+    {
+      "dateTime": "2025-01-16 08:45:10",
+      "type": "104 : FINANCIAL VEND",
+      "terminal": "00002 : POS-DEMO JUICE BAR-2",
+      "status": "Approved",
+      "balance": "1",
+      "units": "0",
+      "amount": "$-4.25"
+    },
+    {
+      "dateTime": "2025-01-15 19:05:42",
+      "type": "004 : VEND (MONEY)",
+      "terminal": "00003 : LN-DEMO LAUNDRY 1",
+      "status": "Approved",
+      "balance": "5",
+      "units": "0",
+      "amount": "$-2.00"
+    },
+    {
+      "dateTime": "2025-01-15 13:12:03",
+      "type": "104 : FINANCIAL VEND",
+      "terminal": "00004 : POS-DEMO BROWSERS CAFE-3",
+      "status": "Approved",
+      "balance": "1",
+      "units": "0",
+      "amount": "$-11.75"
+    },
+    {
+      "dateTime": "2025-01-14 16:40:27",
+      "type": "004 : VEND (MONEY)",
+      "terminal": "00005 : W STORE POS DEMO",
+      "status": "Approved",
+      "balance": "5",
+      "units": "0",
+      "amount": "$-18.99"
+    },
+    {
+      "dateTime": "2025-01-13 10:00:00",
+      "type": "104 : FINANCIAL VEND",
+      "terminal": "00006 : POS-DEMO FOOD COURT-4",
+      "status": "Approved",
+      "balance": "1",
+      "units": "0",
+      "amount": "$-7.30"
+    },
+    {
+      "dateTime": "2025-01-10 09:00:00",
+      "type": "102 : ACCOUNT ADJUSTMENT",
+      "terminal": "00007 : DEMO WEBAPP",
+      "status": "Approved",
+      "balance": "6",
+      "units": "0",
+      "amount": "$-5.00"
+    },
+    {
+      "dateTime": "2025-01-06 09:00:00",
+      "type": "003 : PREPAYMENT (ADMIN)",
+      "terminal": "00008 : DEMO TERM",
+      "status": "Approved",
+      "balance": "1",
+      "units": "0",
+      "amount": "$500.00"
+    }
+  ],
+  "categorySummary": {}
+}
